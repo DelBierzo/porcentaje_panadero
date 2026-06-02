@@ -25,7 +25,7 @@ Una herramienta interactiva para calcular masas de pan basada en el porcentaje p
 
 ## 🚀 Características Clave
 
-* **🧠 Motor Algebraico Reactivo:** Introduce la cantidad de masa final (hasta 10kg) y mira cómo oscilan y se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche...).
+* **🧠 Motor Matematico Reactivo:** Introduce la cantidad de masa final (hasta 10kg) y mira cómo oscilan y se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche...).
 * **🍞 Interceptor de Inóculo Avanzado:** Control dinámico e independiente de la masa madre (inóculo) sin alterar la hidratación base del prefermento, o alterandola en base a tus conocimientos . Permite repartos automáticos avanzados (ej. 30g inóculo - 75g harina - 75g agua).
 * **📈 Recetario JSON:** Guarda, modifica y elimina tus fórmulas directamente desde la tarjeta visual Lovelace sincronizándose con un archivo `formulas.json` local.
 * **📱 Escudo de Confirmaciones Móviles:** Pasarela interactiva bilateral que lanza alertas de confirmación a tu teléfono móvil ante cambios y o borrados accidentales en las formulas.
@@ -55,7 +55,15 @@ Define en gramos la cantidad de **masa final** que deseas y, en porcentaje, el r
 
 ## 🎛️ Arquitectura de Entidades / Entity Architecture
 
-La integración genera de forma automática entidades nativas limpias libres de prefijos duplicados, listas para integrarse en tarjetas `tile`, `custom:expander-card` o `custom:service-call`:
+La integración genera de forma automática 53 entidades nativas, listas para integrarse, en modo "basico". 
+para añadir el modo "avanzado" requiere de la descarga los siguientes complementos desde **HACS** (Home Assistant Community Store):
+
+*   📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
+*   📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Gestiona los menús desplegables de la interfaz.
+*   📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Permite usar plantillas avanzadas en las filas.
+*   📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Añade características extendidas a las tarjetas.
+*   📦 [Popup Card](https://github.com/olivierplante/popup-card) — Necesario para la visualización en ventana flotante.
+
 
 ### Controles Deslizantes (Inputs / Sliders)
 * `number.masa_final_objetivo` - Peso total de la masa en gramos.
@@ -63,7 +71,7 @@ La integración genera de forma automática entidades nativas limpias libres de 
 * `number.agua_hidratacion` - Porcentaje de agua base.
 * `number.sal` - Porcentaje de sal.
 * `number.levadura` - Porcentaje de levadura de la masa principal.
-* `number.prefermento` - Porcentaje de masa destinada a prefermento.
+* `number.prefermento` - Porcentaje de masa destinada a prefermento. (Masa madre, Poolish o Biga)
 * `number.inoculo_masa_madre` - % de inóculo dentro de la masa madre (deslizador dinámico).
 * `number.hidratacion_masa_madre` - % de hidratación propia de tu masa madre.
 * `number.temperatura_ambiente` - Control térmico manual (si no usas sensor físico).
@@ -80,39 +88,9 @@ La integración genera de forma automática entidades nativas limpias libres de 
 
 ---
 
-## 📱 Configuración Móvil Interactiva (Packages / Automations)
+## 📱 Configuración De Avisos
 
-Para habilitar las alertas interactivas de confirmación y blindaje bilateral ante borrados accidentales en tu teléfono, puedes añadir el siguiente Package YAML en tu configuración unificada (`action:` syntax compliant):
-
-```yaml
-automation:
-  - id: porcentaje_panadero_alerta_borrado_movil
-    alias: "Panadero: Alerta Movil de Confirmacion de Borrado"
-    trigger:
-      - platform: event
-        event_type: porcentaje_panadero_alerta_eliminar
-    action:
-      - action: notify.notify
-        data:
-          title: "⚠️ ¿Eliminar Receta Activa?"
-          message: "Estas a punto de borrar definitivamente la formula: **{{ trigger.event.data.nombre }}**. ¿Deseas proceder?"
-          data:
-            actions:
-              - action: "PAN_CONFIRMAR_BORRADO"
-                title: "🗑️ Si, Eliminar"
-              - action: "PAN_CANCELAR_BORRADO"
-                title: "❌ Cancelar"
-
-  - id: porcentaje_panadero_borrado_confirmado_movil
-    alias: "Panadero: Procesar Respuesta de Borrado Móvil"
-    trigger:
-      - platform: event
-        event_type: mobile_app_notification_action
-        event_data:
-          action: "PAN_CONFIRMAR_BORRADO"
-    action:
-      - action: porcentaje_panadero.confirmar_eliminacion
-```
+Para habilitar las alertas interactivas de confirmación ante borrados accidentales tienes que añadir si o si, la automatizacion adjunta (Automation_ES) 
 
 ---
 
