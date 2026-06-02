@@ -1,0 +1,366 @@
+type: vertical-stack
+cards:
+  - type: heading
+    icon: mdi:baguette
+    heading: EL RINCÓN DEL PANADERO
+    heading_style: title
+  - type: vertical-stack
+    cards:
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: button.restablecer_parametros_base
+          - entity: select.formula_de_receta
+          - entity: number.masa_final_objetivo
+          - entity: number.harina_1
+          - entity: number.harina_2
+          - entity: number.harina_3
+          - entity: number.agua_hidratacion
+          - entity: number.sal
+          - entity: number.levadura
+          - entity: button.alternar_fresca_seca
+          - entity: number.prefermento
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+            row:
+              entity: select.tipo_de_prefermento
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state_not: masa madre
+            row:
+              entity: number.levadura_prefermento
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: masa madre
+            row:
+              entity: number.inoculo_masa_madre
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: masa madre
+            row:
+              entity: number.hidratacion_masa_madre
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+            row:
+              entity: select.harina_para_prefermento
+          - entity: switch.habilitar_ingredientes_extras
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.malta
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.azucar
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.aove
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.mantequilla
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.leche_en_polvo
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.leche_liquida
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: switch.habilitar_ingredientes_extras
+                state: "on"
+            row:
+              entity: number.huevo
+  - type: vertical-stack
+    cards:
+      - show_name: true
+        show_icon: true
+        show_state: true
+        type: glance
+        entities:
+          - entity: sensor.pan_harina_total
+          - entity: sensor.pan_agua_total
+          - entity: sensor.pan_prefermento_total
+        state_color: false
+      - type: entities
+        entities:
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: masa madre
+            row:
+              type: section
+              label: " "
+              card_mod:
+                style: >
+                  .divider { display: flex; align-items: center; }
+
+                  .label::before { content: "REFRESCO MASA MADRE"; font-weight:
+                  bold; color: var(--accent-color); }
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: biga
+            row:
+              type: section
+              label: " "
+              card_mod:
+                style: >
+                  .divider { display: flex; align-items: center; }
+
+                  .label::before { content: "ELABORACIÓN BIGA"; font-weight:
+                  bold; color: var(--accent-color); }
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: poolish
+            row:
+              type: section
+              label: " "
+              card_mod:
+                style: >
+                  .divider { display: flex; align-items: center; }
+
+                  .label::before { content: "ELABORACIÓN POOLISH"; font-weight:
+                  bold; color: var(--accent-color); }
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+            row:
+              type: custom:template-entity-row
+              entity: select.harina_para_prefermento
+              name: Harina asignada al prefermento
+              state: "{{ states('select.harina_para_prefermento') | upper }}"
+              icon: mdi:barley
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state
+                entity: select.tipo_de_prefermento
+                state: masa madre
+            row:
+              entity: sensor.pan_inoculo_masa_madre
+              name: Inóculo masa madre
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+              - condition: state_not
+                entity: select.tipo_de_prefermento
+                state_not: masa madre
+            row:
+              entity: sensor.pan_levadura_prefermento
+              name: Levadura prefermento
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+            row:
+              entity: sensor.pan_harina_prefermento
+              name: Harina
+              tap_action:
+                action: none
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: number.prefermento
+                above: 0
+            row:
+              entity: sensor.pan_agua_prefermento
+              name: Agua
+              tap_action:
+                action: none
+          - type: section
+            label: " "
+            card_mod:
+              style: |
+                .divider {
+                  display: flex;
+                  align-items: center;
+                }
+                .label::before {
+                  content: "{% set f = states('select.formula_de_receta') | trim %}{% if f in ['---', ''] %}MÉTODO EMPÍRICO {% else %}{{ f | replace('_', ' ') | upper }} {% endif %}";
+                  font-weight: bold;
+                  color: var(--accent-color);
+                }
+                .label::after {
+                  content: "{{ states('number.masa_final_objetivo') | float(0) | round(0) }}g";
+                  font-weight: bold;
+                  font-size: 1.4rem !important;
+                  color: var(--secondary-text-color);
+                }
+          - entity: sensor.pan_harina_1_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_harina_2_neta
+                above: 0
+            row:
+              entity: sensor.pan_harina_2_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_harina_3_neta
+                above: 0
+            row:
+              entity: sensor.pan_harina_3_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_agua_neta
+                above: 0
+            row:
+              entity: sensor.pan_agua_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_sal_neta
+                above: 0
+            row:
+              entity: sensor.pan_sal_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_levadura_neta
+                above: 0
+            row:
+              entity: sensor.pan_levadura_neta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_malta
+                above: 0
+            row:
+              entity: sensor.pan_malta
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_azucar
+                above: 0
+            row:
+              entity: sensor.pan_azucar
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_aove
+                above: 0
+            row:
+              entity: sensor.pan_aove
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_mantequilla
+                above: 0
+            row:
+              entity: sensor.pan_mantequilla
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_leche_polvo
+                above: 0
+            row:
+              entity: sensor.pan_leche_polvo
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_leche
+                above: 0
+            row:
+              entity: sensor.pan_leche
+          - type: conditional
+            conditions:
+              - condition: numeric_state
+                entity: sensor.pan_huevo
+                above: 0
+            row:
+              entity: sensor.pan_huevo
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: 🌡️ Temperatura Agua Amasado
+        show_header_toggle: false
+        entities:
+          - entity: number.temperatura_objetivo_masa
+          - entity: number.temperatura_ambiente
+          - entity: number.temperatura_harina
+          - entity: number.temperatura_prefermento
+          - entity: number.temperatura_friccion_amasadora
+          - entity: sensor.pan_temperatura_agua_ideal
+            name: ➡️ Temperatura del Agua >>>>>
+      - type: entities
+        title: 💾 Gestión de Recetas
+        show_header_toggle: false
+        entities:
+          - entity: text.porcentaje_panadero_nombre_nueva_formula
+            name: "Nombre para guardar:"
+          - entity: button.guardar_receta_nueva
+            name: Guardar / Actualizar Fórmula
+          - entity: button.eliminar_receta_activa
+            name: Eliminar Fórmula Activa
