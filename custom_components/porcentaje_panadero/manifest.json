@@ -3,7 +3,7 @@
   "name": "Porcentaje Panadero",
   "codeowner": "@DelBierzo",
   "version": "1.0.0",
-  "documentation": "https://github.com",
+  "documentation": "https://github.com/DelBierzo/porcentaje_panadero",
   "integration_type": "integration",
   "iot_class": "calculated_local",
   "quality_scale": "internal",
