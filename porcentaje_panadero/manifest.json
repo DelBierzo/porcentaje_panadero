@@ -1,0 +1,13 @@
+{
+  "domain": "porcentaje_panadero",
+  "name": "Porcentaje Panadero",
+  "codeowner": "@DelBierzo",
+  "version": "1.0.0",
+  "documentation": "https://github.com",
+  "integration_type": "integration",
+  "iot_class": "calculated_local",
+  "quality_scale": "internal",
+  "requirements": [],
+  "dependencies": [],
+  "config_flow": true
+}
