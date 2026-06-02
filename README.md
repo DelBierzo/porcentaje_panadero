@@ -1,19 +1,36 @@
-# 🥖 Porcentaje Panadero (Bakers Percentage) for Home Assistant
+#  <img src="images/logo.png" width="18%" alt="Vista 0"> Porcentaje Panadero para Home Assistant
 
+Una herramienta interactiva para calcular masas de pan basada en el porcentaje panadero, diseñada específicamente para integrarse en tu panel de Home Assistant.
 
+## ✨ Características principales
+
+*   **Gestión total:** Añade, crea, guarda y modifica tus fórmulas fácilmente.
+*   **Doble visualización:** Consúltala directamente desde la tarjeta del dashboard o ábrela en un **popup** (diseñado especialmente para hacer capturas de pantalla limpias).
+
+---
+
+## 📸 Capturas de pantalla
+
+<p align="center">
+  <img src="images/capa1.png" width="18%" alt="Vista 1">
+  <img src="images/capa2.png" width="18%" alt="Vista 2">
+  <img src="images/capa3.png" width="18%" alt="Vista 3">
+  <img src="images/capb1.png" width="18%" alt="Vista 4">
+  <img src="images/capb2.png" width="18%" alt="Vista 5">
+</p>
 
 **Porcentaje Panadero** es una integración nativa de alto rendimiento para Home Assistant que transforma tu servidor en un asistente de obrador profesional asíncrono puro. Permite calcular de forma reactiva y en tiempo real los gramos netos de cada ingrediente basándose en el porcentaje panadero y desglosar de forma dinámica elaboraciones complejas con masas madre, poolish o bigas.
 
 ---
 
-## 🚀 Características Clave / Key Features
+## 🚀 Características Clave
 
-* **🧠 Motor Algebraico Reactivo:** Introduce la masa final objetivo y mira cómo oscilan y se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche...).
-* **🍞 Interceptor de Inóculo Avanzado:** Control dinámico e independiente de la masa madre (inóculo) sin alterar la hidratación base del prefermento. Permite repartos automáticos avanzados (ej. 30g inóculo - 75g harina - 75g agua).
-* **📈 Smart Recetario JSON:** Guarda, modifica (con detección inteligente sobre la receta activa del menú desplegable si la caja de texto está vacía) y elimina fórmulas directamente desde el salpicadero visual Lovelace sincronizándose con un archivo `formulas.json` local.
-* **📱 Escudo de Confirmaciones Móviles:** Pasarela interactiva bilateral que lanza alertas de confirmación a tu teléfono móvil ante borrados accidentales o recetas duplicadas.
-* **🌡️ Algoritmo Térmico Unificado:** Calcula la temperatura ideal del agua del amasado cruzando variables manuales cortas de Lovelace o enlazándose en caliente a tu termómetro Zigbee físico de la cocina.
-* **🌐 Nativo & Bilingüe (Strict Short IDs):** Totalmente compatible con la API moderna de Home Assistant Core (`has_entity_name: true`), ofreciendo traducción automática e independiente en Castellano e Inglés libre de rastrojos de registros viejos.
+* **🧠 Motor Algebraico Reactivo:** Introduce la cantidad de masa final (hasta 10kg) y mira cómo oscilan y se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche...).
+* **🍞 Interceptor de Inóculo Avanzado:** Control dinámico e independiente de la masa madre (inóculo) sin alterar la hidratación base del prefermento, o alterandola en base a tus conocimientos . Permite repartos automáticos avanzados (ej. 30g inóculo - 75g harina - 75g agua).
+* **📈 Recetario JSON:** Guarda, modifica y elimina tus fórmulas directamente desde la tarjeta visual Lovelace sincronizándose con un archivo `formulas.json` local.
+* **📱 Escudo de Confirmaciones Móviles:** Pasarela interactiva bilateral que lanza alertas de confirmación a tu teléfono móvil ante cambios y o borrados accidentales en las formulas.
+* **🌡️ Algoritmo Térmico:** Calcula la temperatura ideal del agua del amasado cruzando variables manuales cortas de Lovelace o enlazándose en caliente a tu termómetro Zigbee físico de la cocina.
+* **🌐 Nativo & Bilingüe:** Totalmente compatible con la API moderna de Home Assistant Core, ofreciendo traducción automática e independiente en Castellano e Inglés.
 
 ---
 
