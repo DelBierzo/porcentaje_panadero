@@ -26,9 +26,8 @@ Una herramienta interactiva para calcular masas de pan basada en el porcentaje p
 ## 🚀 Características Clave
 
 * **🧠 Motor Matematico Reactivo:** Introduce la cantidad de masa final (hasta 10kg) y mira cómo oscilan y se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche...).
-* **🍞 Interceptor de Inóculo Avanzado:** Control dinámico e independiente de la masa madre (inóculo) sin alterar la hidratación base del prefermento, o alterandola en base a tus conocimientos . Permite repartos automáticos avanzados (ej. 30g inóculo - 75g harina - 75g agua).
 * **📈 Recetario JSON:** Guarda, modifica y elimina tus fórmulas directamente desde la tarjeta visual Lovelace sincronizándose con un archivo `formulas.json` local.
-* **📱 Escudo de Confirmaciones Móviles:** Pasarela interactiva bilateral que lanza alertas de confirmación a tu teléfono móvil ante cambios y o borrados accidentales en las formulas.
+* **📱 Confirmaciones Móviles:** Pasarela interactiva bilateral que lanza alertas de confirmación a tu teléfono móvil ante cambios y o borrados accidentales en las formulas.
 * **🌡️ Algoritmo Térmico:** Calcula la temperatura ideal del agua del amasado cruzando variables manuales cortas de Lovelace o enlazándose en caliente a tu termómetro Zigbee físico de la cocina.
 * **🌐 Nativo & Bilingüe:** Totalmente compatible con la API moderna de Home Assistant Core, ofreciendo traducción automática e independiente en Castellano e Inglés.
 
@@ -53,10 +52,9 @@ Define en gramos la cantidad de **masa final** que deseas y, en porcentaje, el r
 5. Descarga la versión `1.0.0`, ve a Ajustes y **Reinicia** Home Assistant.
 6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Añadir integración**, busca `Porcentaje Panadero` y configúralo en un clic.
 
-## 🎛️ Arquitectura de Entidades / Entity Architecture
+## La integración genera de forma automática 53 entidades nativas, listas para integrarse en modo "basico" (Tarjeta_Lovelace_Card _v1_Basic.yaml). Instala, añade la tarjeta basica y listo!
 
-La integración genera de forma automática 53 entidades nativas, listas para integrarse, en modo "basico". 
-para añadir el modo "avanzado" requiere de la descarga los siguientes complementos desde **HACS** (Home Assistant Community Store):
+## Para añadir el modo "avanzado" (Tarjeta_Lovelace_Card_v2_Advanced.yaml) requiere de la descarga los siguientes complementos desde **HACS** (Home Assistant Community Store):
 
 *   📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
 *   📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Gestiona los menús desplegables de la interfaz.
@@ -64,8 +62,15 @@ para añadir el modo "avanzado" requiere de la descarga los siguientes complemen
 *   📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Añade características extendidas a las tarjetas.
 *   📦 [Popup Card](https://github.com/olivierplante/popup-card) — Necesario para la visualización en ventana flotante.
 
+### Activación de la Integración Popup
 
-### Controles Deslizantes (Inputs / Sliders)
+*   Ve a **Ajustes** → **Dispositivos y servicios** → Haz clic en **Añadir integración**.
+*   Busca **"Popup Card"** y selecciónala.
+*   Haz clic en **Enviar** (esta integración no requiere ninguna configuración adicional).
+
+## 🎛️ Arquitectura de Entidades
+
+### Controles Deslizantes
 * `number.masa_final_objetivo` - Peso total de la masa en gramos.
 * `number.harina_1` / `_2` / `_3` - Porcentajes individuales de harinas.
 * `number.agua_hidratacion` - Porcentaje de agua base.
@@ -76,7 +81,7 @@ para añadir el modo "avanzado" requiere de la descarga los siguientes complemen
 * `number.hidratacion_masa_madre` - % de hidratación propia de tu masa madre.
 * `number.temperatura_ambiente` - Control térmico manual (si no usas sensor físico).
 
-### Sensores de Peso Neto (Outputs / Scale sensors)
+### Sensores de Peso Neto
 * `sensor.porcentaje_panadero_harina_total` - Harina total necesaria en el lote.
 * `sensor.porcentaje_panadero_agua_total` - Agua total necesaria en el lote.
 * `sensor.porcentaje_panadero_harina_1_neta` / `_2_neta` / `_3_neta` - Harina neta a pesar en el bol principal.
