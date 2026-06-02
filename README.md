@@ -32,6 +32,14 @@ Una herramienta interactiva para calcular masas de pan basada en el porcentaje p
 * **🌡️ Algoritmo Térmico:** Calcula la temperatura ideal del agua del amasado cruzando variables manuales cortas de Lovelace o enlazándose en caliente a tu termómetro Zigbee físico de la cocina.
 * **🌐 Nativo & Bilingüe:** Totalmente compatible con la API moderna de Home Assistant Core, ofreciendo traducción automática e independiente en Castellano e Inglés.
 
+## ⚙️ Parámetros de Configuración
+
+Define en gramos la cantidad de **masa final** que deseas y, en porcentaje, el resto de los valores del cálculo.
+
+*   **Inóculo de masa madre:** Cantidad exacta de masa madre activa (de tu tarro de reserva) necesaria para iniciar el prefermento. Se calcula automáticamente según el porcentaje de prefermento seleccionado.
+*   **Hidratación de la M.M.:** Porcentaje de agua respecto a la harina en tu masa madre.
+*   **Porcentaje de masa madre: Una porcentaje del 33.3% equivale a una proporción 1:1:1 de harina y agua (el refresco tradicional), o un 20% seria un refresco 1:2:2
+*   **Harina del prefermento:** Indica de cuál de las harinas de la receta se restará la cantidad destinada al prefermento (por defecto, se descuenta de la Harina 1). El sistema solo te permitirá elegir entre las harinas que hayas activado y estén disponibles.
 ---
 
 ## 📥 Instalación / Installation
