@@ -1,4 +1,4 @@
-#  <img src="images/logo.png" width="18%" alt="Vista 0"> Porcentaje Panadero para Home Assistant
+#  <img src="custom_components/porcentaje_panadero/brand/icon.png" width="18%" alt="Vista 0"> Porcentaje Panadero para Home Assistant
 
 Una herramienta interactiva para calcular masas de pan basada en el porcentaje panadero, diseñada específicamente para integrarse en tu panel de Home Assistant.
 
