@@ -12,11 +12,8 @@ Una herramienta interactiva para calcular masas de pan basada en el porcentaje p
 ## 📸 Capturas de pantalla
 
 <p align="center">
-  <img src="images/capa1.png" width="18%" alt="Vista 1">
-  <img src="images/capa2.png" width="18%" alt="Vista 2">
-  <img src="images/capa3.png" width="18%" alt="Vista 3">
-  <img src="images/capb1.png" width="18%" alt="Vista 4">
-  <img src="images/capb2.png" width="18%" alt="Vista 5">
+  <img src="images/capa3.png" width="40%" alt="Vista 1">
+  <img src="images/capb2.png" width="40%" alt="Vista 2">
 </p>
 
 **Porcentaje Panadero** es una integración nativa de alto rendimiento para Home Assistant que transforma tu servidor en un asistente de obrador profesional asíncrono puro. Permite calcular de forma reactiva y en tiempo real los gramos netos de cada ingrediente basándose en el porcentaje panadero y desglosar de forma dinámica elaboraciones complejas con masas madre, poolish o bigas.
