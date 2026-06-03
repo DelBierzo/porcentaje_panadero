@@ -134,7 +134,7 @@ cards:
                         entity_id: number.levadura
                     range:
                       - 0
-                      - 5
+                      - 9
                     step: 0.05
                     styles: |-
                       .icon {
@@ -153,13 +153,35 @@ cards:
                         entity_id: number.levadura
                     range:
                       - 0
-                      - 5
+                      - 9
                     step: 0.01
                     debounce_time: 100
                     styles: |-
                       .icon {
                        display: none;
                       }
+            features_position: inline
+            card_mod:
+              style:
+                ha-tile-info$: |
+                  .secondary {
+                    font-size: 1.4rem !important;
+                  }
+          - type: tile
+            entity: button.alternar_fresca_seca
+            name: TIPO LEVADURA
+            icon: ""
+            color: primary
+            show_entity_picture: false
+            hide_state: false
+            state_content: tipo_levadura
+            vertical: false
+            tap_action:
+              action: none
+            icon_tap_action:
+              action: none
+            features:
+              - type: button
             features_position: inline
             card_mod:
               style:
@@ -247,7 +269,7 @@ cards:
                           entity_id: number.levadura_prefermento
                       range:
                         - 0
-                        - 1.5
+                        - 3
                       step: 0.05
                       styles: |-
                         .icon {
@@ -266,7 +288,7 @@ cards:
                           entity_id: number.levadura_prefermento
                       range:
                         - 0
-                        - 1.5
+                        - 3
                       step: 0.01
                       styles: |-
                         .icon {
@@ -659,6 +681,39 @@ cards:
             }
     icon: mdi:calculator
     padding: 0em
+  - square: false
+    type: grid
+    cards:
+      - type: entity
+        entity: sensor.pan_agua_total
+        state_color: false
+        tap_action:
+          action: none
+        card_mod:
+          style: |
+            .value {
+              font-size: 1.4rem !important;
+            }
+      - type: entity
+        entity: sensor.pan_harina_total
+        tap_action:
+          action: none
+        card_mod:
+          style: |
+            .value {
+              font-size: 1.4rem !important;
+            }
+      - type: entity
+        entity: sensor.pan_prefermento_total
+        tap_action:
+          action: none
+        name: Prefermento
+        icon: mdi:chart-bubble
+        card_mod:
+          style: |
+            .value {
+              font-size: 1.4rem !important;
+            }
   - type: custom:expander-card
     cards:
       - type: entities
@@ -954,9 +1009,8 @@ cards:
               type: custom:template-entity-row
               entity: sensor.pan_levadura_neta
               name: >-
-                • LEVADURA {% if
-                is_state('select.formula_de_receta',['pizza_napolitana','pan_de_molde'])
-                %}FRESCA {%endif%} ({{ states('number.levadura') }}%)
+                • LEVADURA {{ states('button.alternar_fresca_seca') | upper }}
+                ({{ states('number.levadura') }}%)
               state: "{{ states('sensor.pan_levadura_neta') }} g"
               tap_action:
                 action: none
@@ -1473,9 +1527,8 @@ cards:
                   type: custom:template-entity-row
                   entity: sensor.pan_levadura_neta
                   name: >-
-                    • LEVADURA {% if
-                    is_state('select.formula_de_receta',['pizza_napolitana','pan_de_molde'])
-                    %}FRESCA {%endif%} ({{ states('number.levadura') }}%)
+                    • LEVADURA {{ states('button.alternar_fresca_seca') | upper
+                    }} ({{ states('number.levadura') }}%)
                   state: "{{ states('sensor.pan_levadura_neta') }} g"
                   tap_action:
                     action: none
@@ -1664,24 +1717,6 @@ cards:
                         font-weight: bold !important;
                       }       
     padding: 0em
-  - square: false
-    type: grid
-    cards:
-      - type: entity
-        entity: sensor.pan_agua_total
-        state_color: false
-        tap_action:
-          action: none
-      - type: entity
-        entity: sensor.pan_harina_total
-        tap_action:
-          action: none
-      - type: entity
-        entity: sensor.pan_prefermento_total
-        tap_action:
-          action: none
-        name: Prefermento
-        icon: mdi:chart-bubble
   - type: custom:expander-card
     cards:
       - type: vertical-stack
