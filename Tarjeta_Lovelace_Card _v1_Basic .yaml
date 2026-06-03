@@ -18,7 +18,22 @@ cards:
           - entity: number.agua_hidratacion
           - entity: number.sal
           - entity: number.levadura
-          - entity: button.alternar_fresca_seca
+          - type: conditional
+            conditions:
+              - entity: button.alternar_fresca_seca
+                state: fresca
+            row:
+              entity: button.alternar_fresca_seca
+              name: Levadura Fresca
+              icon: mdi:yeast
+          - type: conditional
+            conditions:
+              - entity: button.alternar_fresca_seca
+                state: seca
+            row:
+              entity: button.alternar_fresca_seca
+              name: Levadura Seca
+              icon: mdi:yeast
           - entity: number.prefermento
           - type: conditional
             conditions:
@@ -292,6 +307,16 @@ cards:
                 above: 0
             row:
               entity: sensor.pan_levadura_neta
+          - type: conditional
+            conditions:
+              - entity: button.alternar_fresca_seca
+                state_not: unknown
+            row:
+              type: attribute
+              entity: button.alternar_fresca_seca
+              attribute: tipo_levadura
+              name: Tipo Levadura
+              icon: mdi:information-outline
           - type: conditional
             conditions:
               - condition: numeric_state
