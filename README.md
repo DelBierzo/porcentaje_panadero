@@ -62,13 +62,14 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
  
  * en modo **basico** (Tarjeta_Lovelace_Card _v1_Basic.yaml). Instala, añade la tarjeta basica y listo!
 
- * en modo **avanzado** (Tarjeta_Lovelace_Card_v2_Advanced.yaml), requiere de la descarga los siguientes complementos desde **HACS** (Home Assistant Community Store):
+ * en modo **avanzado** (Tarjeta_Lovelace_Card_v2_Advanced.yaml), requiere de la descarga los siguientes complementos desde **HACS**:
+---
 
-*   📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
-*   📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Gestiona los menús desplegables de la interfaz.
-*   📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Permite usar plantillas avanzadas en las filas.
-*   📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Añade características extendidas a las tarjetas.
-*   📦 [Popup Card](https://github.com/olivierplante/popup-card) — Necesario para la visualización en ventana flotante.
+ * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
+ * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Gestiona los menús desplegables de la interfaz.
+ * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Permite usar plantillas avanzadas en las filas.
+ * 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Añade características extendidas a las tarjetas.
+ * 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Necesario para la visualización en ventana flotante.
 
 ### Activación de la Integración Popup
 
@@ -78,7 +79,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## 📱 Configuración De Avisos
 
-Para habilitar las alertas interactivas de confirmación ante borrados accidentales tienes que añadir si o si, la automatizacion adjunta (Automation_ES) 
+Para permitir eliminar y/o alterar una fórmula (no asi para añadir nuevas), tienes que añadir la automatizacion adjunta (Automation_ES "castellano") para confirmar desde el movil alguno de estos cambios. 
 
 ---
 
