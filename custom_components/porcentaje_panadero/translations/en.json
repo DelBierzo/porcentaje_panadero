@@ -1,0 +1,77 @@
+{
+  "title": "Bakers Percentage",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Baking Room Configuration",
+        "description": "Do you want to install the bakers calculator on your server?",
+        "data": {
+          "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen",
+          "entidad_termometro": "Select your kitchen temperature sensor"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "The bakers percentage calculator is already configured on your system."
+    }
+  },
+  "component": {
+    "porcentaje_panadero": {
+      "state": {
+        "tipo_levadura": {
+          "fresca": "Fresh",
+          "seca": "Dry"
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "formula_de_receta": { "name": "Recipe Formula" },
+      "tipo_de_prefermento": { "name": "Preferment Type" },
+      "harina_para_prefermento": { "name": "Flour for Preferment" }
+    },
+    "switch": {
+      "habilitar_ingredientes_extras": { "name": "Enable Extra Ingredients" }
+    },
+    "text": {
+      "nombre_nueva_formula": { "name": "Name to Save" },
+      "pan_nombre_nueva_formula": { "name": "Name to Save" }
+    },
+    "button": {
+      "pan_restablecer_valores": { "name": "Reset Base Parameters" },
+      "pan_guardar_formula": { "name": "Save New Recipe" },
+      "pan_eliminar_formula": { "name": "Delete Active Recipe" },
+      "pan_alternar_tipo_levadura": { "name": "Toggle Fresh / Dry" }
+    },
+    "number": {
+      "pan_masa_final": { "name": "Dough Weight" },
+      "pan_pct_harina_1": { "name": "Flour 1" },
+      "pan_pct_harina_2": { "name": "Flour 2" },
+      "pan_pct_harina_3": { "name": "Flour 3" },
+      "pan_pct_agua": { "name": "Water (Hydration)" },
+      "pan_pct_sal": { "name": "Salt" },
+      "pan_pct_levadura": { "name": "Main Yeast" },
+      "pan_pct_prefermento": { "name": "Active Preferment" },
+      "pan_hidratacion_masa_madre": { "name": "Sourdough Hydration" },
+      "pan_porcentaje_inoculo_masa_madre": { "name": "Sourdough Inoculum" },
+      "pan_pct_levadura_prefermento": { "name": "Preferment Yeast" },
+      "pan_pct_malta": { "name": "Malt" },
+      "pan_pct_azucar": { "name": "Sugar" },
+      "pan_pct_aove": { "name": "EVOO" },
+      "pan_pct_mantequilla": { "name": "Butter" },
+      "pan_pct_leche_en_polvo": { "name": "Milk Powder" },
+      "pan_pct_leche": { "name": "Milk" },
+      "pan_pct_huevo": { "name": "Egg" },
+      "pan_t_objetivo_masa": { "name": "Dough Temp" },
+      "pan_t_ambiente": { "name": "Ambient Temp" },
+      "pan_t_harina": { "name": "Flour Temp" },
+      "pan_t_prefermento": { "name": "Preferment Temp" },
+      "pan_t_friccion_amasadora": { "name": "Mixer Friction Temp" }
+    },
+    "sensor": {
+      "porcentaje_panadero_harina_total": { "name": "Total Flour" },
+      "porcentaje_panadero_agua_total": { "name": "Total Water" }
+    }
+  }
+}
