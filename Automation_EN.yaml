@@ -11,7 +11,7 @@ automation:
     action:
       - variables:
           recipe_name: "{{ trigger.event.data.nombre }}"
-      - action: notify.notify
+      - action: notify.notify # only your phone "notify.mobile_app_phone"
         data:
           title: "Overwrite Formula?"
           message: "The dough recipe '**{{ recipe_name }}**' already exists. Are you sure you want to overwrite it?"
@@ -63,7 +63,7 @@ automation:
       - platform: event
         event_type: porcentaje_panadero_alerta_eliminar
     action:
-      - action: notify.notify
+      - action: notify.notify # only your phone "notify.mobile_app_phone"
         data:
           title: "Delete Active Formula?"
           message: "You are about to permanently delete the formula: **{{ trigger.event.data.nombre }}**. Do you want to proceed?"
