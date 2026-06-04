@@ -52,7 +52,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## ⚠️ Configuración de Avisos y Alertas
 
-Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricción no aplica al crear nuevas), debes añadir la automatización adjunta (`Automation_ES.yaml` para castellano). Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
+Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricción no aplica al crear nuevas), debes añadir la [automatización](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Automation_ES.yaml) (`Automation_ES.yaml` para castellano). Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
 
 ---
 
@@ -60,10 +60,10 @@ Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricció
 
 La integración genera de forma automática **53 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
-### 🔹 Modo Básico (`Tarjeta_Lovelace_Card_v1_Basic.yaml`)
+### 🔹 [Modo Básico](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Card_v1_Basic.yaml) (`Tarjeta_Lovelace_Card_v1_Basic.yaml`)
 Instala la integración, añade el código de la tarjeta básica a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
 
-### 🔸 Modo Avanzado (`Tarjeta_Lovelace_Card_v2_Advanced.yaml`)
+### 🔸 [Modo Avanzado](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Card_v2_Advanced.yaml) (`Tarjeta_Lovelace_Card_v2_Advanced.yaml`)
 Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
 
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
