@@ -70,8 +70,27 @@
       "pan_t_friccion_amasadora": { "name": "Mixer Friction Temp" }
     },
     "sensor": {
-      "porcentaje_panadero_harina_total": { "name": "Total Flour" },
-      "porcentaje_panadero_agua_total": { "name": "Total Water" }
+      "harina_total": { "name": "Total Flour" },
+      "agua_total": { "name": "Total Water" },
+      "harina_1_neta": { "name": "Flour 1" },
+      "harina_2_neta": { "name": "Flour 2" },
+      "harina_3_neta": { "name": "Flour 3" },
+      "agua_neta": { "name": "Water" },
+      "sal_neta": { "name": "Salt" },
+      "levadura_neta": { "name": "Yeast" },
+      "prefermento_total": { "name": "Total Preferment" },
+      "inoculo_masa_madre": { "name": "Sourdough Inoculum" },
+      "harina_prefermento": { "name": "Preferment Flour" },
+      "agua_prefermento": { "name": "Preferment Water" },
+      "levadura_prefermento": { "name": "Preferment Yeast" },
+      "temperatura_agua_ideal": { "name": "Ideal Water Temp" },
+      "malta": { "name": "Malt" },
+      "azucar": { "name": "Sugar" },
+      "aove": { "name": "EVOO" },
+      "mantequilla": { "name": "Butter" },
+      "leche_polvo": { "name": "Milk Powder" },
+      "leche": { "name": "Milk" },
+      "huevo": { "name": "Egg" }
     }
   }
 }
