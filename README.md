@@ -14,7 +14,6 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 * **Recetario Local:** Guarda, modifica y elimina tus fórmulas directamente desde la tarjeta visual Lovelace. Se sincroniza automáticamente con un archivo `formulas.json` local.
 * **Confirmaciones Móviles:** Pasarela de seguridad que lanza alertas de confirmación a tu teléfono móvil ante cambios o borrados accidentales en las fórmulas.
 * **Algoritmo Térmico:** Calcula la temperatura ideal del agua de amasado cruzando variables manuales desde Lovelace o enlazándose en tiempo real a tu termómetro Zigbee físico de la cocina.
-* **Nativo & Bilingüe:** Totalmente compatible con la API moderna de Home Assistant Core. Ofrece traducción automática e independiente en castellano e inglés.
 
 > **Porcentaje Panadero** es una integración para Home Assistant que transforma tu servidor en un asistente de obrador profesional asíncrono puro. Permite calcular de forma reactiva y en tiempo real los gramos netos de cada ingrediente basándose en el porcentaje panadero, desglosando de forma dinámica elaboraciones complejas con masas madre, poolish o bigas.
 
@@ -52,7 +51,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## ⚠️ Configuración de Avisos y Alertas
 
-Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricción no aplica al crear nuevas), debes añadir la [automatización](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Automation_ES.yaml) (`Automation_ES.yaml` para castellano). Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
+Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricción no aplica al crear nuevas), debes añadir la [automatización](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Automatizacion.yaml) (`Automatizacion.yaml`). Esto te permitirá confirmar o denegar la acción directamente desde una notificación en tu teléfono móvil.
 
 ---
 
@@ -60,10 +59,10 @@ Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricció
 
 La integración genera de forma automática **53 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
-### 🔹 [Modo Básico](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Card_v1_Basic.yaml) (`Tarjeta_Lovelace_Card_v1_Basic.yaml`)
+### 🔹 [Modo Básico](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Basica.yaml) (`Tarjeta_Lovelace_Basica.yaml`)
 Instala la integración, añade el código de la tarjeta básica a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
 
-### 🔸 [Modo Avanzado](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Card_v2_Advanced.yaml) (`Tarjeta_Lovelace_Card_v2_Advanced.yaml`)
+### 🔸 [Modo Avanzado](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Avanzada.yaml) (`Tarjeta_Lovelace_Avanzada.yaml`)
 Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
 
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
