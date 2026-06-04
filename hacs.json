@@ -1,9 +1,5 @@
 {
   "name": "Porcentaje Panadero",
-  "content_in_root": false,
-  "zip_release": false,
-  "filename": null,
-  "manifest": null,
   "render_readme": true,
-  "country": []
+  "homeassistant": "2026.1.0"
 }
