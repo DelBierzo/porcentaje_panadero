@@ -11,7 +11,7 @@ automation:
     action:
       - variables:
           nombre_receta: "{{ trigger.event.data.nombre }}"
-      - action: notify.notify
+      - action: notify.notify # o solo a tu movil "notify.mobile_app_tu_movil"
         data:
           title: "¿Modificar Formula?"
           message: "La formula '**{{ nombre_receta }}**' ya existe. ¿Estas seguro de que quieres sobrescribirla?"
@@ -63,7 +63,7 @@ automation:
       - platform: event
         event_type: porcentaje_panadero_alerta_eliminar
     action:
-      - action: notify.notify  # Corregido a la directiva oficial action
+      - action: notify.notify  # o solo a tu movil "notify.mobile_app_tu_movil"
         data:
           title: "¿Eliminar Formula Activa?"
           message: "Estas a punto de borrar definitivamente la formula: **{{ trigger.event.data.nombre }}**. ¿Deseas proceder?"
@@ -85,4 +85,4 @@ automation:
         event_data:
           action: "PAN_CONFIRMAR_BORRADO"
     action:
-      - action: porcentaje_panadero.confirmar_eliminacion  # Corregido a la directiva oficial action
+      - action: porcentaje_panadero.confirmar_eliminacion
