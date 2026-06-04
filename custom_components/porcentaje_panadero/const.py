@@ -1,1 +1,0 @@
-DOMAIN = "porcentaje_panadero"
