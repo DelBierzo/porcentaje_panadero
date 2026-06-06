@@ -18,19 +18,20 @@
       "already_configured": "The bakery calculator is already configured on your system."
     }
   },
-  "component": {
-    "button": {
-      "porcentaje_panadero": {
-        "state": {
-          "tipo_levadura": {
-            "fresca": "Fresh",
-            "seca": "Instant Dry"
-          }
-        }
-      }
-    }
-  },
   "entity": {
+    "button": {
+      "pan_restablecer_valores": { "name": "Reset Parameters" },
+      "pan_guardar_formula": { "name": "Save New Recipe" },
+      "pan_eliminar_formula": { "name": "Delete Active Formula" },
+      "pan_alternar_tipo_levadura": { 
+        "name": "Toggle Fresh / Dry",
+        "state": {
+          "fresca": "Fresh",
+          "seca": "Instant Dry"
+        }
+      },
+      "pan_alternar_tang_zhong_base": { "name": "Tang-Zhong Liquid Base" }
+    },
     "select": {
       "formula_de_receta": { "name": "Recipe Formula" },
       "tipo_de_prefermento": { "name": "Preferment Type" },
@@ -42,13 +43,6 @@
     },
     "text": {
       "nombre_nueva_formula": { "name": "Name to Save" }
-    },
-    "button": {
-      "pan_restablecer_valores": { "name": "Reset Parameters" },
-      "pan_guardar_formula": { "name": "Save New Recipe" },
-      "pan_eliminar_formula": { "name": "Delete Active Formula" },
-      "pan_alternar_tipo_levadura": { "name": "Toggle Fresh / Dry" },
-      "pan_alternar_tang_zhong_base": { "name": "Tang-Zhong Liquid Base" }
     },
     "number": {
       "masa_final_objetivo": { "name": "Dough Quantity" },
