@@ -1,75 +1,86 @@
 <p align="center"> 
-  <img src="custom_components/porcentaje_panadero/brand/icon.png" width="300" alt="Porcentaje Panadero Logo" />
+  <img src="images/icon.png" width="200" alt="Porcentaje Panadero Logo" />
 </p>
  
 # Porcentaje Panadero para Home Assistant
-  
+
 Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero, diseñada para integrarse de forma nativa en tu panel de Home Assistant.
 
-## ✨ Características
+---
+
+## 🌐 English Abstract (HACS Compliance)
+**Baker's Percentage** is an advanced custom integration for Home Assistant that turns your smart home into a professional bakery station. It dynamically scales flours, liquids, preferments, and extra ingredients based on bakers' percentages, targeting precise final dough weights. It features automated **Tang-Zhong** scaling with mixed-scald milk back-up, hidden liquid compensation (eggs/milk), Arrhenius proofing speed estimations, and local recipe persistence into a JSON file with mobile interactive safety confirmations.
+
+---
+
+## ✨ Características Destacadas
 
 * **Gestión Total:** Añade, crea, guarda y modifica tus fórmulas fácilmente desde la interfaz.
-* **Doble Visualización:** Consúltala directamente desde la tarjeta del dashboard o ábrela en un **popup** (diseñado especialmente para realizar capturas de pantalla limpias). *Requiere complementos adicionales de HACS.*
-* **Motor Matemático:** Introduce la cantidad de masa final (hasta 10 kg) y observa cómo se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras y hasta 7 ingredientes extras enriquecidos (AOVE, mantequilla, huevo, leche, etc.).
-* **Recetario Local:** Guarda, modifica y elimina tus fórmulas directamente desde la tarjeta visual Lovelace. Se sincroniza automáticamente con un archivo `formulas.json` local.
-* **Confirmaciones Móviles:** Pasarela de seguridad que lanza alertas de confirmación a tu teléfono móvil ante cambios o borrados accidentales en las fórmulas.
-* **Algoritmo Térmico:** Calcula la temperatura ideal del agua de amasado cruzando variables manuales desde Lovelace o enlazándose en tiempo real a tu termómetro Zigbee físico de la cocina.
+* **Motor Matemático Reactivo:** Introduce la cantidad de masa final (hasta 10 kg) y observa cómo se recalculan al milisegundo los gramos netos de harinas, agua, sal, levaduras e ingredientes enriquecidos.
+* **Escaldado Oriental Tang-Zhong / Yudane:** Automatización del engrudo en relación 1:5 descontando la harina y el líquido de la báscula principal con selector dinámico de agua o leche.
+* **Escudo Inteligente de Escaldado Mixto:** Si seleccionas base leche para el Tang-Zhong pero la receta se queda sin existencias lácteas, el asistente calcula e inyecta de forma automática agua del grifo a mayores para completar el cazo sin descuadrar la masa final.
+* **Compensador de Hidratación Real:** Descuenta y equilibra de forma automática el porcentaje de agua oculta que introducen los huevos batidos y la leche líquida en el bol de amasar.
+* **Desglose de Prefermentos Avanzado:** Modelos de cálculo nativos para Poolish, Biga y Masa Madre (refrescos, inóculos e hidrataciones) con asignación y descuento dinámico de harinas netas.
+* **Ratio Harina sobre Masa:** Nuevo sensor avanzado que calcula y expone el porcentaje real de la harina total respecto al peso neto de la masa en el bol.
+* **Algoritmo Térmico del Agua:** Calcula la temperatura ideal del agua de amasado cruzando variables manuales de fricción o enlazándose en tiempo real a tu termómetro Zigbee físico de la cocina.
+* **Recetario Local con Confirmaciones Móviles:** Se sincroniza automáticamente con un archivo `formulas.json` local. Lanzamiento de alertas interactivas a tu smartphone ante sobreescrituras o borrados accidentales.
 
-> **Porcentaje Panadero** es una integración para Home Assistant que transforma tu servidor en un asistente de obrador profesional asíncrono puro. Permite calcular de forma reactiva y en tiempo real los gramos netos de cada ingrediente basándose en el porcentaje panadero, desglosando de forma dinámica elaboraciones complejas con masas madre, poolish o bigas.
-
-## 📸 Capturas de Pantalla
+## 📸 Capturas de Pantalla / Screenshots
 
 <p align="center">
-  <img src="images/capa.png" width="45%" alt="Vista de la Tarjeta Básica">
-  <img src="images/capb.png" width="45%" alt="Vista de la Tarjeta Avanzada">
+  <img src="images/cap_adv1.png" width="40%" alt="Vista de la Tarjeta Básica">
+  <img src="images/cap_bas.png" width="50%" alt="Vista de la Tarjeta Avanzada">
 </p>
 
 ## ⚙️ Parámetros de Configuración
 
 Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, el resto de los valores del cálculo.
 
-* **Inóculo de Masa Madre:** Cantidad exacta de masa madre activa (de tu tarro de reserva) necesaria para iniciar el prefermento. Se calcula automáticamente según el porcentaje de prefermento seleccionado.
-* **Hidratación de Masa Madre:** Porcentaje de agua respecto a la harina en tu masa madre.
-* **Porcentaje de Masa Madre:** Un porcentaje del 33.3% equivale a una proporción 1:1:1 (masa madre | harina | agua) del refresco tradicional; un 20% sería un refresco 1:2:2, etc.
-* **Harina del Prefermento:** Indica de cuál de las harinas de la receta se restará la cantidad destinada al prefermento (por defecto, se descuenta de la Harina 1). El sistema solo te permitirá elegir entre las harinas que hayas activado y estén disponibles.
-* **Control Térmico:** Control de la temperatura final de la masa, donde entran en escena las temperaturas ambiente, de la harina, del prefermento (solo válido si está activado en la fórmula) y de la fricción de la amasadora (si se utiliza).
+* **Inóculo de Masa Madre:** Cantidad exacta de masa madre activa necesaria para iniciar el prefermento según el porcentaje seleccionado.
+* **Hidratación de Masa Madre:** Porcentaje de agua respecto a la harina en tu masa madre de reserva.
+* **Porcentaje de Masa Madre:** Un porcentaje del 33.3% equivale a una proporción 1:1:1 (masa madre | harina | agua) del refresco tradicional.
+* **Harina del Prefermento:** Indica de cuál de las harinas de la receta se restará la cantidad destinada al prefermento (por defecto, se descuenta de la Harina 1).
+* **Control Térmico:** Control de la temperatura final de la masa cruzando ambiente, harina, prefermento y fricción de la amasadora.
 
 ---
 
-## 📥 Instalación
+## 📥 Instalación / Installation
 
 ### Método 1: HACS (Recomendado)
 
 1. Ve a **HACS** en tu panel de Home Assistant.
-2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados**.
+2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados** (*Custom repositories*).
 3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero`
-4. En **Categoría**, selecciona estrictamente **Integración** y haz clic en **Añadir**.
+4. En **Categoría**, selecciona estrictamente **Integración** (*Integration*) y haz clic en **Añadir**.
 5. Descarga la última versión, ve a Ajustes y **Reinicia** Home Assistant.
 6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Añadir integración**, busca `Porcentaje Panadero` y configúrala con un solo clic.
 
 ---
 
-## ⚠️ Configuración de Avisos y Alertas
+## ⚠️ Configuración de Avisos y Alertas / Safety Alerts Setup
 
-Para habilitar la seguridad al eliminar o alterar una fórmula (esta restricción no aplica al crear nuevas), debes añadir la [automatización](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Automatizacion.yaml) (`Automatizacion.yaml`). Esto te permitirá confirmar o denegar la acción directamente desde una notificación en tu teléfono móvil.
+### 🇪🇸 Castellano
+Para habilitar la seguridad al eliminar o alterar una fórmula, debes añadir las automatizaciones del archivo [`Automatizaciones.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Automatizaciones.yaml) a tu servidor. Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
+
+### 🇬🇧 English
+To enable actionable safety alerts when deleting or modifying a formula, you must add the automations from the [`automations.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/automations.yaml) file to your server. This allows you to confirm or deny the action directly from an interactive notification on your mobile phone.
 
 ---
 
 ## 🎛️ Tarjetas Lovelace (Modos de Uso)
 
-La integración genera de forma automática **53 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
+La integración genera de forma automática **60/61 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
-### 🔹 [Modo Básico](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Basica.yaml) (`Tarjeta_Lovelace_Basica.yaml`)
+### 🔹 Modo Básico
 Instala la integración, añade el código de la tarjeta básica a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
 
-### 🔸 [Modo Avanzado](https://github.com/DelBierzo/porcentaje_panadero/blob/main/Tarjeta_Lovelace_Avanzada.yaml) (`Tarjeta_Lovelace_Avanzada.yaml`)
+### 🔸 Modo Avanzado Requisitos:
 Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
-
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Permite personalizar los estilos CSS de la tarjeta.
-* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Gestiona los menús desplegables de la interfaz.
-* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Permite usar plantillas avanzadas en las filas de entidades.
-* 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Añade características extendidas a las tarjetas nativas.
-* 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Necesario para la correcta visualización de la ventana flotante.
+* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Personaliza los estilos CSS de las filas.
+* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
+* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
+* 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Características extendidas para los Tiles nativos.
+* 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Ventanas flotantes integradas.
 
 #### Activación de la Integración Popup Card
 1. Ve a **Ajustes** → **Dispositivos y servicios** → Haz clic en **Añadir integración**.
@@ -78,9 +89,31 @@ Este modo exprime al máximo la interfaz visual y requiere la descarga previa de
 
 ---
 
+## 🎛️ Lovelace Cards (Usage Modes)
+
+The integration automatically generates **60/61 native entities** that you can utilize in your dashboard through two different modes:
+
+### 🔹 Basic Mode
+Install the integration, add the basic card code to your dashboard, and you are ready to go! It does not require any additional dependencies.
+
+### 🔸 Advanced Mode Requirements:
+This mode unlocks the full potential of the visual interface and requires downloading the following frontend cards/plugins from **HACS** beforehand:
+* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customize rows CSS styling.
+* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
+* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
+* 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Extended button and slider features for native Tiles.
+* 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Integrated contextual floating windows.
+
+#### Activating the Popup Card Integration
+1. Go to **Settings** → **Devices & services** → Click on **Add integration**.
+2. Search for **"Popup Card"** and select it.
+3. Click **Submit** (this backend integration requires no further configuration).
+
+---
+
 ## 🛠️ Desarrollo Local y Contribuciones / Contributions
 
-Si deseas modificar las ecuaciones panaderas internas, optimizar el balanceo reactivo de harinas al 100% o proponer mejoras en la interfaz Lovelace, eres más que bienvenido a abrir un *Pull Request* o reportar un *Issue*.
+Si deseas modificar las ecuaciones panaderas internas o proponer mejoras en la interfaz Lovelace, eres más que bienvenido a abrir un *Pull Request* o reportar un *Issue*.
 
 ### Licencia / License
 Este proyecto es software libre y está licenciado bajo los términos de la [Licencia MIT](LICENSE).
