@@ -18,19 +18,20 @@
       "already_configured": "La calculadora panadera ya se encuentra configurada en tu sistema."
     }
   },
-  "component": {
-    "button": {
-      "porcentaje_panadero": {
-        "state": {
-          "tipo_levadura": {
-            "fresca": "Fresca",
-            "seca": "Seca"
-          }
-        }
-      }
-    }
-  },
   "entity": {
+    "button": {
+      "pan_restablecer_valores": { "name": "Restablecer Parámetros" },
+      "pan_guardar_formula": { "name": "Guardar Receta Nueva" },
+      "pan_eliminar_formula": { "name": "Eliminar Receta Activa" },
+      "pan_alternar_tipo_levadura": { 
+        "name": "Alternar Fresca / Seca",
+        "state": {
+          "fresca": "Fresca",
+          "seca": "Seca"
+        }
+      },
+      "pan_alternar_tang_zhong_base": { "name": "Base Líquida Tang-Zhong" }
+    },
     "select": {
       "formula_de_receta": { "name": "Fórmula de Receta" },
       "tipo_de_prefermento": { "name": "Tipo de Prefermento" },
@@ -42,13 +43,6 @@
     },
     "text": {
       "nombre_nueva_formula": { "name": "Nombre para Guardar" }
-    },
-    "button": {
-      "pan_restablecer_valores": { "name": "Restablecer Parámetros" },
-      "pan_guardar_formula": { "name": "Guardar Receta Nueva" },
-      "pan_eliminar_formula": { "name": "Eliminar Receta Activa" },
-      "pan_alternar_tipo_levadura": { "name": "Alternar Fresca / Seca" },
-      "pan_alternar_tang_zhong_base": { "name": "Base Líquida Tang-Zhong" }
     },
     "number": {
       "masa_final_objetivo": { "name": "Cantidad de Masa" },
