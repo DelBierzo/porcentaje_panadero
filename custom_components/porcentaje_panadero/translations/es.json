@@ -19,11 +19,13 @@
     }
   },
   "component": {
-    "porcentaje_panadero": {
-      "state": {
-        "tipo_levadura": {
-          "fresca": "Fresca",
-          "seca": "Seca"
+    "button": {
+      "porcentaje_panadero": {
+        "state": {
+          "tipo_levadura": {
+            "fresca": "Fresca",
+            "seca": "Seca"
+          }
         }
       }
     }
@@ -100,7 +102,7 @@
       "formula_activa": { "name": "Receta en el Obrador" },
       "tiempo_fermentacion_estimado": { "name": "Tiempo de Levado Estimado" },
       "hora_fin_fermentacion": { "name": "Hora Aproximada de Masa Lista" },
-	  "porcentaje_harina_sobre_masa": { "name": "Porcentaje Harina Total" }
+      "porcentaje_harina_sobre_masa": { "name": "Porcentaje Harina Total" }
     }
   }
 }
