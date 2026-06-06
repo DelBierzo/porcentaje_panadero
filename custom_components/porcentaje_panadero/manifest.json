@@ -1,7 +1,7 @@
 {
   "domain": "porcentaje_panadero",
   "name": "Porcentaje Panadero",
-  "codeowners": ["DelBierzo"],
+  "codeowners": ["@DelBierzo"],
   "dependencies": [],
   "config_flow": true,
   "single_config_entry": true,
