@@ -76,10 +76,11 @@ Si durante la instalación inicial del asistente configuras un **sensor de tempe
 La integración genera de forma automática **60/61 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
 ### 🔹 Modo Básico
-Instala la integración, añade el código de la tarjeta básica a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
+Instala la integración, añade el código de la [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml) a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
 
 ### 🔸 Modo Avanzado Requisitos:
 Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
+
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Personaliza los estilos CSS de las filas.
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
@@ -91,6 +92,8 @@ Este modo exprime al máximo la interfaz visual y requiere la descarga previa de
 2. Busca **"Popup Card"** y selecciónala.
 3. Haz clic en **Enviar** (esta integración trasera no requiere ninguna configuración adicional).
 
+ [`tarjeta avanzada`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
+ 
 ---
 
 ## 🇬🇧 English
@@ -112,7 +115,7 @@ If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during 
 The integration automatically generates **60/61 native entities** that you can utilize in your dashboard through two different modes:
 
 ### 🔹 Basic Mode
-Install the integration, add the basic card code to your dashboard, and you are ready to go! It does not require any additional dependencies.
+Install the integration, add the [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Basic_Card.yaml) code to your dashboard, and you are ready to go! It does not require any additional dependencies.
 
 ### 🔸 Advanced Mode Requirements:
 This mode unlocks the full potential of the visual interface and requires downloading the following frontend cards/plugins from **HACS** beforehand:
@@ -127,6 +130,8 @@ This mode unlocks the full potential of the visual interface and requires downlo
 2. Search for **"Popup Card"** and select it.
 3. Click **Submit** (this backend integration requires no further configuration).
 
+ [`advanced_card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Advanced_Card.yaml)
+ 
 ---
 
 ## 🛠️ Desarrollo Local y Contribuciones / Contributions
