@@ -57,10 +57,12 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ---
 
-## ⚠️ Configuración de Avisos y Alertas / Safety Alerts Setup
+## 🇪🇸 Castellano
 
-### 🇪🇸 Castellano
+## ⚠️ Configuración de Avisos y Alertas
+
 Para habilitar la seguridad al eliminar o alterar una fórmula, debes añadir las automatizaciones del archivo [`Automatizaciones.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Automatizaciones.yaml) a tu servidor. Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
+
 
 ## 📝 Notas Importantes sobre el Sensor Físico de Temperatura
 
@@ -68,16 +70,6 @@ Si durante la instalación inicial del asistente configuras un **sensor de tempe
 
 * **Modificación de la Tarjeta:** La tarjeta avanzada de Lovelace incluye por defecto deslizadores interactivos manuales (`number.temperatura_...`). Si deseas que el panel muestre la lectura real de tu termómetro físico en lugar del slider, debes editar el código YAML de tu tarjeta avanzada y **reemplazar la entidad del número manual por tu sensor real** (por ejemplo, cambiar `number.temperatura_ambiente` por `sensor.tu_termometro_cocina_temperature`).
 
-### 🇬🇧 English
-To enable actionable safety alerts when deleting or modifying a formula, you must add the automations from the [`automations.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/automations.yaml) file to your server. This allows you to confirm or deny the action directly from an interactive notification on your mobile phone.
-
-## 📝 Important Notes on Physical Temperature Sensors
-
-If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during the initial setup instead of using the manual sliders, please note the following step for your dashboard:
-
-* **Dashboard Modification:** The advanced Lovelace card uses manual interactive sliders (`number.temperatura_...`) by default. To display the actual live reading from your physical kitchen thermometer instead of the manual input slider, you must edit your advanced card YAML code and **replace the manual number entity with your actual sensor entity** (e.g., changing `number.temperatura_ambiente` to `sensor.your_kitchen_thermometer_temperature`).
-
----
 
 ## 🎛️ Tarjetas Lovelace (Modos de Uso)
 
@@ -100,6 +92,20 @@ Este modo exprime al máximo la interfaz visual y requiere la descarga previa de
 3. Haz clic en **Enviar** (esta integración trasera no requiere ninguna configuración adicional).
 
 ---
+
+## 🇬🇧 English
+
+## ⚠️ Safety Alerts Setup
+
+To enable actionable safety alerts when deleting or modifying a formula, you must add the automations from the [`automations.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/automations.yaml) file to your server. This allows you to confirm or deny the action directly from an interactive notification on your mobile phone.
+
+
+## 📝 Important Notes on Physical Temperature Sensors
+
+If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during the initial setup instead of using the manual sliders, please note the following step for your dashboard:
+
+* **Dashboard Modification:** The advanced Lovelace card uses manual interactive sliders (`number.temperatura_...`) by default. To display the actual live reading from your physical kitchen thermometer instead of the manual input slider, you must edit your advanced card YAML code and **replace the manual number entity with your actual sensor entity** (e.g., changing `number.temperatura_ambiente` to `sensor.your_kitchen_thermometer_temperature`).
+
 
 ## 🎛️ Lovelace Cards (Usage Modes)
 
