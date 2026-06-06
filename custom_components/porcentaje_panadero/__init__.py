@@ -5,6 +5,7 @@ import asyncio
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
+import homeassistant.helpers.config_validation as cv
 from .button import (
     obtener_tipo_levadura_actual, 
     establecer_tipo_levadura_actual, 
@@ -15,7 +16,10 @@ from .button import (
 )
 from .const import DOMAIN, RECETA_ACTIVA_MEMORIA
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 _LOGGER = logging.getLogger(__name__)
+
 DOMAIN = "porcentaje_panadero"
 
 PLATFORMS = [
