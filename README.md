@@ -2,7 +2,7 @@
   <img src="https://github.com/DelBierzo/porcentaje_panadero/blob/main/images/logo.png" width="300" alt="Porcentaje Panadero Logo" />
 </p>
  
-# Porcentaje Panadero para Home Assistant
+# Porcentaje Panadero / Baker's Percentage (Home Assistant)
 
 Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero, diseñada para integrarse de forma nativa en tu panel de Home Assistant.
 
