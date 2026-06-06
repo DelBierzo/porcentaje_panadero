@@ -1,6 +1,5 @@
 {
-  "name": "Porcentaje Panadero",
+  "name": "Baker's Percentage",
   "render_readme": true,
-  "language": "es"
   "homeassistant": "2026.1.0"
 }
