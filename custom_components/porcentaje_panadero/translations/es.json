@@ -1,0 +1,106 @@
+{
+  "title": "Porcentaje Panadero",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuración del Obrador Domótico",
+        "description": "¿Deseas instalar la calculadora panadera en tu servidor?",
+        "data": {
+          "usar_sensor_fisico": "Tengo un sensor de temperatura físico en mi cocina",
+          "entidad_termometro": "Selecciona el sensor de temperatura de tu cocina"
+        }
+      }
+    },
+    "error": {
+      "sensor_no_seleccionado": "Debes elegir un sensor de temperatura físico de la lista si marcas la casilla."
+    },
+    "abort": {
+      "already_configured": "La calculadora panadera ya se encuentra configurada en tu sistema."
+    }
+  },
+  "component": {
+    "porcentaje_panadero": {
+      "state": {
+        "tipo_levadura": {
+          "fresca": "Fresca",
+          "seca": "Seca"
+        }
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "formula_de_receta": { "name": "Fórmula de Receta" },
+      "tipo_de_prefermento": { "name": "Tipo de Prefermento" },
+      "harina_para_prefermento": { "name": "Harina para Prefermento" }
+    },
+    "switch": {
+      "habilitar_ingredientes_extras": { "name": "Habilitar Ingredientes Extras" },
+      "calcular_hidratacion_real": { "name": "Calcular Hidratación Real" }
+    },
+    "text": {
+      "nombre_nueva_formula": { "name": "Nombre para Guardar" }
+    },
+    "button": {
+      "pan_restablecer_valores": { "name": "Restablecer Parámetros" },
+      "pan_guardar_formula": { "name": "Guardar Receta Nueva" },
+      "pan_eliminar_formula": { "name": "Eliminar Receta Activa" },
+      "pan_alternar_tipo_levadura": { "name": "Alternar Fresca / Seca" },
+      "pan_alternar_tang_zhong_base": { "name": "Base Líquida Tang-Zhong" }
+    },
+    "number": {
+      "masa_final_objetivo": { "name": "Cantidad de Masa" },
+      "harina_1": { "name": "Harina 1" },
+      "harina_2": { "name": "Harina 2" },
+      "harina_3": { "name": "Harina 3" },
+      "agua_hidratacion": { "name": "Agua (Hidratación)" },
+      "sal": { "name": "Sal" },
+      "levadura": { "name": "Levadura" },
+      "prefermento": { "name": "Prefermento Activo" },
+      "hidratacion_masa_madre": { "name": "Hidratación Masa Madre" },
+      "inoculo_masa_madre": { "name": "Inóculo Masa Madre" },
+      "levadura_prefermento": { "name": "Levadura Prefermento" },
+      "malta": { "name": "Malta" },
+      "azucar": { "name": "Azúcar" },
+      "aove": { "name": "AOVE" },
+      "mantequilla": { "name": "Mantequilla" },
+      "leche_en_polvo": { "name": "Leche en Polvo" },
+      "leche_liquida": { "name": "Leche" },
+      "huevo": { "name": "Huevo" },
+      "temperatura_objetivo_masa": { "name": "Temp. Masa" },
+      "temperatura_ambiente": { "name": "Temp. Ambiente" },
+      "temperatura_harina": { "name": "Temp. Harina" },
+      "temperatura_prefermento": { "name": "Temp. Prefermento" },
+      "temperatura_friccion_amasadora": { "name": "Temp. Fricción Amasadora" },
+      "tang_zhong": { "name": "Tang-Zhong" }
+    },
+    "sensor": {
+      "harina_total": { "name": "Harina Total" },
+      "agua_total": { "name": "Agua Total" },
+      "tang_zhong_total": { "name": "Tang-Zhong Total" },
+      "prefermento_total": { "name": "Prefermento Total" },
+      "harina_1_neta": { "name": "Harina 1" },
+      "harina_2_neta": { "name": "Harina 2" },
+      "harina_3_neta": { "name": "Harina 3" },
+      "agua_neta": { "name": "Agua" },
+      "sal_neta": { "name": "Sal" },
+      "levadura_neta": { "name": "Levadura" },
+      "inoculo_masa_madre": { "name": "Inóculo Masa Madre" },
+      "harina_prefermento": { "name": "Harina Prefermento" },
+      "agua_prefermento": { "name": "Agua Prefermento" },
+      "levadura_prefermento": { "name": "Levadura Prefermento" },
+      "temperatura_agua_ideal": { "name": "Temp. Ideal Agua" },
+      "malta": { "name": "Malta" },
+      "azucar": { "name": "Azúcar" },
+      "aove": { "name": "AOVE" },
+      "mantequilla": { "name": "Mantequilla" },
+      "leche_polvo": { "name": "Leche en Polvo" },
+      "leche": { "name": "Leche" },
+      "huevo": { "name": "Huevo" },
+      "formula_activa": { "name": "Receta en el Obrador" },
+      "tiempo_fermentacion_estimado": { "name": "Tiempo de Levado Estimado" },
+      "hora_fin_fermentacion": { "name": "Hora Aproximada de Masa Lista" },
+	  "porcentaje_harina_sobre_masa": { "name": "Porcentaje Harina Total" }
+    }
+  }
+}

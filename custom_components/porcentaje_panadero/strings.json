@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bakery Automation Configuration",
+        "description": "Do you want to install the baker's calculator on your server?",
+        "data": {
+          "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen",
+          "entidad_termometro": "Select your kitchen temperature sensor"
+        }
+      }
+    },
+    "error": {
+      "sensor_no_seleccionado": "You must select a physical temperature sensor from the list if the checkbox is checked."
+    },
+    "abort": {
+      "already_configured": "The baker's calculator is already configured on your system."
+    }
+  }
+}
