@@ -4,7 +4,7 @@
   "codeowners": ["@DelBierzo"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com",
+  "documentation": "https://github.com/DelBierzo/porcentaje_panadero",
   "integration_type": "service",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/issues",
