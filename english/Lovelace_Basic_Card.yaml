@@ -453,28 +453,87 @@ cards:
           entity: sensor.tang_zhong_total
     title: 📝Formula
   - type: entities
-    title: 📋 Info
+    title: 🌡️ Dough Water Temperature
     show_header_toggle: false
     entities:
-      - entity: sensor.pan_harina_total
-      - entity: sensor.porcentaje_harina_total
+      - entity: number.temperatura_objetivo_masa
+        name: Target Dough Temp
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state_not: "true"
+        row:
+          entity: number.temperatura_ambiente
+          name: Room Temp
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state: "true"
+        row:
+          entity: sensor.temperatura_real
+          name: Room Temp
+      - entity: number.temperatura_harina
+        name: Flour Temp
+      - entity: number.temperatura_prefermento
+        name: Preferment Temp
+      - entity: number.temperatura_friccion_amasadora
+        name: Mixer Friction Temp
+      - entity: sensor.pan_temperatura_agua_ideal
+        name: Ideal Water Temp >>>
   - type: entities
     title: 📈 Proofing & Fermentation
     show_header_toggle: false
     entities:
       - entity: sensor.tiempo_de_levado_estimado
+        name: Estimated Proofing Time
       - entity: sensor.hora_de_masa_lista_aproximada
+        name: Approximate Ready Time
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state_not: "true"
+        row:
+          entity: number.temperatura_ambiente
+          name: Manual adjustment
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state: "true"
+        row:
+          entity: select.origen_temperatura_levado
+          name: Choose Temp Source
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state: "true"
+          - condition: state
+            entity: select.origen_temperatura_levado
+            state: Sensor Físico
+        row:
+          entity: sensor.temperatura_real
+          name: Environment Temperature
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state: "true"
+          - condition: state
+            entity: select.origen_temperatura_levado
+            state: Manual (Slider)
+        row:
+          entity: number.temperatura_ambiente
+          name: Manual Adjustment
   - type: entities
-    title: 🌡️ Dough Mixing Water Temperature
+    title: 📋 Info
     show_header_toggle: false
     entities:
-      - entity: number.temperatura_objetivo_masa
-      - entity: number.temperatura_ambiente
-      - entity: number.temperatura_harina
-      - entity: number.temperatura_prefermento
-      - entity: number.temperatura_friccion_amasadora
-      - entity: sensor.pan_temperatura_agua_ideal
-        name: ➡️ Target Water Temp >>>
+      - entity: sensor.pan_harina_total
+      - entity: sensor.porcentaje_harina_total
   - type: entities
     title: 💾 Recipe Management
     show_header_toggle: false
