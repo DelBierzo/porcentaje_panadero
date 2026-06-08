@@ -1,3 +1,4 @@
+#sensor.py
 import logging
 from datetime import datetime, timedelta
 from homeassistant.components.sensor import SensorEntity
@@ -21,12 +22,16 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
         "agua_prefermento", "levadura_prefermento", "temperatura_agua_ideal", 
         "malta", "azucar", "aove", "mantequilla", "leche_polvo", "leche", "huevo",
         "formula_activa", "tiempo_fermentacion_estimado", "hora_fin_fermentacion",
-        "porcentaje_harina_sobre_masa"
+        "porcentaje_harina_sobre_masa", "temperatura_utilizada", "sensor_fisico_instalado"
     ]
+
+    # COMPROBACIÓN DINÁMICA
+    if usar_sensor_fisico and entidad_termometro != "manual":
+        claves_sensores.append("temperatura_real")
 
     sensores = []
     for clave in claves_sensores:
-        if clave in ["formula_activa", "tiempo_fermentacion_estimado", "hora_fin_fermentacion", "porcentaje_harina_sobre_masa"]:
+        if clave in ["formula_activa", "tiempo_fermentacion_estimado", "hora_fin_fermentacion", "porcentaje_harina_sobre_masa", "sensor_fisico_instalado"]:
             if clave == "porcentaje_harina_sobre_masa":
                 unidad = "%"
             else:
@@ -35,10 +40,14 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
             if clave == "formula_activa": icono = "mdi:notebook-check"
             elif clave == "tiempo_fermentacion_estimado": icono = "mdi:timer-sand"
             elif clave == "porcentaje_harina_sobre_masa": icono = "mdi:label-percent-outline"
+            elif clave == "sensor_fisico_instalado": icono = "mdi:chip"
             else: icono = "mdi:clock-check-outline"
         else:
-            unidad = "°C" if clave == "temperatura_agua_ideal" else "g"
-            if "agua" in clave or clave == "leche": icono = "mdi:water"
+            unidad = "°C" if clave in ["temperatura_agua_ideal", "temperatura_utilizada", "temperatura_real"] else "g"
+            if clave == "temperatura_utilizada": icono = "mdi:thermometer"
+            elif clave == "temperatura_real": icono = "mdi:home-thermometer"
+            elif clave == "temperatura_agua_ideal": icono = "mdi:thermometer-water"
+            elif "agua" in clave or clave == "leche": icono = "mdi:water"
             elif "harina" in clave or clave == "malta": icono = "mdi:grain"
             elif "levadura" in clave: icono = "mdi:yeast"
             elif clave == "sal_neta": icono = "mdi:shaker-outline"
@@ -64,7 +73,7 @@ class PanSensor(SensorEntity, RestoreEntity):
         self.entidad_termometro = entidad_termometro
         self._attributes = {}
         
-        if tipo_sensor == "formula_activa":
+        if tipo_sensor in ["formula_activa", "sensor_fisico_instalado"]:
             self._state = "---"
         else:
             self._state = 0.0
@@ -77,8 +86,14 @@ class PanSensor(SensorEntity, RestoreEntity):
     def unique_id(self): return f"porcentaje_panadero_{self.tipo_sensor}_unique"
     @property
     def native_value(self): return self._state
+    
     @property
-    def native_unit_of_measurement(self): return self._unidad
+    def native_unit_of_measurement(self):
+        """Fuerza a omitir la unidad si el sensor devuelve texto plano."""
+        if self.tipo_sensor in ["formula_activa", "sensor_fisico_instalado"]:
+            return None
+        return self._unidad
+
     @property
     def icon(self): return self._icono
     @property
@@ -97,13 +112,12 @@ class PanSensor(SensorEntity, RestoreEntity):
             "number.malta", "number.azucar", "number.aove", "number.mantequilla", "number.leche_en_polvo",
             "number.leche_liquida", "number.huevo", "number.temperatura_objetivo_masa",
             "number.temperatura_harina", "number.temperatura_prefermento", "number.temperatura_friccion_amasadora",
-            "select.formula_de_receta", "button.alternar_tang_zhong_agua_leche"
+            "select.formula_de_receta", "button.alternar_tang_zhong_agua_leche", "select.origen_temperatura_levado",
+            "number.temperatura_ambiente"
         ]
 
         if self.usar_fisico and self.entidad_termometro != "manual":
             entidades_escucha.append(self.entidad_termometro)
-        else:
-            entidades_escucha.append("number.temperatura_ambiente")
 
         @callback
         def _on_state_change(event):
@@ -215,7 +229,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                     h_en_inoculo = g_inoculo_state / factor_hyd if factor_hyd != 0 else g_inoculo_state / 2
                     a_en_inoculo = g_inoculo_state - h_en_inoculo
                     h_pref_raw = h_total_prefermento - h_en_inoculo
-                    a_pref_raw = (pref_total_raw - h_total_prefermento) - a_en_inoculo
+                    a_en_inoculo = (pref_total_raw - h_total_prefermento) - a_en_inoculo
                     h_desc = h_total_prefermento
 
             h_pref_state = round(h_pref_raw, 1)
@@ -243,6 +257,36 @@ class PanSensor(SensorEntity, RestoreEntity):
             elif "3" in h_para_pref:
                 if pct_h3 > 0 and (h3_bruta - h_desc) >= 0: h3_final_state = h3_bruta - h_desc
                 else: h1_final_state = h1_bruta - h_desc
+
+            # SEPARACIÓN DE TEMPERATURAS
+            st_origen = self.hass.states.get("select.origen_temperatura_levado")
+            origen_temp = st_origen.state if st_origen else "Manual (Slider)"
+
+            def get_termometro_real(entity_id, de_respaldo=22.0):
+                st_term = self.hass.states.get(entity_id)
+                if not st_term or st_term.state in ["unavailable", "unknown", ""]:
+                    return de_respaldo
+                try:
+                    valor_limpio = str(st_term.state).replace("°C", "").replace("°F", "").strip()
+                    return float(valor_limpio)
+                except (ValueError, TypeError):
+                    return de_respaldo
+
+            # 1. TEMPERATURA A UTILIZAR PARA ESTIMAR LOS TIEMPO DE FERMENTACIÓN (MANUAL VS SENSOR FISICO)
+            if origen_temp == "Sensor Físico" and self.usar_fisico and self.entidad_termometro != "manual":
+                t_fermentacion = get_termometro_real(self.entidad_termometro, 22.0)
+            else:
+                t_fermentacion = get_float("number.temperatura_ambiente", 22.0)
+
+            # 2. TEMPERATURA SENSOR FISICO (SIEMPRE EL SENSOR FISICO SI EXISTE) PARA CALCULAR LA TEMPERATURA DEL AGUA
+            if self.usar_fisico and self.entidad_termometro != "manual":
+                t_cocina_real = get_termometro_real(self.entidad_termometro, 22.0)
+            else:
+                t_cocina_real = get_float("number.temperatura_ambiente", 22.0)
+
+            t_objetivo = get_float("number.temperatura_objetivo_masa", 24.0)
+            t_harina = get_float("number.temperatura_harina", 20.0)
+            t_friccion = get_float("number.temperatura_friccion_amasadora", 0.0)
 
             # MATEMÁTICAS APLICADAS DEL TANG-ZHONG (Relación 1:5)
             g_harina_tz = 0.0
@@ -288,35 +332,31 @@ class PanSensor(SensorEntity, RestoreEntity):
                     g_agua_en_tz = g_liquido_tz
                     agua_neta_state = round(max(0.0, agua_neta_state - g_liquido_tz), 1)
 
-            # GUARDAMOS EL AVISO DEL DESCUBIERTO EN LOS ATRIBUTOS GLOBALES PARA QUE LO LEA EL NUEVO SENSOR TOTAL
+            # GUARDAMOS EL AVISO DEL DESCUBIERTO EN LOS ATRIBUTOS GLOBALES
             self._attributes["leche_utilizada_tz_g"] = round(g_leche_en_tz, 1)
             self._attributes["agua_asistencia_tz_g"] = round(g_agua_en_tz, 1)
             self._attributes["escaldado_mixto"] = g_agua_en_tz > 0.0
 
+            # CÁLCULO DEL AGUA IDEAL
+            if pct_pref > 0: 
+                t_agua_calc = round((t_objetivo * 4) - (t_cocina_real + t_harina + get_float("number.temperatura_prefermento", 20.0) + t_friccion), 1)
+            else: 
+                t_agua_calc = round((t_objetivo * 3) - (t_cocina_real + t_harina + t_friccion), 1)
 
-            if self.usar_fisico and self.entidad_termometro != "manual":
-                state_termometro = self.hass.states.get(self.entidad_termometro)
-                t_ambiente = float(state_termometro.state) if state_termometro and state_termometro.state not in ["unavailable", "unknown", ""] else 22.0
-            else:
-                t_ambiente = get_float("number.temperatura_ambiente", 22.0)
+            # NORMALIZACIÓN CORRECTA DE LA LEVADURA
+            if tipo_leva_activa == "seca": 
+                pct_leva_normalizado = pct_leva * 3.0
+            else: 
+                pct_leva_normalizado = pct_leva
 
-            t_objetivo = get_float("number.temperatura_objetivo_masa", 24.0)
-            t_harina = get_float("number.temperatura_harina", 20.0)
-            t_friccion = get_float("number.temperatura_friccion_amasadora", 0.0)
-            
-            if pct_pref > 0: t_agua_calc = round((t_objetivo * 4) - (t_ambiente + t_harina + get_float("number.temperatura_prefermento", 20.0) + t_friccion), 1)
-            else: t_agua_calc = round((t_objetivo * 3) - (t_ambiente + t_harina + t_friccion), 1)
-
-            if tipo_leva_activa == "fresca": pct_leva_normalizado = pct_leva / 3.0
-            else: pct_leva_normalizado = pct_leva
-
-            velocidad_levadura = pct_leva_normalizado / 3.0 if pct_leva_normalizado > 0 else 0.0
+            # VELOCIDAD METABÓLICA BASE REAL REFERENCIADA A 24ºC
+            velocidad_levadura = pct_leva_normalizado * 0.25 if pct_leva_normalizado > 0 else 0.0
 
             velocidad_masa_madre = 0.0
             if tipo_pref == "masa madre" and pct_pref > 0:
                 pct_inoculo_real = get_float("number.inoculo_masa_madre", 33.3)
                 pct_inoculo_calculo = max(5.0, pct_inoculo_real)
-                velocidad_masa_madre = (pct_inoculo_calculo / 120.0) * (pct_pref / 20.0)
+                velocidad_masa_madre = (pct_inoculo_calculo / 100.0) * (pct_pref / 20.0) * 0.15
 
             velocidad_total_combinada = velocidad_levadura + velocidad_masa_madre
 
@@ -324,14 +364,13 @@ class PanSensor(SensorEntity, RestoreEntity):
                 texto_tiempo_levado, texto_reloj_listo = "---", "---"
             else:
                 tiempo_base_horas = 1.0 / velocidad_total_combinada
-                delta_t = t_ambiente - 24.0
-                if delta_t > 0:
-                    t_ambiente_limite = min(35.0, t_ambiente)
-                    factor_temperatura = 1.0 - ((t_ambiente_limite - 24.0) * 0.09)
-                    factor_temperatura = max(0.35, factor_temperatura)
+                
+                # FACTOR EXPO COMPENSADO (CURVA REAL DE FERMENTACIÓN ARRHENIUS)
+                if t_fermentacion >= 24.0:
+                    t_ambiente_limite = min(38.0, t_fermentacion)
+                    factor_temperatura = 2.0 ** ((24.0 - t_ambiente_limite) / 10.0)
                 else:
-                    factor_temperatura = 1.0 + (abs(delta_t) * 0.11)
-                    factor_temperatura = min(12.0, factor_temperatura)
+                    factor_temperatura = 2.5 ** ((24.0 - t_fermentacion) / 10.0)
 
                 horas_totales_estimadas = tiempo_base_horas * factor_temperatura
                 minutos_totales = int(round(horas_totales_estimadas * 60))
@@ -359,7 +398,6 @@ class PanSensor(SensorEntity, RestoreEntity):
             elif self.tipo_sensor == "tang_zhong_total":
                 g_total_tz = g_harina_tz + g_liquido_tz
                 self._state = round(g_total_tz, 1)
-                # VOLCADO DE ATRIBUTOS ESPECÍFICOS DESGLOSADOS
                 self._attributes["harina_g"] = round(g_harina_tz, 1)
                 self._attributes["liquido_total_g"] = round(g_liquido_tz, 1)
                 self._attributes["leche_utilizada_g"] = round(g_leche_en_tz, 1)
@@ -377,6 +415,21 @@ class PanSensor(SensorEntity, RestoreEntity):
             elif self.tipo_sensor == "temperatura_agua_ideal": self._state = t_agua_calc
             elif self.tipo_sensor == "tiempo_fermentacion_estimado": self._state = texto_tiempo_levado
             elif self.tipo_sensor == "hora_fin_fermentacion": self._state = texto_reloj_listo
+            elif self.tipo_sensor == "temperatura_utilizada":
+                self._state = round(t_fermentacion, 1)
+                self._attributes["usar_sensor_fisico"] = "true" if self.usar_fisico else "false"
+                self._attributes["entidad_termometro"] = self.entidad_termometro
+            elif self.tipo_sensor == "temperatura_real":
+                self._state = round(t_cocina_real, 1)
+            elif self.tipo_sensor == "sensor_fisico_instalado":
+                if self.usar_fisico and self.entidad_termometro != "manual":
+                    st_term = self.hass.states.get(self.entidad_termometro)
+                    if not st_term or st_term.state in ["unavailable", "unknown", ""]:
+                        self._state = "unavailable"
+                    else:
+                        self._state = "true"
+                else:
+                    self._state = "false"
             elif self.tipo_sensor == "porcentaje_harina_sobre_masa":
                 if masa_final > 0:
                     self._state = round((h_total / masa_final) * 100, 1)

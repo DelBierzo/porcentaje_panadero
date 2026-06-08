@@ -12,12 +12,19 @@ DOMAIN = "porcentaje_panadero"
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Levanta los desplegables nativos bajo la arquitectura moderna."""
+    config_app = hass.data[DOMAIN][entry.entry_id]
+    usar_sensor_fisico = config_app.get("usar_sensor_fisico", False)
+    
+    opciones_origen = ["Manual (Slider)", "Sensor Físico"] if usar_sensor_fisico else ["Manual (Slider)"]
+
     desplegables = [
         PanSelectMenu(hass, "formula_de_receta", ["---"], "mdi:notebook-edit"),
         PanSelectMenu(hass, "tipo_de_prefermento", ["poolish", "biga", "masa madre"], "mdi:chart-bubble"),
-        PanSelectMenu(hass, "harina_para_prefermento", ["harina 1", "harina 2", "harina 3"], "mdi:barley")
+        PanSelectMenu(hass, "harina_para_prefermento", ["harina 1", "harina 2", "harina 3"], "mdi:barley"),
+        PanSelectMenu(hass, "origen_temperatura_levado", opciones_origen, "mdi:thermometer-cog")
     ]
     async_add_entities(desplegables, True)
+
 
 class PanSelectMenu(SelectEntity):
     """Representación nativa de un menú desplegable panadero."""
@@ -34,6 +41,8 @@ class PanSelectMenu(SelectEntity):
             self._current_option = "poolish"
         elif clave == "harina_para_prefermento":
             self._current_option = "harina 1"
+        elif clave == "origen_temperatura_levado":
+            self._current_option = "Manual (Slider)"
         else:
             self._current_option = "---"
 
@@ -44,7 +53,8 @@ class PanSelectMenu(SelectEntity):
     def translation_key(self) -> str: return self._clave
 
     @property
-    def unique_id(self) -> str: return self._clave
+    def unique_id(self) -> str: 
+        return f"porcentaje_panadero_select_{self._clave}_unique"
 
     @property
     def options(self) -> list:
@@ -114,8 +124,10 @@ class PanSelectMenu(SelectEntity):
         if self._clave in ["harina_para_prefermento", "tipo_de_prefermento", "formula_de_receta"]:
             @callback
             def _on_bascula_change(event):
-                if self._current_option == "---" and self._clave == "formula_de_receta":
-                    self.async_write_ha_state()
+                if self._clave == "formula_de_receta":
+                    if self._current_option != "---":
+                        self._current_option = "---"
+                        self.async_write_ha_state()
                     return
 
                 if self._current_option == "unknown" or self._current_option not in self.options:
@@ -157,6 +169,7 @@ class PanSelectMenu(SelectEntity):
 
         if self._clave == "formula_de_receta":
             await self.hass.services.async_call(DOMAIN, "cargar_formula_en_sliders", {"nombre": option})
+            self._current_option = "---"
+            self.async_write_ha_state()
 
         await self.hass.services.async_call(DOMAIN, "balancear_harinas", {"harina_origen": 1})
-

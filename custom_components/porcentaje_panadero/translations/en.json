@@ -3,31 +3,31 @@
   "config": {
     "step": {
       "user": {
-        "title": "Smart Bakery Setup",
-        "description": "Do you want to install the bakery scale calculator on your server?",
+        "title": "Bakery Setup",
+        "description": "Do you want to install the baker's calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to dynamically choose between that sensor or a static manual temperature (ideal for simulating a constant proofing temperature). By default, manual control will be used.",
         "data": {
-          "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen",
-          "entidad_termometro": "Select your kitchen temperature sensor"
+          "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen/bakery",
+          "entidad_termometro": "Select the physical temperature sensor"
         }
       }
     },
     "error": {
-      "sensor_no_seleccionado": "You must select a physical temperature sensor from the list if checked."
+      "sensor_no_seleccionado": "You must choose a physical temperature sensor from the list if you check the box."
     },
     "abort": {
-      "already_configured": "The bakery calculator is already configured on your system."
+      "already_configured": "The baker's calculator is already configured on your system."
     }
   },
   "entity": {
     "button": {
       "pan_restablecer_valores": { "name": "Reset Parameters" },
       "pan_guardar_formula": { "name": "Save New Recipe" },
-      "pan_eliminar_formula": { "name": "Delete Active Formula" },
+      "pan_eliminar_formula": { "name": "Delete Active Recipe" },
       "pan_alternar_tipo_levadura": { 
-        "name": "Toggle Fresh / Dry",
+        "name": "Toggle Fresh / Dry Yeast",
         "state": {
           "fresca": "Fresh",
-          "seca": "Instant Dry"
+          "seca": "Dry"
         }
       },
       "pan_alternar_tang_zhong_base": { "name": "Tang-Zhong Liquid Base" }
@@ -35,7 +35,8 @@
     "select": {
       "formula_de_receta": { "name": "Recipe Formula" },
       "tipo_de_prefermento": { "name": "Preferment Type" },
-      "harina_para_prefermento": { "name": "Preferment Flour Allocation" }
+      "harina_para_prefermento": { "name": "Flour for Preferment" },
+      "origen_temperatura_levado": { "name": "Proofing Temp Source" }
     },
     "switch": {
       "habilitar_ingredientes_extras": { "name": "Enable Extra Ingredients" },
@@ -45,7 +46,7 @@
       "nombre_nueva_formula": { "name": "Name to Save" }
     },
     "number": {
-      "masa_final_objetivo": { "name": "Dough Quantity" },
+      "masa_final_objetivo": { "name": "Dough Amount" },
       "harina_1": { "name": "Flour 1" },
       "harina_2": { "name": "Flour 2" },
       "harina_3": { "name": "Flour 3" },
@@ -64,11 +65,11 @@
       "leche_liquida": { "name": "Milk" },
       "huevo": { "name": "Egg" },
       "temperatura_objetivo_masa": { "name": "Dough Temp" },
-      "temperatura_ambiente": { "name": "Ambient Temp" },
+      "temperatura_ambiente": { "name": "Room Temp." },
       "temperatura_harina": { "name": "Flour Temp" },
       "temperatura_prefermento": { "name": "Preferment Temp" },
       "temperatura_friccion_amasadora": { "name": "Mixer Friction Temp" },
-      "tang_zhong": { "name": "Tang-Zhong Ratio" }
+      "tang_zhong": { "name": "Tang-Zhong" }
     },
     "sensor": {
       "harina_total": { "name": "Total Flour" },
@@ -96,7 +97,10 @@
       "formula_activa": { "name": "Recipe in Bakery" },
       "tiempo_fermentacion_estimado": { "name": "Estimated Proofing Time" },
       "hora_fin_fermentacion": { "name": "Approximate Ready Time" },
-      "porcentaje_harina_sobre_masa": { "name": "Total Flour Ratio" }
+      "porcentaje_harina_sobre_masa": { "name": "Total Flour Percentage" },
+      "temperatura_utilizada": { "name": "Room Temp." },
+	  "sensor_fisico_instalado": { "name": "Physical Sensor Installed" },
+	  "temperatura_real": { "name": "Real Temperature" }
     }
   }
 }

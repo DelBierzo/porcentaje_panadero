@@ -1924,93 +1924,10 @@ cards:
                           }       
     padding: 0em
   - type: custom:expander-card
-    title: Expander Card
     cards:
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: sensor.pan_harina_total
-            name: TOTAL FLOUR
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.4rem !important;
-                    font-weight: bold !important;
-                  }
-          - entity: sensor.porcentaje_harina_total
-            name: TOTAL FLOUR RATIO
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.4rem !important;
-                    font-weight: bold !important;
-                  }
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: sensor.tiempo_de_levado_estimado
-            name: ESTIMATED PROOFING TIME
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.4rem !important;
-                    font-weight: bold !important;
-                  }
-          - entity: sensor.hora_de_masa_lista_aproximada
-            name: APPROXIMATE READY TIME
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.4rem !important;
-                    font-weight: bold !important;
-                  }
-    title-card-clickable: true
-    clear-children: true
-    child-margin-top: 0em
-    padding: 0em
-    title-card:
-      type: tile
-      entity: text.nombre_nueva_formula
-      hide_state: true
-      name: INFO / PROOFING TIME
-      icon: mdi:information
-      tap_action:
-        action: none
-  - type: custom:expander-card
-    cards:
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: sensor.pan_temperatura_agua_ideal
-            name: IDEAL WATER TEMPERATURE
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                .: |
-                  :host {
-                    --card-mod-icon-color: #2196f3;
-                  }
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.4rem !important;
-                    font-weight: bold !important;
-                  }
       - type: tile
         entity: number.temperatura_objetivo_masa
-        name: DOUGH TARGET
+        name: DOUGH
         icon: ""
         color: green
         show_entity_picture: false
@@ -2028,26 +1945,56 @@ cards:
               .secondary {
                 font-size: 1.4rem !important;
               }
-      - type: tile
-        entity: number.temperatura_ambiente
-        name: AMBIENT
-        icon: ""
-        color: primary
-        show_entity_picture: false
-        hide_state: false
-        vertical: false
-        tap_action:
-          action: none
-        features:
-          - style: slider
-            type: numeric-input
-        features_position: inline
-        card_mod:
-          style:
-            ha-tile-info$: |
-              .secondary {
-                font-size: 1.4rem !important;
-              }
+      - type: vertical-stack
+        cards:
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.sensor_fisico_instalado
+                state_not: "true"
+            card:
+              type: vertical-stack
+              cards:
+                - type: tile
+                  entity: number.temperatura_ambiente
+                  name: ENVIRONMENT
+                  vertical: false
+                  tap_action:
+                    action: none
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style:
+                      ha-tile-info$: |
+                        .secondary {
+                          font-size: 1.4rem !important;
+                        }
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.sensor_fisico_instalado
+                state: "true"
+            card:
+              type: vertical-stack
+              cards:
+                - type: tile
+                  entity: sensor.temperatura_real
+                  name: ENVIRONMENT
+                  color: primary
+                  show_entity_picture: false
+                  hide_state: false
+                  vertical: false
+                  tap_action:
+                    action: none
+                  features_position: bottom
+                  card_mod:
+                    style:
+                      ha-tile-info$: |
+                        .secondary {
+                          font-size: 1.4rem !important;
+                        }
       - type: tile
         entity: number.temperatura_harina
         name: FLOUR
@@ -2090,7 +2037,7 @@ cards:
               }
       - type: tile
         entity: number.temperatura_friccion_amasadora
-        name: MIXER FRICTION
+        name: MIXER
         icon: ""
         color: deep-purple
         show_entity_picture: false
@@ -2108,6 +2055,24 @@ cards:
               .secondary {
                 font-size: 1.4rem !important;
               }
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: sensor.pan_temperatura_agua_ideal
+            name: IDEAL WATER TEMPERATURE
+            tap_action:
+              action: none
+            card_mod:
+              style:
+                .: |
+                  :host {
+                    --card-mod-icon-color: #2196f3;
+                  }
+                hui-generic-entity-row $: |
+                  .state {
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                  }
     title-card:
       type: tile
       entity: text.nombre_nueva_formula
@@ -2124,6 +2089,154 @@ cards:
     child-margin-top: 0em
     icon: mdi:plus-circle
     title-card-clickable: true
+  - type: custom:expander-card
+    title: Expander Card
+    cards:
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: sensor.tiempo_de_levado_estimado
+            name: ESTIMATED PROOFING TIME
+            tap_action:
+              action: none
+            card_mod:
+              style:
+                hui-generic-entity-row $: |
+                  .state {
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                  }
+          - entity: sensor.hora_de_masa_lista_aproximada
+            name: APPROXIMATE READY TIME
+            tap_action:
+              action: none
+            card_mod:
+              style:
+                hui-generic-entity-row $: |
+                  .state {
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                  }
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.sensor_fisico_instalado
+                state: "true"
+            row:
+              type: divider
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: sensor.sensor_fisico_instalado
+            state: "true"
+        card:
+          type: vertical-stack
+          cards:
+            - type: tile
+              entity: select.origen_temperatura_levado
+              name: CHOOSE TEMP SOURCE
+              hide_state: true
+              vertical: false
+              tap_action:
+                action: none
+              features:
+                - type: select-options
+              features_position: inline
+            - type: conditional
+              conditions:
+                - entity: select.origen_temperatura_levado
+                  state: Physical Sensor
+              card:
+                type: tile
+                entity: sensor.temperatura_real
+                name: ENVIRONMENT
+                vertical: false
+                tap_action:
+                  action: none
+                features_position: bottom
+                card_mod:
+                  style:
+                    ha-tile-info$: |
+                      .secondary {
+                        font-size: 1.4rem !important;
+                      }
+            - type: conditional
+              conditions:
+                - entity: select.origen_temperatura_levado
+                  state: Manual (Slider)
+              card:
+                type: tile
+                entity: number.temperatura_ambiente
+                name: MANUAL ADJUSTMENT
+                vertical: false
+                tap_action:
+                  action: none
+                features:
+                  - style: slider
+                    type: numeric-input
+                features_position: inline
+                card_mod:
+                  style:
+                    ha-tile-info$: |
+                      .secondary {
+                        font-size: 1.4rem !important;
+                      }
+    title-card-clickable: true
+    clear-children: true
+    child-margin-top: 0em
+    padding: 0em
+    title-card:
+      type: tile
+      entity: text.nombre_nueva_formula
+      name: PROOFING TIME CONTROL
+      icon: mdi:clock-end
+      hide_state: true
+      vertical: false
+      tap_action:
+        action: none
+      features_position: bottom
+  - type: custom:expander-card
+    title: Expander Card
+    cards:
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: sensor.pan_harina_total
+            name: TOTAL FLOUR
+            tap_action:
+              action: none
+            card_mod:
+              style:
+                hui-generic-entity-row $: |
+                  .state {
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                  }
+          - entity: sensor.porcentaje_harina_total
+            name: TOTAL FLOUR PERCENTAGE
+            tap_action:
+              action: none
+            card_mod:
+              style:
+                hui-generic-entity-row $: |
+                  .state {
+                    font-size: 1.4rem !important;
+                    font-weight: bold !important;
+                  }
+    title-card-clickable: true
+    clear-children: true
+    child-margin-top: 0em
+    padding: 0em
+    title-card:
+      type: tile
+      entity: text.nombre_nueva_formula
+      name: INFO
+      icon: mdi:information
+      hide_state: true
+      vertical: false
+      tap_action:
+        action: none
+      features_position: bottom
   - type: custom:expander-card
     cards:
       - type: vertical-stack

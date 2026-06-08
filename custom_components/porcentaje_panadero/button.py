@@ -71,7 +71,7 @@ class PanResetButton(ButtonEntity):
             "number.prefermento": 0.0,
             "number.hidratacion_masa_madre": 100.0,
             "number.inoculo_masa_madre": 33.3,
-            "number.levadura_prefermento": 0.0,
+            "number.levadura_prefermento": 0.2,
             "number.tang_zhong": 0.0,
             "number.malta": 0.0,
             "number.azucar": 0.0,
@@ -82,9 +82,9 @@ class PanResetButton(ButtonEntity):
             "number.huevo": 0.0,
             "number.temperatura_objetivo_masa": 24.0,
             "number.temperatura_harina": 20.0,
-            "number.temperatura_prefermento": 20.0,
+            "number.temperatura_prefermento": 0.0,
             "number.temperatura_friccion_amasadora": 0.0,
-            "number.temperatura_ambiente": 20.0
+            "number.temperatura_ambiente": 24.0
         }
 
         if self._hass.states.get("select.formula_de_receta") is not None:
@@ -96,6 +96,9 @@ class PanResetButton(ButtonEntity):
         if self._hass.states.get("text.nombre_nueva_formula") is not None:
             await self._hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
 
+        if self._hass.states.get("select.origen_temperatura_levado") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.origen_temperatura_levado", "option": "Manual (Slider)"})
+            
         for entidad_id, valor in valores_fabrica.items():
             if self._hass.states.get(entidad_id) is not None:
                 try:
@@ -136,7 +139,6 @@ class PanSaveButton(ButtonEntity):
     async def async_press(self) -> None:
         await self._hass.services.async_call(DOMAIN, "guardar_formula", {})
 
-
 class PanDeleteButton(ButtonEntity):
     """Botón nativo para eliminar la receta activa."""
 
@@ -154,7 +156,6 @@ class PanDeleteButton(ButtonEntity):
 
     async def async_press(self) -> None:
         await self._hass.services.async_call(DOMAIN, "eliminar_formula", {})
-
 
 class PanToggleYeastButton(ButtonEntity):
     """Botón con estado persistente de texto inyectado para el tipo de levadura."""
@@ -183,7 +184,6 @@ class PanToggleYeastButton(ButtonEntity):
             "tipo_levadura": _TIPO_LEVADURA_MEMORIA,
             "options": ["fresca", "seca"]
         }
-
     async def async_press(self) -> None:
         """Se ejecuta al pulsar físicamente el botón en la pantalla. Aplica el factor de conversión."""
         global _TIPO_LEVADURA_MEMORIA
@@ -214,7 +214,6 @@ class PanToggleYeastButton(ButtonEntity):
 
     async def async_added_to_hass(self) -> None:
         self.async_write_ha_state()
-
 
 class PanToggleTangZhongButton(ButtonEntity):
     """Botón nativo con estado de texto para alternar el líquido base del Tang-Zhong."""

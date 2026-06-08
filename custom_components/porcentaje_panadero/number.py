@@ -8,7 +8,6 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     config_app = hass.data[DOMAIN][entry.entry_id]
-    usar_sensor_fisico = config_app.get("usar_sensor_fisico", False)
 
     config_numbers = [
         ("masa_final_objetivo", 1000.0, 100.0, 10000.0, 50.0, "g", "mdi:scale-balance"),
@@ -21,7 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         ("prefermento", 0.0, 0.0, 100.0, 1.0, "%", "mdi:chart-bubble"),
         ("hidratacion_masa_madre", 100.0, 50.0, 150.0, 1.0, "%", "mdi:flask-round-bottom"),
         ("inoculo_masa_madre", 33.3, 0.0, 100.0, 0.1, "%", "mdi:flask-plus"),
-        ("levadura_prefermento", 0.0, 0.0, 3.0, 0.01, "%", "mdi:yeast"),
+        ("levadura_prefermento", 0.2, 0.0, 3.0, 0.01, "%", "mdi:yeast"),
         ("malta", 0.0, 0.0, 3.0, 0.1, "%", "mdi:grain"),
         ("azucar", 0.0, 0.0, 30.0, 0.1, "%", "mdi:spoon-sugar"),
         ("aove", 0.0, 0.0, 30.0, 0.1, "%", "mdi:oil"),
@@ -29,15 +28,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         ("leche_en_polvo", 0.0, 0.0, 20.0, 0.1, "%", "mdi:blur"),
         ("leche_liquida", 0.0, 0.0, 100.0, 0.1, "%", "mdi:water-opacity"),
         ("huevo", 0.0, 0.0, 50.0, 0.1, "%", "mdi:egg"),
-        ("temperatura_objetivo_masa", 24.0, 0.0, 32.0, 0.5, "°C", "mdi:thermometer-check"),
+        ("temperatura_objetivo_masa", 24.0, 0.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("temperatura_harina", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_prefermento", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_friccion_amasadora", 0.0, 0.0, 15.0, 0.5, "°C", "mdi:engine-outline"),
+        ("temperatura_prefermento", 0.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_friccion_amasadora", 0.0, 0.0, 15.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_ambiente", 24.0, 4.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("tang_zhong", 0.0, 0.0, 20.0, 1.0, "%", "mdi:pot-steam"),
     ]
-
-    if not usar_sensor_fisico:
-        config_numbers.append(("temperatura_ambiente", 20.0, 0.0, 40.0, 0.5, "°C", "mdi:thermometer"))
 
     sliders = [PanNumberSlider(c, d, mi, ma, p, u, i) for c, d, mi, ma, p, u, i in config_numbers]
     async_add_entities(sliders, True)
