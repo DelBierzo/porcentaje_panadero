@@ -1,4 +1,3 @@
-#sensor.py
 import logging
 from datetime import datetime, timedelta
 from homeassistant.components.sensor import SensorEntity
@@ -115,7 +114,6 @@ class PanSensor(SensorEntity, RestoreEntity):
             "select.formula_de_receta", "button.alternar_tang_zhong_agua_leche", "select.origen_temperatura_levado",
             "number.temperatura_ambiente"
         ]
-
         if self.usar_fisico and self.entidad_termometro != "manual":
             entidades_escucha.append(self.entidad_termometro)
 
@@ -207,8 +205,10 @@ class PanSensor(SensorEntity, RestoreEntity):
             leche_state = round(h_total * (pct_leche / 100), 1)
             huevo_state = round(h_total * (pct_huevo / 100), 1)
 
-            h_desc, g_inoculo_state, h_pref_raw, a_pref_raw, l_pref_state = 0.0, 0.0, 0.0, 0.0, 0.0
             pref_total_raw = h_total * (pct_pref / 100)
+
+            # === DECLARACIÓN DE VARIABLES DE RESPALDO ===
+            h_desc, g_inoculo_state, h_pref_raw, a_pref_raw, l_pref_state = 0.0, 0.0, 0.0, 0.0, 0.0
 
             if pct_pref > 0:
                 if tipo_pref == "biga":
@@ -225,11 +225,14 @@ class PanSensor(SensorEntity, RestoreEntity):
                     pct_inoculo = get_float("number.inoculo_masa_madre", 33.3)
                     factor_hyd = 1 + (hyd_mm / 100)
                     h_total_prefermento = pref_total_raw / factor_hyd if factor_hyd != 0 else pref_total_raw / 2
+                    a_total_prefermento = pref_total_raw - h_total_prefermento
+                    
                     g_inoculo_state = round(h_total_prefermento * (pct_inoculo / 100) * factor_hyd, 1)
                     h_en_inoculo = g_inoculo_state / factor_hyd if factor_hyd != 0 else g_inoculo_state / 2
                     a_en_inoculo = g_inoculo_state - h_en_inoculo
+                    
                     h_pref_raw = h_total_prefermento - h_en_inoculo
-                    a_en_inoculo = (pref_total_raw - h_total_prefermento) - a_en_inoculo
+                    a_pref_raw = a_total_prefermento - a_en_inoculo
                     h_desc = h_total_prefermento
 
             h_pref_state = round(h_pref_raw, 1)
@@ -272,13 +275,13 @@ class PanSensor(SensorEntity, RestoreEntity):
                 except (ValueError, TypeError):
                     return de_respaldo
 
-            # 1. TEMPERATURA A UTILIZAR PARA ESTIMAR LOS TIEMPO DE FERMENTACIÓN (MANUAL VS SENSOR FISICO)
+            # 1. TEMPERATURA A UTILIZAR PARA ESTIMAR LOS TIEMPOS DE FERMENTACIÓN
             if origen_temp == "Sensor Físico" and self.usar_fisico and self.entidad_termometro != "manual":
                 t_fermentacion = get_termometro_real(self.entidad_termometro, 22.0)
             else:
                 t_fermentacion = get_float("number.temperatura_ambiente", 22.0)
 
-            # 2. TEMPERATURA SENSOR FISICO (SIEMPRE EL SENSOR FISICO SI EXISTE) PARA CALCULAR LA TEMPERATURA DEL AGUA
+            # 2. TEMPERATURA SENSOR FÍSICO PARA CALCULAR LA TEMPERATURA DEL AGUA
             if self.usar_fisico and self.entidad_termometro != "manual":
                 t_cocina_real = get_termometro_real(self.entidad_termometro, 22.0)
             else:
@@ -298,7 +301,6 @@ class PanSensor(SensorEntity, RestoreEntity):
                 g_harina_tz = h_total * (pct_tz / 100)
                 g_liquido_tz = g_harina_tz * 5.0
 
-            # ALMACENAMOS LOS GRAMOS DEL ESCALDADO BASE EN LOS ATRIBUTOS
             self._attributes["harina_tang_zhong_g"] = round(g_harina_tz, 1)
             self._attributes["liquido_tang_zhong_g"] = round(g_liquido_tz, 1)
             self._attributes["base_liquida_tang_zhong"] = base_tz_activa
@@ -332,15 +334,21 @@ class PanSensor(SensorEntity, RestoreEntity):
                     g_agua_en_tz = g_liquido_tz
                     agua_neta_state = round(max(0.0, agua_neta_state - g_liquido_tz), 1)
 
-            # GUARDAMOS EL AVISO DEL DESCUBIERTO EN LOS ATRIBUTOS GLOBALES
             self._attributes["leche_utilizada_tz_g"] = round(g_leche_en_tz, 1)
             self._attributes["agua_asistencia_tz_g"] = round(g_agua_en_tz, 1)
             self._attributes["escaldado_mixto"] = g_agua_en_tz > 0.0
 
-            # CÁLCULO DEL AGUA IDEAL
-            if pct_pref > 0: 
-                t_agua_calc = round((t_objetivo * 4) - (t_cocina_real + t_harina + get_float("number.temperatura_prefermento", 20.0) + t_friccion), 1)
-            else: 
+
+            # CÁLCULO DEL AGUA IDEAL (SÓLO CUENTA EL PREFERMENTO SI ESTÁ ACTIVO) 
+            tiene_prefermento = (
+                pct_pref > 0 
+                and tipo_pref not in ["", "ninguno", "none", "no", "false", "0"]
+            )
+
+            if tiene_prefermento:
+                t_pref = get_float("number.temperatura_prefermento", 20.0)
+                t_agua_calc = round((t_objetivo * 4) - (t_cocina_real + t_harina + t_pref + t_friccion), 1)
+            else:
                 t_agua_calc = round((t_objetivo * 3) - (t_cocina_real + t_harina + t_friccion), 1)
 
             # NORMALIZACIÓN CORRECTA DE LA LEVADURA
@@ -364,7 +372,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                 texto_tiempo_levado, texto_reloj_listo = "---", "---"
             else:
                 tiempo_base_horas = 1.0 / velocidad_total_combinada
-                
+
                 # FACTOR EXPO COMPENSADO (CURVA REAL DE FERMENTACIÓN ARRHENIUS)
                 if t_fermentacion >= 24.0:
                     t_ambiente_limite = min(38.0, t_fermentacion)
