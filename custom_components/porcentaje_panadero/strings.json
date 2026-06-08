@@ -1,0 +1,21 @@
+{
+  "title": "Baker's Percentage",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bakery Setup",
+        "description": "Do you want to install the baker's calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to dynamically choose between that sensor or a static manual temperature (ideal for simulating a constant proofing temperature). By default, manual control will be used.",
+        "data": {
+          "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen/bakery",
+          "entidad_termometro": "Select the physical temperature sensor"
+        }
+      }
+    },
+    "error": {
+      "sensor_no_seleccionado": "You must choose a physical temperature sensor from the list if you check the box."
+    },
+    "abort": {
+      "already_configured": "The baker's calculator is already configured on your system."
+    }
+  }
+}
