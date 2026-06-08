@@ -476,12 +476,31 @@ cards:
           name: Room Temp
       - entity: number.temperatura_harina
         name: Flour Temp
-      - entity: number.temperatura_prefermento
-        name: Preferment Temp
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            above: 0
+            entity: number.prefermento
+        row:
+          entity: number.temperatura_prefermento
+          name: Preferment Temp
       - entity: number.temperatura_friccion_amasadora
         name: Mixer Friction Temp
       - entity: sensor.pan_temperatura_agua_ideal
-        name: Ideal Water Temp >>>
+        name: Ideal Water Temp
+        tap_action:
+          action: none
+        card_mod:
+          style:
+            .: |
+              :host {
+                --card-mod-icon-color: #2196f3;
+              }
+            hui-generic-entity-row $: |
+              .state {
+                font-size: 1.4rem !important;
+                font-weight: bold !important;
+              }
   - type: entities
     title: 📈 Proofing & Fermentation
     show_header_toggle: false
