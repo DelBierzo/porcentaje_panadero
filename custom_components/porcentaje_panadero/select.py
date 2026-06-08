@@ -21,7 +21,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         PanSelectMenu(hass, "formula_de_receta", ["---"], "mdi:notebook-edit"),
         PanSelectMenu(hass, "tipo_de_prefermento", ["poolish", "biga", "masa madre"], "mdi:chart-bubble"),
         PanSelectMenu(hass, "harina_para_prefermento", ["harina 1", "harina 2", "harina 3"], "mdi:barley"),
-        PanSelectMenu(hass, "origen_temperatura_levado", opciones_origen, "mdi:thermometer-cog")
+        PanSelectMenu(hass, "origen_temperatura_levado", opciones_origen, "mdi:thermometer-alert")
     ]
     async_add_entities(desplegables, True)
 
@@ -58,7 +58,7 @@ class PanSelectMenu(SelectEntity):
 
     @property
     def options(self) -> list:
-        """Filtra dinámicamente las harinas en vivo y fuerza la selección de respaldo."""
+        """Devuelve las opciones válidas de la lista estática (evita I/O síncrono)."""
         if self._clave == "harina_para_prefermento":
             try:
                 def get_f(eid):
@@ -103,27 +103,37 @@ class PanSelectMenu(SelectEntity):
     @property
     def icon(self) -> str: return self._icon
 
+    def _leer_formulas_sync(self):
+        """Método seguro ejecutado en el pool de hilos para cargar el archivo."""
+        ruta_json = self._hass.config.path("custom_components/porcentaje_panadero/formulas.json")
+        if os.path.exists(ruta_json):
+            try:
+                with open(ruta_json, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as ex:
+                _LOGGER.error("Error leyendo archivo de recetas: %s", ex)
+        return None
+
+    async def async_recargar_recetas(self):
+        """Actualiza de forma asíncrona la lista de recetas desde el disco sin bloquear a HA."""
+        data = await self._hass.async_add_executor_job(self._leer_formulas_sync)
+        if data:
+            self._options = ["---"] + list(data.keys())
+        else:
+            self._options = ["---"]
+        self.async_write_ha_state()
+
     async def async_added_to_hass(self):
-        """Se ejecuta cuando el desplegable se acopla a HA. Lee el JSON de forma segura y escucha cambios."""
+        """Se ejecuta al arrancar. Carga las recetas e inicia los escuchadores."""
         await super().async_added_to_hass()
 
         if self._clave == "formula_de_receta":
-            ruta_json = self._hass.config.path("custom_components/porcentaje_panadero/formulas.json")
-            
-            def leer_json_seguro():
-                if os.path.exists(ruta_json):
-                    with open(ruta_json, "r", encoding="utf-8") as f:
-                        return json.load(f)
-                return None
-
-            data = await self._hass.async_add_executor_job(leer_json_seguro)
-            if data:
-                self._options = ["---"] + list(data.keys())
-                self.async_write_ha_state()
+            await self.async_recargar_recetas()
 
         if self._clave in ["harina_para_prefermento", "tipo_de_prefermento", "formula_de_receta"]:
             @callback
             def _on_bascula_change(event):
+                # RESTAURADO: Si tocas una báscula, la receta vuelve a "---" para poder editarla libremente
                 if self._clave == "formula_de_receta":
                     if self._current_option != "---":
                         self._current_option = "---"
@@ -148,7 +158,15 @@ class PanSelectMenu(SelectEntity):
             )
 
     async def async_select_option(self, option: str) -> None:
-        """Cambia la opcion seleccionada por el dedo en Lovelace y dispara las matematicas."""
+        """Cambia la opción seleccionada y ejecuta los servicios correspondientes."""
+        if self._clave == "formula_de_receta":
+            # Si vas a seleccionar, nos aseguramos primero de refrescar la lista por si guardaste una nueva
+            await self.async_recargar_recetas()
+            
+        if option not in self._options:
+            # Forzado dinámico si Lovelace guardó e intentó seleccionar en el mismo milisegundo
+            self._options.append(option)
+
         self._current_option = option
         self.async_write_ha_state()
 

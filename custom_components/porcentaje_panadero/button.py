@@ -82,7 +82,7 @@ class PanResetButton(ButtonEntity):
             "number.huevo": 0.0,
             "number.temperatura_objetivo_masa": 24.0,
             "number.temperatura_harina": 20.0,
-            "number.temperatura_prefermento": 0.0,
+            "number.temperatura_prefermento": 20.0,
             "number.temperatura_friccion_amasadora": 0.0,
             "number.temperatura_ambiente": 24.0
         }

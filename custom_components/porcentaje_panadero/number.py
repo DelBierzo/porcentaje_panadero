@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         ("huevo", 0.0, 0.0, 50.0, 0.1, "%", "mdi:egg"),
         ("temperatura_objetivo_masa", 24.0, 0.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("temperatura_harina", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_prefermento", 0.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_prefermento", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
         ("temperatura_friccion_amasadora", 0.0, 0.0, 15.0, 0.5, "°C", "mdi:thermometer"),
         ("temperatura_ambiente", 24.0, 4.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("tang_zhong", 0.0, 0.0, 20.0, 1.0, "%", "mdi:pot-steam"),

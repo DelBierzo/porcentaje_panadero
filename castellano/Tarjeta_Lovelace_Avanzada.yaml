@@ -2020,26 +2020,32 @@ cards:
               .secondary {
                 font-size: 1.4rem !important;
               }
-      - type: tile
-        entity: number.temperatura_prefermento
-        name: PREFERMENTO
-        icon: ""
-        color: purple
-        show_entity_picture: false
-        hide_state: false
-        vertical: false
-        tap_action:
-          action: none
-        features:
-          - style: slider
-            type: numeric-input
-        features_position: inline
-        card_mod:
-          style:
-            ha-tile-info$: |
-              .secondary {
-                font-size: 1.4rem !important;
-              }
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            above: 0
+            entity: number.prefermento
+        card:
+          type: tile
+          entity: number.temperatura_prefermento
+          name: PREFERMENTO
+          icon: ""
+          color: purple
+          show_entity_picture: false
+          hide_state: false
+          vertical: false
+          tap_action:
+            action: none
+          features:
+            - style: slider
+              type: numeric-input
+          features_position: inline
+          card_mod:
+            style:
+              ha-tile-info$: |
+                .secondary {
+                  font-size: 1.4rem !important;
+                }
       - type: tile
         entity: number.temperatura_friccion_amasadora
         name: AMASADORA

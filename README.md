@@ -25,6 +25,8 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 * **Ratio Harina sobre Masa:** Nuevo sensor avanzado que calcula y expone el porcentaje real de la harina total respecto al peso neto de la masa en el bol.
 * **Algoritmo Térmico del Agua:** Calcula la temperatura ideal del agua de amasado cruzando variables manuales de fricción o enlazándose en tiempo real a tu termómetro Zigbee físico de la cocina.
 * **Recetario Local con Confirmaciones Móviles:** Se sincroniza automáticamente con un archivo `formulas.json` local. Lanzamiento de alertas interactivas a tu smartphone ante sobreescrituras o borrados accidentales.
+* **Algoritmo Térmico de Doble Vía:** Calcula la temperatura ideal del agua de amasado monitorizando de forma constante tu cocina (vía termómetro físico Zigbee), mientras que el tiempo de fermentación se calcula de forma independiente según el entorno elegido (encimera real o slider manual para consigna de cámara).
+* **Cinética Biológica Exponencial:** Integra un motor de estimación de levado basado en las curvas termodinámicas reales de Arrhenius (Van 't Hoff). Ofrece predicciones exactas tanto a temperatura ambiente estándar de obrador (24°C) como en aletargamiento de frío extremo en nevera (5°C) para fermentaciones prolongadas.
 
 ---
 
@@ -38,7 +40,10 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 * **Flour-to-Dough Ratio:** New advanced sensor that calculates and displays the exact percentage of total flour relative to the net dough weight.
 * **Water Thermal Algorithm:** Calculates the ideal water temperature by crossing manual friction variables or syncing in real time with your physical Zigbee kitchen thermometer.
 * **Local Recipe Book with Mobile Confirmations:** Syncs automatically with a local `formulas.json` file. Sends interactive smartphone alerts to prevent accidental overwrites or deletions.
+* **Dual-Way Thermal Algorithm:** Calculates the ideal kneading water temperature by constantly tracking your physical Zigbee kitchen thermometer, while independently estimating proofing time based on your chosen environment (live counter-top or manual chamber consign slider).
+* **Exponential Biological Kinetics:** Integrates a proofing speed engine based on true Arrhenius (Van 't Hoff) thermodynamic curves. It yields highly accurate time predictions for both standard room fermentation (24°C) and extreme cold retardation in fridges (5°C) for extended dough maturations.
 
+---
 
 ## 📸 Capturas de Pantalla / Screenshots
 
@@ -46,6 +51,8 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
   <img src="images/cap_adv1.png" width="40%" alt="Vista de la Tarjeta Básica">
   <img src="images/cap_bas.png" width="50%" alt="Vista de la Tarjeta Avanzada">
 </p>
+
+## 🇪🇸 Castellano
 
 ## ⚙️ Parámetros de Configuración
 
@@ -72,8 +79,6 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ---
 
-## 🇪🇸 Castellano
-
 ## ⚠️ Configuración de Avisos y Alertas
 
 Para habilitar la seguridad al eliminar o alterar una fórmula, debes añadir las automatizaciones del archivo [`Automatizaciones.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Automatizaciones.yaml) a tu servidor. Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
@@ -88,7 +93,7 @@ Si durante la instalación inicial del asistente configuras un **sensor de tempe
 
 ## 🎛️ Tarjetas Lovelace (Modos de Uso)
 
-La integración genera de forma automática **60/61 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
+La integración genera de forma automática **65 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
 ### 🔹 Modo Básico
 Instala la integración, añade el código de la [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml) a tu panel y ¡listo para usar! No requiere ninguna dependencia adicional.
@@ -113,6 +118,31 @@ Este modo exprime al máximo la interfaz visual y requiere la descarga previa de
 
 ## 🇬🇧 English
 
+## ⚙️ Configuration Parameters
+
+Define the **final dough weight** in grams and the rest of the calculation values in **percentages**.
+
+* **Sourdough Inoculum:** The exact amount of active sourdough starter required to build the preferment based on the selected percentage.
+* **Sourdough Hydration:** The percentage of water relative to flour in your mother sourdough culture.
+* **Sourdough Percentage:** A percentage of 33.3% equals a traditional 1:1:1 feeding ratio (sourdough culture | flour | water).
+* **Preferment Flour:** Specifies from which recipe flour the preferment portion will be subtracted (by default, it is deducted from Flour 1).
+* **Thermal Control:** Manages the final dough temperature by crossing variables for ambient, flour, preferment, and mixer friction temperatures.
+
+---
+
+## 📥 Installation
+
+### Method 1: HACS (Recommended)
+
+1. Go to **HACS** in your Home Assistant panel.
+2. Click on the three vertical dots in the top right corner and select **Custom repositories**.
+3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero`
+4. Under **Category**, strictly select **Integration** and click **Add**.
+5. Download the latest version, go to Settings, and **Restart** Home Assistant.
+6. Go to **Settings ➔ Devices & services ➔ Add integration**, search for `Porcentaje Panadero` and configure it with a single click.
+
+---
+
 ## ⚠️ Safety Alerts Setup
 
 To enable actionable safety alerts when deleting or modifying a formula, you must add the automations from the [`automations.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/automations.yaml) file to your server. This allows you to confirm or deny the action directly from an interactive notification on your mobile phone.
@@ -127,7 +157,7 @@ If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during 
 
 ## 🎛️ Lovelace Cards (Usage Modes)
 
-The integration automatically generates **60/61 native entities** that you can utilize in your dashboard through two different modes:
+The integration automatically generates **65 native entities** that you can utilize in your dashboard through two different modes:
 
 ### 🔹 Basic Mode
 Install the integration, add the [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Basic_Card.yaml) code to your dashboard, and you are ready to go! It does not require any additional dependencies.
