@@ -13,6 +13,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": false,
         "malta": 0.0,
         "azucar": 0.0,
@@ -20,7 +22,8 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pizza_romana_tonda": {
         "masa_final_objetivo": 250.0,
@@ -36,6 +39,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 0.0,
@@ -43,7 +48,8 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pizza_romana_alla_pala": {
         "masa_final_objetivo": 500.0,
@@ -59,6 +65,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 0.0,
@@ -66,7 +74,8 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pizza_new_york": {
         "masa_final_objetivo": 300.0,
@@ -82,6 +91,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 1.5,
@@ -89,7 +100,8 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pizza_detroit": {
         "masa_final_objetivo": 520.0,
@@ -105,6 +117,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 0.0,
@@ -112,7 +126,8 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pan_de_hamburguesa_clasica_x6_95g": {
         "masa_final_objetivo": 570.0,
@@ -128,6 +143,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 6.0,
@@ -135,7 +152,8 @@
         "mantequilla": 10.0,
         "leche_en_polvo": 2.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "pan_de_hamburguesa_con_leche_huevo_x6_95g": {
         "masa_final_objetivo": 570.0,
@@ -151,6 +169,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 10.0,
@@ -158,7 +178,8 @@
         "mantequilla": 7.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 33.4,
-        "huevo": 16.7
+        "huevo": 16.7,
+        "calcular_hidratacion_real": false
     },
     "pan_de_molde": {
         "masa_final_objetivo": 900.0,
@@ -174,6 +195,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.0,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": true,
         "malta": 0.0,
         "azucar": 2.5,
@@ -181,7 +204,8 @@
         "mantequilla": 5.0,
         "leche_en_polvo": 5.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     },
     "baguettes_con_poolish_x4_380g": {
         "masa_final_objetivo": 1520.0,
@@ -197,6 +221,8 @@
         "hidratacion_masa_madre": 100.0,
         "harina_para_prefermento": "harina 1",
         "levadura_prefermento": 0.21,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
         "habilitar_ingredientes_extras": false,
         "malta": 0.0,
         "azucar": 0.0,
@@ -204,6 +230,34 @@
         "mantequilla": 0.0,
         "leche_en_polvo": 0.0,
         "leche_liquida": 0.0,
-        "huevo": 0.0
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
+    },
+    "pan_con_masa_madre_v2": {
+        "masa_final_objetivo": 1010.0,
+        "harina_1": 80.0,
+        "harina_2": 20.0,
+        "harina_3": 0.0,
+        "agua_hidratacion": 66.0,
+        "sal": 2.0,
+        "levadura": 0.33,
+        "tipo_levadura": "seca",
+        "prefermento": 40.0,
+        "tipo_de_prefermento": "masa madre",
+        "inoculo_masa_madre": 20.0,
+        "hidratacion_masa_madre": 100.0,
+        "harina_para_prefermento": "harina 1",
+        "levadura_prefermento": 0.2,
+        "tang_zhong": 0.0,
+        "base_tang_zhong": "agua",
+        "habilitar_ingredientes_extras": false,
+        "malta": 0.0,
+        "azucar": 0.0,
+        "aove": 0.0,
+        "mantequilla": 0.0,
+        "leche_en_polvo": 0.0,
+        "leche_liquida": 0.0,
+        "huevo": 0.0,
+        "calcular_hidratacion_real": false
     }
 }

@@ -23,7 +23,7 @@
       "pan_restablecer_valores": { "name": "Restablecer Parámetros" },
       "pan_guardar_formula": { "name": "Guardar Receta Nueva" },
       "pan_eliminar_formula": { "name": "Eliminar Receta Activa" },
-      "pan_alternar_tipo_levadura": { 
+      "pan_alternar_tipo_levadura": {
         "name": "Alternar Fresca / Seca",
         "state": {
           "fresca": "Fresca",
@@ -93,14 +93,22 @@
       "mantequilla": { "name": "Mantequilla" },
       "leche_polvo": { "name": "Leche en Polvo" },
       "leche": { "name": "Leche" },
-      "huevo": { "name": "Egg" },
+      "huevo": { "name": "Huevo" },
       "formula_activa": { "name": "Receta en el Obrador" },
       "tiempo_fermentacion_estimado": { "name": "Tiempo de Levado Estimado" },
       "hora_fin_fermentacion": { "name": "Hora Aproximada de Masa Lista" },
       "porcentaje_harina_sobre_masa": { "name": "Porcentaje Harina Total" },
       "temperatura_utilizada": { "name": "Temp. Ambiente" },
-	  "sensor_fisico_instalado": { "name": "Sensor Físico Instalado" },
-	  "temperatura_real": { "name": "Temperatura Real" }
+      "sensor_fisico_instalado": { "name": "Sensor Físico Instalado" },
+      "temperatura_real": { "name": "Temperatura Real" },
+      "porcentaje_hidratacion_final": { "name": "Agua de Amasado Directo" },
+      "porcentaje_hidratacion_prefermento": { "name": "Agua Aportada por Prefermento" },
+      "porcentaje_harina_prefermento": { "name": "Harina Prefermentada Total" },
+      "porcentaje_harina_1_neta": { "name": "Porcentaje Neto Harina 1" },
+      "porcentaje_harina_2_neta": { "name": "Porcentaje Neto Harina 2" },
+      "porcentaje_harina_3_neta": { "name": "Porcentaje Neto Harina 3" },
+      "porcentaje_inoculo_puro": { "name": "Porcentaje Inóculo Receta" },
+      "porcentaje_hidratacion_total_real": { "name": "Hidratación Total Real Receta" }
     }
   }
 }

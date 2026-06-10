@@ -23,7 +23,7 @@
       "pan_restablecer_valores": { "name": "Reset Parameters" },
       "pan_guardar_formula": { "name": "Save New Recipe" },
       "pan_eliminar_formula": { "name": "Delete Active Recipe" },
-      "pan_alternar_tipo_levadura": { 
+      "pan_alternar_tipo_levadura": {
         "name": "Toggle Fresh / Dry Yeast",
         "state": {
           "fresca": "Fresh",
@@ -99,8 +99,16 @@
       "hora_fin_fermentacion": { "name": "Approximate Ready Time" },
       "porcentaje_harina_sobre_masa": { "name": "Total Flour Percentage" },
       "temperatura_utilizada": { "name": "Room Temp." },
-	  "sensor_fisico_instalado": { "name": "Physical Sensor Installed" },
-	  "temperatura_real": { "name": "Real Temperature" }
+      "sensor_fisico_instalado": { "name": "Physical Sensor Installed" },
+      "temperatura_real": { "name": "Real Temperature" },
+      "porcentaje_hidratacion_final": { "name": "Direct Kneading Water" },
+      "porcentaje_hidratacion_prefermento": { "name": "Water Contributed by Preferment" },
+      "porcentaje_harina_prefermento": { "name": "Total Prefermented Flour" },
+      "porcentaje_harina_1_neta": { "name": "Net Percentage Flour 1" },
+      "porcentaje_harina_2_neta": { "name": "Net Percentage Flour 2" },
+      "porcentaje_harina_3_neta": { "name": "Net Percentage Flour 3" },
+      "porcentaje_inoculo_puro": { "name": "Net Percentage Inoculum" },
+      "porcentaje_hidratacion_total_real": { "name": "Real Total Hydration" }
     }
   }
 }
