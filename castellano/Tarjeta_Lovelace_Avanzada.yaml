@@ -4,6 +4,13 @@ cards:
     icon: mdi:baguette
     heading: EL RINCÓN DEL PANADERO
     heading_style: title
+    badges:
+      - type: entity
+        entity: sensor.receta_en_el_obrador
+        icon: ""
+        display_type: state
+        tap_action:
+          action: none
   - type: custom:expander-card
     cards:
       - type: vertical-stack
