@@ -66,24 +66,37 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ---
 
-## 📥 Instalación / Installation
+## 📥 Instalación
 
 ### Método 1: HACS (Recomendado)
 
 1. Ve a **HACS** en tu panel de Home Assistant.
-2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados** (*Custom repositories*).
+2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados** (*Repositorios Personalizados*).
 3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero`
 4. En **Categoría**, selecciona estrictamente **Integración** (*Integration*) y haz clic en **Añadir**.
 5. Descarga la última versión, ve a Ajustes y **Reinicia** Home Assistant.
 6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Añadir integración**, busca `Porcentaje Panadero` y configúrala con un solo clic.
+7. Asegúrate de añadir el recurso correspondiente si no se añade automáticamente mediante HACS:
 
----
+	Configuración > Paneles > Recursos
+
+	AÑADIR RECURSO
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js`
+	* **Tipo de recurso:** Módulo JavaScript (`JavaScript Module`)
+
+Con esto incorporamos las tarjetas:
+
+```
+type: custom:porcentaje-panadero-formula-card
+type: custom:porcentaje-panadero-info-card
+type: custom:porcentaje-panadero-control-panel-card
+```
 
 ## 📝 Notas Importantes sobre el Sensor Físico de Temperatura
 
-Si durante la instalación inicial del asistente configuras un **sensor de temperatura físico** (Zigbee, Wi-Fi, etc.) en lugar del slider manual, ten en cuenta el siguiente paso para tu interfaz visual:
+Si durante la instalación inicial del asistente configuras un **sensor de temperatura físico** (Zigbee, Wi-Fi, etc.) en lugar del slider manual, ten en cuenta el siguiente:
 
-* **Modificación de la Tarjeta:** La tarjeta avanzada de Lovelace incluye por defecto deslizadores interactivos manuales (`number.temperatura_...`). Si deseas que el panel muestre la lectura real de tu termómetro físico en lugar del slider, debes editar el código YAML de tu tarjeta avanzada y **reemplazar la entidad del número manual por tu sensor real** (por ejemplo, cambiar `number.temperatura_ambiente` por `sensor.tu_termometro_cocina_temperature`).
+* **Para la temperatura ideal del agua, siempre se tiene en cuenta la temperatura del sensor fisico (temperatura ambiente "real"), en cambio tienes la opccion de alternar entre sensor fisico / manual, para la temperatura de levado, pudiendo elegir otro lugar donde llevar a cabo la fermentacion de la masa.** 
 
 
 ## 🎛️ Tarjetas Lovelace (Modos de Uso)
@@ -103,12 +116,6 @@ Este modo exprime al máximo la interfaz visual y requiere la descarga previa de
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
 * 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Características extendidas para los Tiles nativos.
-* 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Ventanas flotantes integradas.
-
-#### Activación de la Integración Popup Card
-1. Ve a **Ajustes** → **Dispositivos y servicios** → Haz clic en **Añadir integración**.
-2. Busca **"Popup Card"** y selecciónala.
-3. Haz clic en **Enviar** (esta integración trasera no requiere ninguna configuración adicional).
 
 ---
 
@@ -130,45 +137,53 @@ Define the **final dough weight** in grams and the rest of the calculation value
 
 ### Method 1: HACS (Recommended)
 
-1. Go to **HACS** in your Home Assistant panel.
+1. Go to **HACS** in your Home Assistant dashboard.
 2. Click on the three vertical dots in the top right corner and select **Custom repositories**.
 3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero`
-4. Under **Category**, strictly select **Integration** and click **Add**.
+4. In **Category**, strictly select **Integration** and click **Add**.
 5. Download the latest version, go to Settings, and **Restart** Home Assistant.
 6. Go to **Settings ➔ Devices & services ➔ Add integration**, search for `Porcentaje Panadero` and configure it with a single click.
+7. Make sure to add the corresponding resource if it is not automatically added via HACS:
 
+	Settings > Dashboards > Resources
+
+	ADD RESOURCE
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js`
+	* **Resource type:** JavaScript Module (`JavaScript Module`)
+
+With this, we incorporate the cards:
+
+```
+type: custom:porcentaje-panadero-formula-card
+type: custom:porcentaje-panadero-info-card
+type: custom:porcentaje-panadero-control-panel-card
+```
 ---
 
-## 📝 Important Notes on Physical Temperature Sensors
+## 📝 Important Notes on the Physical Temperature Sensor
 
-If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during the initial setup instead of using the manual sliders, please note the following step for your dashboard:
+If during the initial setup wizard you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) instead of the manual slider, please note the following:
 
-* **Dashboard Modification:** The advanced Lovelace card uses manual interactive sliders (`number.temperatura_...`) by default. To display the actual live reading from your physical kitchen thermometer instead of the manual input slider, you must edit your advanced card YAML code and **replace the manual number entity with your actual sensor entity** (e.g., changing `number.temperatura_ambiente` to `sensor.your_kitchen_thermometer_temperature`).
+* **For the ideal water temperature, the physical sensor's temperature ("real" ambient temperature) is always taken into account. On the other hand, you have the option to toggle between the physical sensor and the manual slider for the proofing temperature, allowing you to choose a different location to ferment your dough.** 
 
 
 ## 🎛️ Lovelace Cards (Usage Modes)
 
-The integration automatically generates **78 native entities** that you can utilize in your dashboard through two different modes:
+The integration automatically generates **78 native entities** that you can utilize in your interface through two modes:
 
-### 🔹 Basic Mode Requirements: [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Basic_Card.yaml)
-This mode requires downloading the following frontend cards/plugins from **HACS** beforehand:
+### 🔹 Basic Mode Requirements: [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
+This mode requires downloading the following add-ons from **HACS** beforehand:
 
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customize rows CSS styling.
+* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customizes the CSS styles of rows.
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
-  
-### 🔸 Advanced Mode Requirements:  [`advanced_card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Advanced_Card.yaml)
-This mode unlocks the full potential of the visual interface and requires downloading the following frontend cards/plugins from **HACS** beforehand:
+ 
+### 🔸 Advanced Mode Requirements: [`advanced card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
+This mode squeezes the visual interface to its fullest and requires downloading the following add-ons from **HACS** beforehand:
 
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customize rows CSS styling.
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
 * 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Extended button and slider features for native Tiles.
-* 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Integrated contextual floating windows.
-
-#### Activating the Popup Card Integration
-1. Go to **Settings** → **Devices & services** → Click on **Add integration**.
-2. Search for **"Popup Card"** and select it.
-3. Click **Submit** (this backend integration requires no further configuration).
 
 ---
 
