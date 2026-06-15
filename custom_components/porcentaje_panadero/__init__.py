@@ -65,7 +65,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "entidad_termometro": entry.data.get("entidad_termometro", "manual")
     }
 
-    # 🟢 SOLUCIÓN DEFINITIVA: Añadimos await para ejecutar la función asíncrona de forma nativa
     await hass.http.async_register_static_paths([
         StaticPathConfig(
             url_path="/porcentaje_panadero_ui",
@@ -76,7 +75,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     def buscar_estado_entidad(nombre_base, default_val=0.0):
         """Busca la entidad en el Core probando todas las variantes unificadas posibles."""
-
 
         if nombre_base in ["nombre_nueva_formula", "pan_nombre_nueva_formula"]:
             st_texto = hass.states.get("text.nombre_nueva_formula")
@@ -313,7 +311,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await hass.async_add_executor_job(escribir_json)
         _LOGGER.info("Nueva formula '%s' creada con exito en el archivo JSON.", nombre_id)
 
-        # Actualiza la memoria global y fuerza al sensor a pintar el nombre recien guardado
         const.RECETA_ACTIVA_MEMORIA = nombre_raw.strip().replace("_", " ").title()
         hass.states.async_set("sensor.formula_activa", const.RECETA_ACTIVA_MEMORIA, {
             "friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"
@@ -322,7 +319,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if hass.states.get("text.nombre_nueva_formula") is not None:
             await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
 
-        # Enviamos la notificacion nativa por el bus para recargar el select de forma segura
         hass.bus.fire("porcentaje_panadero_recetas_actualizadas", {})
 
     async def confirmar_sobreescritura_service(call: ServiceCall):

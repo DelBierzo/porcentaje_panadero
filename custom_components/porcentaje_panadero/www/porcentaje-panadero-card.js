@@ -30,7 +30,6 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
     const tzTotal = parseFloat(this._hass.states['sensor.tang_zhong_total']?.state || 0), pctPref = parseFloat(this._hass.states['number.prefermento']?.state || 0);
 
     if (!this._htmlInyectado) {
-      // 🟢 CORREGIDO: Estilo nativo tipo tarjeta Entities (24px, sin negrita, color primario)
       const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
       
       this.content.innerHTML = `
@@ -38,7 +37,6 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
         <div class="control-header"><select class="select-formula-receta" id="select-formula-card"></select><button class="btn-reset-receta" id="btn-reset-card">🔄 ${isEn?'RESET':'RESTABLECER'}</button></div><div class="obrador-title"><span id="cabecera-receta-dinamica" style="font-size:14px !important; font-weight:normal; margin-left:auto; color:var(--secondary-text-color); text-transform: uppercase; letter-spacing: 0.5px;"></span></div><div id="bloque-tangzhong-dinamico"></div><div id="bloque-prefermento-dinamico"></div><div class="panel-section">${isEn ? 'FINAL KNEADING INGREDIENTS' : 'INGREDIENTES AMASADO FINAL'}</div><div id="lista-ingredientes"></div>`;
       this.registrarEventosCard(); this._htmlInyectado = true;
     }
-
 
     const activeEl = this.shadowRoot.activeElement, selF = this.shadowRoot.getElementById('select-formula-card');
     if (selF && selF !== activeEl) { selF.innerHTML = opcionesRecetas.map(opt => `<option value="${opt}" ${opt === recetaSeleccionada ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join(''); }
@@ -139,7 +137,6 @@ class PorcentajePanaderoInfoCard extends HTMLElement {
     const tipoPref = (this._hass.states['select.tipo_de_prefermento']?.state || 'poolish').toLowerCase();
 
     if (!this._htmlInyectado) {
-      // 🟢 CORREGIDO: Estilo nativo tipo tarjeta Entities (24px, sin negrita, color primario)
       const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
 
       this.content.innerHTML = `
@@ -229,7 +226,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     const opcionesRetirarHarina = selectorRetirarHarina?.attributes['options'] || [];
 
     if (!this._htmlInyectado) {
-      // 🟢 CORREGIDO: Estilo nativo tipo tarjeta Entities (24px, sin negrita, color primario)
       const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
 
       this.content.innerHTML = `
