@@ -7,8 +7,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 import homeassistant.helpers.config_validation as cv
 from .button import (
-    obtener_tipo_levadura_actual, 
-    establecer_tipo_levadura_actual, 
+    obtener_tipo_levadura_actual,
+    establecer_tipo_levadura_actual,
     ID_BOTON_LEVADURA,
     obtener_base_tz_actual,
     establecer_base_tz_actual,
@@ -17,9 +17,7 @@ from .button import (
 from .const import DOMAIN, RECETA_ACTIVA_MEMORIA
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
-
 _LOGGER = logging.getLogger(__name__)
-
 DOMAIN = "porcentaje_panadero"
 
 PLATFORMS = [
@@ -32,17 +30,33 @@ PLATFORMS = [
 ]
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Configuración inicial por archivo YAML."""
+    """Configuracion inicial por archivo YAML."""
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Configura la integración de forma oficial desde Ajustes."""
+    """Configura la integracion de forma oficial desde Ajustes."""
     _LOGGER.info("Inicializando cerebro de Porcentaje Panadero.")
-    
+
     ruta_json = hass.config.path("custom_components/porcentaje_panadero/formulas.json")
-    if not os.path.exists(ruta_json):
-        with open(ruta_json, "w", encoding="utf-8") as f:
-            json.dump({}, f, indent=4, ensure_ascii=False)
+    ruta_harinas_json = hass.config.path("custom_components/porcentaje_panadero/harinas.json")
+
+    def inicializar_archivos_persistentes_sync():
+        if not os.path.exists(ruta_json):
+            with open(ruta_json, "w", encoding="utf-8") as f:
+                json.dump({}, f, indent=4, ensure_ascii=False)
+
+        if not os.path.exists(ruta_harinas_json):
+            with open(ruta_harinas_json, "w", encoding="utf-8") as f:
+                base_harinas = [
+                    "Harina de Media Fuerza",
+                    "Harina de Fuerza",
+                    "Harina de Gran Fuerza",
+                    "Harina de Centeno",
+                    "Harina de Espelta"
+                ]
+                json.dump(base_harinas, f, indent=4, ensure_ascii=False)
+
+    await hass.async_add_executor_job(inicializar_archivos_persistentes_sync)
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
@@ -58,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 return st_texto.state
 
         limpio = nombre_base.replace("pan_pct_", "").replace("pan_t_", "").replace("pan_", "")
-        
+
         equivalencias = {
             "masa_final": "number.masa_final_objetivo",
             "harina_1": "number.harina_1",
@@ -88,7 +102,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             "harina_para_prefermento": "select.harina_para_prefermento",
             "extras": "switch.habilitar_ingredientes_extras"
         }
-        
+
         if limpio in equivalencias:
             state = hass.states.get(equivalencias[limpio])
             if state and state.state not in ["unavailable", "unknown", ""]:
@@ -113,17 +127,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return default_val
 
     async def forzar_inyeccion_slider(nombre_base, valor):
-        """Busca el ID real nativo activo del slider e inyecta el valor de forma asíncrona."""
+        """Busca el ID real nativo activo del slider e inyecta el valor de forma asincrona."""
         if nombre_base in ["nombre_nueva_formula", "pan_nombre_nueva_formula"]:
             if hass.states.get("text.nombre_nueva_formula") is not None:
                 await hass.services.async_call("text", "set_value", {
-                    "entity_id": "text.nombre_nueva_formula", 
+                    "entity_id": "text.nombre_nueva_formula",
                     "value": str(valor)
                 })
-                return True
+            return True
 
         limpio = nombre_base.replace("pan_pct_", "").replace("pan_t_", "").replace("pan_", "")
-        
+
         equivalencias_id = {
             "masa_final_objetivo": "number.masa_final_objetivo",
             "masa_final": "number.masa_final_objetivo",
@@ -162,7 +176,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         if limpio in equivalencias_id and hass.states.get(equivalencias_id[limpio]) is not None:
             entidad_id = equivalencias_id[limpio]
-            dominio = entidad_id.split(".")[0]
+            partes = entidad_id.split(".")
+            dominio = partes[0]
+            
             if dominio == "select":
                 servicio = "select_option"
                 params = {"entity_id": entidad_id, "option": str(valor)}
@@ -172,6 +188,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             else:
                 servicio = "set_value"
                 params = {"entity_id": entidad_id, "value": float(valor)}
+                
             await hass.services.async_call(dominio, servicio, params)
             return True
 
@@ -180,7 +197,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ]
         for entidad_id in variantes:
             if hass.states.get(entidad_id) is not None:
-                dominio = entidad_id.split(".")[0]
+                partes = entidad_id.split(".")
+                dominio = partes[0]
+                
                 if dominio == "select":
                     servicio = "select_option"
                     params = {"entity_id": entidad_id, "option": str(valor)}
@@ -190,6 +209,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 else:
                     servicio = "set_value"
                     params = {"entity_id": entidad_id, "value": float(valor)}
+                    
                 await hass.services.async_call(dominio, servicio, params)
                 return True
         return False
@@ -208,11 +228,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         except (ValueError, TypeError):
             inoculo_real = 33.3
 
+        sel_h1 = hass.states.get("select.harina_principal_1")
+        sel_h2 = hass.states.get("select.harina_secundaria_2")
+        sel_h3 = hass.states.get("select.harina_secundaria_3")
+
         return {
             "masa_final_objetivo": masa_real,
             "harina_1": float(buscar_estado_entidad("harina_1", 100.0)),
             "harina_2": float(buscar_estado_entidad("harina_2", 0.0)),
             "harina_3": float(buscar_estado_entidad("harina_3", 0.0)),
+            "harina_1_nombre": sel_h1.state if sel_h1 and sel_h1.state not in ["unknown", "unavailable", ""] else "Harina de Fuerza",
+            "harina_2_nombre": sel_h2.state if sel_h2 and sel_h2.state not in ["unknown", "unavailable", ""] else "Harina de Centeno",
+            "harina_3_nombre": sel_h3.state if sel_h3 and sel_h3.state not in ["unknown", "unavailable", ""] else "Harina de Espelta",
             "agua_hidratacion": float(buscar_estado_entidad("agua", 60.0)),
             "sal": float(buscar_estado_entidad("sal", 2.0)),
             "levadura": float(buscar_estado_entidad("levadura", 0.7)),
@@ -241,52 +268,58 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         from . import const
         estado_texto = hass.states.get("text.nombre_nueva_formula")
         nombre_raw = estado_texto.state if estado_texto else ""
-        
         if not nombre_raw or str(nombre_raw).strip() in ["", "0.0", "0", "unknown", "unavailable"]:
             nombre_raw = const.RECETA_ACTIVA_MEMORIA
-            
         if not nombre_raw or str(nombre_raw).strip() in ["", "---", "unknown", "unavailable"]:
             _LOGGER.warning("Intento de guardado fallido: No hay nombre en el cuadro de texto ni receta activa.")
             await hass.services.async_call("persistent_notification", "create", {
-                "title": "⚠️ Error de Guardado",
-                "message": "No se puede guardar la receta porque el campo **'Nombre para guardar'** está vacío y no hay ninguna receta activa cargada.",
+                "title": "Error de Guardado",
+                "message": "No se puede guardar la receta porque el campo **Nombre para guardar** esta vacio y no hay ninguna receta activa cargada.",
                 "notification_id": "porcentaje_panadero_vacio"
             })
             return
-        
+
         nombre_id = str(nombre_raw).strip().replace(" ", "_").lower()
 
         def leer_json():
             with open(ruta_json, "r", encoding="utf-8") as f:
                 return json.load(f)
+
         data = await hass.async_add_executor_job(leer_json)
 
         if nombre_id in data:
-            _LOGGER.info("Fórmula '%s' ya existe. Solicitando confirmación de sobreescritura.", nombre_id)
+            _LOGGER.info("Formula '%s' ya existe. Solicitando confirmacion de sobreescritura.", nombre_id)
             hass.bus.fire("porcentaje_panadero_alerta_duplicado", {"nombre": str(nombre_raw)})
             return
 
         data[nombre_id] = obtener_datos_interfaz()
-        
+
         def escribir_json():
             with open(ruta_json, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
+
         await hass.async_add_executor_job(escribir_json)
-            
-        _LOGGER.info("Nueva fórmula '%s' creada con éxito en el archivo JSON.", nombre_id)
-        
+        _LOGGER.info("Nueva formula '%s' creada con exito en el archivo JSON.", nombre_id)
+
+        # Actualiza la memoria global y fuerza al sensor a pintar el nombre recien guardado
+        const.RECETA_ACTIVA_MEMORIA = nombre_raw.strip().replace("_", " ").title()
+        hass.states.async_set("sensor.formula_activa", const.RECETA_ACTIVA_MEMORIA, {
+            "friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"
+        })
+
         if hass.states.get("text.nombre_nueva_formula") is not None:
             await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
-            
-        await actualizar_menu_desplegable(hass, list(data.keys()), nombre_id)
+
+        # Enviamos la notificacion nativa por el bus para recargar el select de forma segura
+        hass.bus.fire("porcentaje_panadero_recetas_actualizadas", {})
 
     async def confirmar_sobreescritura_service(call: ServiceCall):
-        """Servicio definitivo que se ejecuta si una automatización móvil llama a la confirmación."""
+        """Servicio definitivo que se ejecuta si una automatizacion movil llama a la confirmacion."""
         from . import const
         nombre_raw = const.RECETA_ACTIVA_MEMORIA
-        if not nombre_raw or str(nombre_raw).strip() in ["", "---", "unknown", "unavailable"]: 
+        if not nombre_raw or str(nombre_raw).strip() in ["", "---", "unknown", "unavailable"]:
             return
-            
+
         nombre_id = str(nombre_raw).strip().replace(" ", "_").lower()
 
         def leer_json():
@@ -294,76 +327,196 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 return json.load(f)
         data = await hass.async_add_executor_job(leer_json)
         data[nombre_id] = obtener_datos_interfaz()
-        
+
         def escribir_json():
             with open(ruta_json, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
         await hass.async_add_executor_job(escribir_json)
-            
-        _LOGGER.info("Fórmula '%s' actualizada en el JSON tras confirmación externa.", nombre_id)
+
+        _LOGGER.info("Formula '%s' actualizada en el JSON tras confirmacion externa.", nombre_id)
+        
         if hass.states.get("text.nombre_nueva_formula") is not None:
             await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
-            
-        await actualizar_menu_desplegable(hass, list(data.keys()), nombre_id)
+
+        const.RECETA_ACTIVA_MEMORIA = nombre_raw.strip().replace("_", " ").title()
+        hass.states.async_set("sensor.formula_activa", const.RECETA_ACTIVA_MEMORIA, {
+            "friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"
+        })
+
+        if hass.states.get("select.formula_de_receta") is not None:
+            await hass.services.async_call("select", "select_option", {"entity_id": "select.formula_de_receta", "option": "---"})
 
     async def eliminar_formula_service(call: ServiceCall):
-        """Usa la memoria global fija de Python para saber qué receta borrar."""
+        """Usa la memoria global fija de Python para saber que receta borrar."""
         from . import const
         nombre_raw = const.RECETA_ACTIVA_MEMORIA
         if nombre_raw in ["---", "", "unknown", "unavailable"]:
             _LOGGER.warning("Intento de borrado fallido: No hay ninguna receta activa en el obrador.")
             return
-            
+
         nombre_id = nombre_raw.strip().replace(" ", "_").lower()
-        _LOGGER.info("Solicitando confirmación de borrado para la receta activa: %s", nombre_id)
+        _LOGGER.info("Solicitando confirmacion de borrado para la receta activa: %s", nombre_id)
         hass.bus.fire("porcentaje_panadero_alerta_eliminar", {"nombre": str(nombre_raw)})
 
     async def confirmar_eliminacion_service(call: ServiceCall):
-        """Servicio forzado que se ejecuta tras confirmar el borrado desde el móvil."""
+        """Servicio definitivo que se ejecuta tras confirmar el borrado desde el movil."""
         from . import const
         nombre_raw = const.RECETA_ACTIVA_MEMORIA
-        if nombre_raw in ["---", "", "unknown", "unavailable"]: 
+        if nombre_raw in ["---", "", "unknown", "unavailable"]:
             return
-            
+
         nombre_id = nombre_raw.strip().replace(" ", "_").lower()
 
         def leer_json():
             with open(ruta_json, "r", encoding="utf-8") as f:
                 return json.load(f)
         data = await hass.async_add_executor_job(leer_json)
-            
+
         if nombre_id in data:
             del data[nombre_id]
             def escribir_json():
                 with open(ruta_json, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=4, ensure_ascii=False)
             await hass.async_add_executor_job(escribir_json)
-                
-            _LOGGER.info("Fórmula '%s' destruida del JSON tras confirmación de seguridad.", nombre_id)
-            await actualizar_menu_desplegable(hass, list(data.keys()), "---")
+
+            _LOGGER.info("Formula '%s' destruida del JSON tras confirmacion de seguridad.", nombre_id)
+            
+            const.RECETA_ACTIVA_MEMORIA = "---"
+            hass.states.async_set("sensor.formula_activa", "---", {
+                "friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"
+            })
+            
             await hass.services.async_call("button", "press", {"entity_id": "button.restablecer_parametros_base"})
+            if hass.states.get("select.formula_de_receta") is not None:
+                await hass.services.async_call("select", "select_option", {"entity_id": "select.formula_de_receta", "option": "---"})
 
     hass.services.async_register(DOMAIN, "confirmar_eliminacion", confirmar_eliminacion_service)
+
+    async def sincronizar_selectores_harina(lista_harinas):
+        """Notifica los cambios a la UI de Lovelace y actualiza la RAM interna separando comodines."""
+        marcas_reales = [h for h in lista_harinas if h not in ["HARINA 1", "HARINA 2", "HARINA 3", "---"]]
+
+        lista_bascula = list(marcas_reales)
+        for texto_base in ["HARINA 1", "HARINA 2", "HARINA 3"]:
+            if texto_base not in lista_bascula:
+                lista_bascula.append(texto_base)
+
+        lista_purga = ["---"] + marcas_reales
+
+        try:
+            componente_select = hass.data.get("select")
+            if componente_select and hasattr(componente_select, "entities"):
+                for entidad in componente_select.entities:
+                    if hasattr(entidad, "_clave"):
+                        if entidad._clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"]:
+                            entidad._options = lista_bascula
+                            entidad.async_write_ha_state()
+                        elif entidad._clave == "retirar_harina_del_inventario":
+                            entidad._options = lista_purga
+                            entidad.async_write_ha_state()
+        except Exception as ex:
+            _LOGGER.error("No se pudo sincronizar la lista de harinas en la RAM del componente: %s", ex)
+
+        for entidad_id in ["select.harina_principal_1", "select.harina_secundaria_2", "select.harina_secundaria_3"]:
+            estado_actual = hass.states.get(entidad_id)
+            if estado_actual:
+                hass.states.async_set(entidad_id, estado_actual.state, {
+                    **dict(estado_actual.attributes),
+                    "options": lista_bascula
+                })
+        
+        id_purga = "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario"
+        estado_purga = hass.states.get(id_purga)
+        if estado_purga:
+            hass.states.async_set(id_purga, estado_purga.state, {
+                **dict(estado_purga.attributes),
+                "options": lista_purga
+            })
+
+    async def gestion_anadir_harina_service(call: ServiceCall):
+        """Toma el texto exacto escrito en tu cuadro nativo de harina y lo registra en disco."""
+        estado_texto = hass.states.get("text.nombre_nueva_harina")
+        nueva_harina = estado_texto.state.strip() if estado_texto else ""
+        if not nueva_harina or nueva_harina.upper() in ["", "UNKNOWN", "UNAVAILABLE", "---"]: return
+
+        _LOGGER.info("Registrando nueva materia prima en el almacen: %s", nueva_harina)
+
+        def leer_escribir_anadir():
+            with open(ruta_harinas_json, "r", encoding="utf-8") as f: harinas = json.load(f)
+            if nueva_harina not in harinas:
+                harinas.append(nueva_harina)
+                with open(ruta_harinas_json, "w", encoding="utf-8") as f: json.dump(harinas, f, indent=4, ensure_ascii=False)
+            return harinas
+
+        lista_actualizada = await hass.async_add_executor_job(leer_escribir_anadir)
+        
+        if hass.states.get("text.nombre_nueva_harina") is not None:
+            await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_harina", "value": ""})
+            
+        await sincronizar_selectores_harina(lista_actualizada)
+
+    async def gestion_eliminar_harina_service(call: ServiceCall):
+        """Purga del JSON fisico la harina seleccionada en el menu."""
+        estado_select = hass.states.get("select.porcentaje_panadero_pan_select_retirar_harina_del_inventario")
+        harina_a_borrar = estado_select.state if estado_select else ""
+        if not harina_a_borrar or harina_a_borrar.upper() in ["", "UNKNOWN", "UNAVAILABLE", "---"]: return
+
+        _LOGGER.info("Purgando del almacen la materia prima: %s", harina_a_borrar)
+
+        def leer_escribir_eliminar():
+            with open(ruta_harinas_json, "r", encoding="utf-8") as f: harinas = json.load(f)
+            if harina_a_borrar in harinas:
+                harinas.remove(harina_a_borrar)
+                with open(ruta_harinas_json, "w", encoding="utf-8") as f: json.dump(harinas, f, indent=4, ensure_ascii=False)
+            return harinas
+
+        lista_actualizada = await hass.async_add_executor_job(leer_escribir_eliminar)
+        await sincronizar_selectores_harina(lista_actualizada)
+        
+        if hass.states.get("select.porcentaje_panadero_pan_select_retirar_harina_del_inventario") is not None:
+            await hass.services.async_call("select", "select_option", {"entity_id": "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario", "option": "---"})
 
     async def cargar_formula_en_sliders_service(call: ServiceCall):
         """Mueve los controles de la pantalla al seleccionar una receta adaptando IDs."""
         from . import const
         nombre_id = call.data.get("nombre").strip().replace(" ", "_").lower()
         if not os.path.exists(ruta_json): return
-        
+
         def leer_json():
             with open(ruta_json, "r", encoding="utf-8") as f:
                 return json.load(f)
         data = await hass.async_add_executor_job(leer_json)
-        
+
         if nombre_id in data:
             const.CARGANDO_RECETA_BLOQUEO = True
             receta = data[nombre_id]
-            
-            for key, val in receta.items():
-                if key in ["tipo_levadura", "base_tang_zhong"]:
-                    continue
-                await forzar_inyeccion_slider(key, val)
+
+            try:
+                async def inyectar_harina_segura(id_selector, clave_json, fallback_default):
+                    marca_guardada = receta.get(clave_json, fallback_default)
+                    state_obj = hass.states.get(id_selector)
+                    
+                    if state_obj and "options" in state_obj.attributes:
+                        opciones_sistema = state_obj.attributes["options"]
+                        if marca_guardada in opciones_sistema:
+                            await hass.services.async_call("select", "select_option", {"entity_id": id_selector, "option": marca_guardada})
+                            return
+                    
+                    _LOGGER.info("La harina '%s' ya no existe en el catalogo. Restableciendo %s a su estado base traducido.", marca_guardada, id_selector)
+                    
+                    atributos_actuales = dict(state_obj.attributes) if state_obj else {}
+                    hass.states.async_set(id_selector, "unknown", atributos_actuales)
+
+                await inyectar_harina_segura("select.harina_principal_1", "harina_1_nombre", "HARINA 1")
+                await inyectar_harina_segura("select.harina_secundaria_2", "harina_2_nombre", "HARINA 2")
+                await inyectar_harina_segura("select.harina_secundaria_3", "harina_3_nombre", "HARINA 3")
+
+                for key, val in receta.items():
+                    if key in ["tipo_levadura", "base_tang_zhong", "harina_1_nombre", "harina_2_nombre", "harina_3_nombre"]:
+                        continue
+                    await forzar_inyeccion_slider(key, val)
+            finally:
+                pass
 
             tipo_leva_receta = receta.get("tipo_levadura", "seca")
             establecer_tipo_levadura_actual(tipo_leva_receta)
@@ -380,12 +533,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             atributos_tz["base_liquida"] = tipo_base_tz
             atributos_tz["options"] = ["agua", "leche"]
             hass.states.async_set(ID_BOTON_TANG_ZHONG, tipo_base_tz, atributos_tz)
-            
-            await actualizar_menu_desplegable(hass, list(data.keys()), nombre_id)
+
+            const.RECETA_ACTIVA_MEMORIA = nombre_id.replace("_", " ").title()
+            hass.states.async_set("sensor.formula_activa", const.RECETA_ACTIVA_MEMORIA, {
+                "friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"
+            })
             const.CARGANDO_RECETA_BLOQUEO = False
 
+
     async def alternar_tipo_levadura_service(call: ServiceCall):
-        """Conmuta entre levadura aplicando el factor x3 o /3 leyendo los números reales actuales."""
+        """Conmuta entre levadura aplicando el factor x3 o /3 leyendo los numeros reales actuales."""
         tipo_actual = obtener_tipo_levadura_actual()
         nuevo_tipo = "fresca" if tipo_actual == "seca" else "seca"
 
@@ -393,16 +550,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         st_leva_pref = hass.states.get("number.levadura_prefermento")
 
         pct_leva_principal = float(st_leva.state) if st_leva and st_leva.state not in ["unavailable", "unknown", ""] else 0.7
-        pct_leva_pref = float(st_leva_pref.state) if st_leva_pref and st_leva_pref.state not in ["unavailable", "unknown", ""] else 0.0
+        pct_leva_pref_val = float(st_leva_pref.state) if st_leva_pref and st_leva_pref.state not in ["unavailable", "unknown", ""] else 0.0
 
         nuevo_pct = round(pct_leva_principal * 3.0, 2) if tipo_actual == "seca" else round(pct_leva_principal / 3.0, 2)
-        nuevo_pct_pref = round(pct_leva_pref * 3.0, 2) if tipo_actual == "seca" else round(pct_leva_pref / 3.0, 2)
+        nuevo_pct_pref = round(pct_leva_pref_val * 3.0, 2) if tipo_actual == "seca" else round(pct_leva_pref_val / 3.0, 2)
 
         establecer_tipo_levadura_actual(nuevo_tipo)
 
         if hass.states.get("number.levadura") is not None:
             await hass.services.async_call("number", "set_value", {"entity_id": "number.levadura", "value": nuevo_pct})
-        if pct_leva_pref > 0 and hass.states.get("number.levadura_prefermento") is not None:
+        if pct_leva_pref_val > 0 and hass.states.get("number.levadura_prefermento") is not None:
             await hass.services.async_call("number", "set_value", {"entity_id": "number.levadura_prefermento", "value": nuevo_pct_pref})
 
         estado_actual = hass.states.get(ID_BOTON_LEVADURA)
@@ -412,7 +569,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.states.async_set(ID_BOTON_LEVADURA, nuevo_tipo, atributos_base)
 
     async def alternar_tang_zhong_base_service(call: ServiceCall):
-        """Conmuta la base líquida del Tang-Zhong y fuerza el balanceo matemático de líquidos."""
+        """Conmuta la base liquida del Tang-Zhong y fuerza el balanceo matematico de liquidos."""
         base_actual = obtener_base_tz_actual()
         nueva_base = "leche" if base_actual == "agua" else "agua"
         establecer_base_tz_actual(nueva_base)
@@ -456,38 +613,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 if buscar_estado_entidad(extra_key, 0.0) > 0.0:
                     await forzar_inyeccion_slider(extra_key, 0.0)
 
-    async def actualizar_menu_desplegable(hass, lista_recetas, seleccion_actual):
-        """Actualiza la memoria de las opciones del selector y fuerza el refresco visual en Lovelace."""
-        opciones_finales = ["---"] + lista_recetas
-        entidad_select_id = "select.formula_de_receta"
-        entidad_sensor_id = "sensor.formula_activa"
-        
-        try:
-            componente_select = hass.data.get("select")
-            if componente_select and hasattr(componente_select, "entities"):
-                for entidad in componente_select.entities:
-                    if hasattr(entidad, "unique_id") and entidad.unique_id == "formula_de_receta":
-                        entidad._options = opciones_finales
-                        entidad._current_option = "---"
-                        entidad.async_write_ha_state()
-                        break
-        except Exception as ex:
-            _LOGGER.error("No se pudo actualizar el objeto select en memoria: %s", ex)
-
-        if seleccion_actual != "---":
-            const.RECETA_ACTIVA_MEMORIA = seleccion_actual.replace("_", " ").title()
-            hass.states.async_set(entidad_sensor_id, const.RECETA_ACTIVA_MEMORIA, {"friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"})
-            receta_atributo = seleccion_actual
-        else:
-            const.RECETA_ACTIVA_MEMORIA = "---"
-            hass.states.async_set(entidad_sensor_id, "---", {"friendly_name": "Receta en el Obrador", "icon": "mdi:notebook-check"})
-            receta_atributo = "---"
-
-        atributos = {"options": opciones_finales, "friendly_name": "Fórmula de Receta", "receta_activa": receta_atributo}
-        await asyncio.sleep(0.4)
-        if hass.states.get(entidad_select_id) is not None:
-            hass.states.async_set(entidad_select_id, "---", atributos)
-
     # REGISTRO DE SERVICIOS EN EL CORE
     hass.services.async_register(DOMAIN, "guardar_formula", guardar_formula_service)
     hass.services.async_register(DOMAIN, "confirmar_sobreescritura", confirmar_sobreescritura_service)
@@ -496,6 +621,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_register(DOMAIN, "alternar_tipo_levadura", alternar_tipo_levadura_service)
     hass.services.async_register(DOMAIN, "alternar_tang_zhong_base", alternar_tang_zhong_base_service)
     hass.services.async_register(DOMAIN, "balancear_harinas", balancear_harinas_service)
+    hass.services.async_register(DOMAIN, "anadir_harina", gestion_anadir_harina_service)
+    hass.services.async_register(DOMAIN, "eliminar_harina", gestion_eliminar_harina_service)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -506,8 +633,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                     return json.load(f)
             return None
         data = await hass.async_add_executor_job(leer_json)
-        if data:
-            await actualizar_menu_desplegable(hass, list(data.keys()), "---")
+
+        def leer_harinas_inicio():
+            if os.path.exists(ruta_harinas_json):
+                with open(ruta_harinas_json, "r", encoding="utf-8") as f: return json.load(f)
+            return []
+        listado_harinas = await hass.async_add_executor_job(leer_harinas_inicio)
+        if listado_harinas:
+            await sincronizar_selectores_harina(listado_harinas)
     except Exception:
         pass
 

@@ -1,10 +1,10 @@
 {
-  "title": "Baker's Percentage",
+  "title": "Bakery Percentage",
   "config": {
     "step": {
       "user": {
-        "title": "Bakery Setup",
-        "description": "Do you want to install the baker's calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to dynamically choose between that sensor or a static manual temperature (ideal for simulating a constant proofing temperature). By default, manual control will be used.",
+        "title": "Domotic Bakery Configuration",
+        "description": "Do you want to install the bakery calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to control fermentation by dynamically selecting between that sensor or a manual static temperature. By default, manual control will be used.",
         "data": {
           "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen/bakery",
           "entidad_termometro": "Select the physical temperature sensor"
@@ -15,7 +15,39 @@
       "sensor_no_seleccionado": "You must choose a physical temperature sensor from the list if you check the box."
     },
     "abort": {
-      "already_configured": "The baker's calculator is already configured on your system."
+      "already_configured": "The bakery calculator is already configured on your system."
+    }
+  },
+  "entity": {
+    "button": {
+      "pan_restablecer_valores": { "name": "Reset Parameters" },
+      "pan_guardar_formula": { "name": "Save New Recipe" },
+      "pan_eliminar_formula": { "name": "Delete Active Recipe" },
+      "pan_alternar_tipo_levadura": {
+        "name": "Toggle Fresh / Dry Yeast",
+        "state": {
+          "fresca": "Fresh",
+          "seca": "Dry"
+        }
+      },
+      "pan_alternar_tang_zhong_base": { "name": "Tang-Zhong Liquid Base" }
+    },
+    "select": {
+      "formula_de_receta": { "name": "Recipe Formula" },
+      "tipo_de_prefermento": { "name": "Preferment Type" },
+      "harina_para_prefermento": { "name": "Flour for Preferment" },
+      "origen_temperatura_levado": { "name": "Proofing Temp Source" },
+      "selector_harina_1": { "name": "Main Flour (1)" },
+      "selector_harina_2": { "name": "Secondary Flour (2)" },
+      "selector_harina_3": { "name": "Secondary Flour (3)" },
+      "eliminar_harina": { "name": "Remove Flour from Inventory" }
+    },
+    "switch": {
+      "habilitar_ingredientes_extras": { "name": "Enable Extra Ingredients" },
+      "calcular_hidratacion_real": { "name": "Calculate Real Hydration" }
+    },
+    "text": {
+      "nombre_nueva_formula": { "name": "Name to Save" }
     }
   }
 }

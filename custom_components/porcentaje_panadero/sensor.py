@@ -18,9 +18,9 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
         "harina_total", "agua_total", "harina_1_neta", "harina_2_neta",
         "harina_3_neta", "agua_neta", "sal_neta", "levadura_neta",
         "prefermento_total", "tang_zhong_total", "inoculo_masa_madre",
-        "harina_prefermento", "agua_prefermento", "levadura_prefermento", 
-        "temperatura_agua_ideal", "malta", "azucar", "aove", "mantequilla", 
-        "leche_polvo", "leche", "huevo", "formula_activa", 
+        "harina_prefermento", "agua_prefermento", "levadura_prefermento",
+        "temperatura_agua_ideal", "malta", "azucar", "aove", "mantequilla",
+        "leche_polvo", "leche", "huevo", "formula_activa",
         "tiempo_fermentacion_estimado", "hora_fin_fermentacion",
         "porcentaje_harina_sobre_masa", "temperatura_utilizada",
         "sensor_fisico_instalado", "porcentaje_hidratacion_final",
@@ -29,7 +29,6 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
         "porcentaje_inoculo_puro", "porcentaje_hidratacion_total_real"
     ]
 
-    # COMPROBACIÓN DINÁMICA
     if usar_sensor_fisico and entidad_termometro != "manual":
         claves_sensores.append("temperatura_real")
 
@@ -57,8 +56,10 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
             elif clave == "tiempo_fermentacion_estimado": icono = "mdi:timer-sand"
             elif clave == "porcentaje_harina_sobre_masa": icono = "mdi:label-percent-outline"
             elif clave == "sensor_fisico_instalado": icono = "mdi:chip"
-            elif clave in ["porcentaje_hidratacion_final", "porcentaje_hidratacion_prefermento", "porcentaje_hidratacion_total_real"]: icono = "mdi:water-percent"
-            elif clave in ["porcentaje_harina_prefermento", "porcentaje_harina_1_neta", "porcentaje_harina_2_neta", "porcentaje_harina_3_neta", "porcentaje_inoculo_puro"]: icono = "mdi:blur-linear"
+            elif clave in ["porcentaje_hidratacion_final", "porcentaje_hidratacion_prefermento", "porcentaje_hidratacion_total_real"]:
+                icono = "mdi:water-percent"
+            elif clave in ["porcentaje_harina_prefermento", "porcentaje_harina_1_neta", "porcentaje_harina_2_neta", "porcentaje_harina_3_neta", "porcentaje_inoculo_puro"]:
+                icono = "mdi:blur-linear"
             else: icono = "mdi:clock-check-outline"
         else:
             unidad = "°C" if clave in ["temperatura_agua_ideal", "temperatura_utilizada", "temperatura_real"] else "g"
@@ -78,6 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
         sensores.append(PanSensor(hass, clave, unidad, icono, usar_sensor_fisico, entidad_termometro))
 
     async_add_entities(sensores, False)
+    
 class PanSensor(SensorEntity, RestoreEntity):
     """Entidad de sensor panadero asíncrono con persistencia de disco."""
 
@@ -130,8 +132,11 @@ class PanSensor(SensorEntity, RestoreEntity):
             "number.leche_liquida", "number.huevo", "number.temperatura_objetivo_masa",
             "number.temperatura_harina", "number.temperatura_prefermento", "number.temperatura_friccion_amasadora",
             "select.formula_de_receta", "button.alternar_tang_zhong_agua_leche", "select.origen_temperatura_levado",
-            "number.temperatura_ambiente"
+            "number.temperatura_ambiente", "select.selector_harina_1", "select.harina_principal_1",
+            "select.selector_harina_2", "select.harina_secundaria_2", "select.selector_harina_3",
+            "select.harina_secundaria_3"
         ]
+        
         if self.usar_fisico and self.entidad_termometro != "manual":
             entidades_escucha.append(self.entidad_termometro)
 
@@ -144,6 +149,7 @@ class PanSensor(SensorEntity, RestoreEntity):
             async_track_state_change_event(self.hass, entidades_escucha, _on_state_change)
         )
         self.calcular_matematicas_panaderas()
+
     def calcular_matematicas_panaderas(self):
         """Procesa las ecuaciones panaderas leyendo tus ID reales de Lovelace."""
         try:
@@ -224,8 +230,9 @@ class PanSensor(SensorEntity, RestoreEntity):
 
             pref_total_raw = h_total * (pct_pref / 100)
 
-            # === DECLARACIÓN DE VARIABLES DE RESPALDO ===
             h_desc, g_inoculo_state, h_pref_raw, a_pref_raw, l_pref_state = 0.0, 0.0, 0.0, 0.0, 0.0
+            h_pref_state, a_pref_state, pref_total_state = 0.0, 0.0, 0.0
+
 
             if pct_pref > 0:
                 if tipo_pref == "biga":
@@ -248,22 +255,18 @@ class PanSensor(SensorEntity, RestoreEntity):
                     h_en_inoculo = g_inoculo_state / factor_hyd if factor_hyd != 0 else g_inoculo_state / 2
                     a_en_inoculo = g_inoculo_state - h_en_inoculo
 
-                    # Filtramos para medir estrictamente la harina y agua NUEVA de refresco
                     h_pref_raw = h_total_prefermento - h_en_inoculo
                     a_pref_raw = a_total_prefermento - a_en_inoculo
-                    
-                    # La harina descontada del tazón hoy es solo la nueva del refresco
+
                     h_desc = h_pref_raw
 
-            h_pref_state = round(h_pref_raw, 1)
-            a_pref_state = round(a_pref_raw, 1)
+                h_pref_state = round(h_pref_raw, 1)
+                a_pref_state = round(a_pref_raw, 1)
 
-            if tipo_pref == "masa madre":
-                pref_total_state = round(g_inoculo_state + h_pref_state + a_pref_state, 1)
-            else:
-                pref_total_state = round(h_pref_state + a_pref_state + l_pref_state, 1)
-
-            if pct_pref == 0: pref_total_state = 0.0
+                if tipo_pref == "masa madre":
+                    pref_total_state = round(g_inoculo_state + h_pref_state + a_pref_state, 1)
+                else:
+                    pref_total_state = round(h_pref_state + a_pref_state + l_pref_state, 1)
 
             h1_bruta = h_total * (pct_h1 / 100)
             h2_bruta = h_total * (pct_h2 / 100)
@@ -273,13 +276,14 @@ class PanSensor(SensorEntity, RestoreEntity):
             h2_final_state = h2_bruta
             h3_final_state = h3_bruta
 
-            if "1" in h_para_pref: h1_final_state = h1_bruta - h_desc
-            elif "2" in h_para_pref:
-                if pct_h2 > 0 and (h2_bruta - h_desc) >= 0: h2_final_state = h2_bruta - h_desc
-                else: h1_final_state = h1_bruta - h_desc
-            elif "3" in h_para_pref:
-                if pct_h3 > 0 and (h3_bruta - h_desc) >= 0: h3_final_state = h3_bruta - h_desc
-                else: h1_final_state = h1_bruta - h_desc
+            if pct_pref > 0:
+                if "1" in h_para_pref: h1_final_state = h1_bruta - h_desc
+                elif "2" in h_para_pref:
+                    if pct_h2 > 0 and (h2_bruta - h_desc) >= 0: h2_final_state = h2_bruta - h_desc
+                    else: h1_final_state = h1_bruta - h_desc
+                elif "3" in h_para_pref:
+                    if pct_h3 > 0 and (h3_bruta - h_desc) >= 0: h3_final_state = h3_bruta - h_desc
+                    else: h1_final_state = h1_bruta - h_desc
 
             # SEPARACIÓN DE TEMPERATURAS
             st_origen = self.hass.states.get("select.origen_temperatura_levado")
@@ -325,8 +329,8 @@ class PanSensor(SensorEntity, RestoreEntity):
                 self._attributes["liquido_tang_zhong_g"] = round(g_liquido_tz, 1)
                 self._attributes["base_liquida_tang_zhong"] = base_tz_activa
 
-            # DESCONTAMOS LA HARINA DEL ESCALDADO DE LA HARINA 1 NETA DE LA BÁSCULA
-            h1_final_state = max(0.0, h1_final_state - g_harina_tz)
+                # DESCONTAMOS LA HARINA DEL ESCALDADO DE LA HARINA 1 NETA DE LA BÁSCULA
+                h1_final_state = max(0.0, h1_final_state - g_harina_tz)
 
             h1_final_state = round(h1_final_state, 1)
             h2_final_state = round(h2_final_state, 1)
@@ -365,10 +369,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                 self._attributes["escaldado_mixto"] = g_agua_en_tz > 0.0
 
             # CÁLCULO DEL AGUA IDEAL (SÓLO CUENTA EL PREFERMENTO SI ESTÁ ACTIVO)
-            tiene_prefermento = (
-                pct_pref > 0
-                and tipo_pref not in ["", "ninguno", "none", "no", "false", "0"]
-            )
+            tiene_prefermento = (pct_pref > 0 and tipo_pref not in ["", "ninguno", "none", "no", "false", "0"])
 
             if tiene_prefermento:
                 t_pref = get_float("number.temperatura_prefermento", 20.0)
@@ -414,7 +415,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                 hora_actual = datetime.now()
                 hora_futura = hora_actual + timedelta(minutes=minutos_totales)
                 texto_reloj_listo = hora_futura.strftime("%H:%M")
-
+                
             # VOLCADO DE ESTADOS DE SALIDA DE LOS SENSORES
             if tipo_pref == "masa madre":
                 g_prefermento_reales = round(g_inoculo_state + h_pref_state + a_pref_state, 1)
@@ -454,7 +455,27 @@ class PanSensor(SensorEntity, RestoreEntity):
                 self._attributes["base_solicitada"] = base_tz_activa
                 self._attributes["escaldado_mixto_por_descubierto"] = g_agua_en_tz > 0.0
             elif self.tipo_sensor == "inoculo_masa_madre": self._state = g_inoculo_state
-            elif self.tipo_sensor == "harina_prefermento": self._state = h_pref_state
+            elif self.tipo_sensor == "harina_prefermento":
+                self._state = h_pref_state
+                
+                def obtener_nombre_seguro(entity_id, fallback_text):
+                    state_obj = self.hass.states.get(entity_id)
+                    if not state_obj or state_obj.state in ["unavailable", "unknown", ""]:
+                        if state_obj and "friendly_name" in state_obj.attributes:
+                            return state_obj.attributes["friendly_name"]
+                        return fallback_text
+                    return str(state_obj.state)
+
+                nombre_comercial = "Harina 1"
+                if "1" in h_para_pref:
+                    nombre_comercial = obtener_nombre_seguro("select.harina_principal_1", "Harina 1")
+                elif "2" in h_para_pref:
+                    nombre_comercial = obtener_nombre_seguro("select.harina_secundaria_2", "Harina 2")
+                elif "3" in h_para_pref:
+                    nombre_comercial = obtener_nombre_seguro("select.harina_secundaria_3", "Harina 3")
+                
+                self._attributes["nombre_harina_real"] = nombre_comercial
+
             elif self.tipo_sensor == "agua_prefermento": self._state = a_pref_state
             elif self.tipo_sensor == "levadura_prefermento": self._state = l_pref_state
             elif self.tipo_sensor == "harina_1_neta": self._state = h1_final_state
@@ -475,25 +496,19 @@ class PanSensor(SensorEntity, RestoreEntity):
                     st_term = self.hass.states.get(self.entidad_termometro)
                     if not st_term or st_term.state in ["unavailable", "unknown", ""]:
                         self._state = "unavailable"
-                    else:
-                        self._state = "true"
-                else:
-                    self._state = "false"
+                    else: self._state = "true"
+                else: self._state = "false"
             elif self.tipo_sensor == "porcentaje_harina_sobre_masa":
                 if masa_final > 0: self._state = round((h_total / masa_final) * 100, 1)
                 else: self._state = 0.0
             elif self.tipo_sensor == "porcentaje_hidratacion_final":
-                # LÓGICA PURA DE RECETA: Slider Agua - Agua Prefermento Nueva - Agua Inóculo Vieja
                 if h_total > 0:
                     pct_pref_agua = (a_pref_state / h_total) * 100
                     pct_inoculo_agua = 0.0
                     if pct_pref > 0 and tipo_pref == "masa madre":
                         pct_inoculo_agua = ((g_inoculo_state / 2) / h_total) * 100
-                    
-                    # Restamos de la hidratación teórica para saber cuánto queda por echar limpio en el tazón
                     self._state = round(pct_agua - pct_pref_agua - pct_inoculo_agua, 1)
-                else:
-                    self._state = 0.0
+                else: self._state = 0.0
             elif self.tipo_sensor == "porcentaje_hidratacion_prefermento":
                 if h_total > 0: self._state = round((a_pref_state / h_total) * 100, 1)
                 else: self._state = 0.0
@@ -514,11 +529,8 @@ class PanSensor(SensorEntity, RestoreEntity):
                     self._state = round((g_inoculo_state / h_total) * 100, 1)
                 else: self._state = 0.0
             elif self.tipo_sensor == "porcentaje_hidratacion_total_real":
-                if h_total > 0:
-                    # Aquí la hidratación total siempre va a cantar exactamente el valor de tu slider
-                    self._state = round(pct_agua, 1)
-                else:
-                    self._state = 0.0
+                if h_total > 0: self._state = round(pct_agua, 1)
+                else: self._state = 0.0
             elif self.tipo_sensor in ["formula_active", "formula_activa"]:
                 from . import const
                 self._state = const.RECETA_ACTIVA_MEMORIA

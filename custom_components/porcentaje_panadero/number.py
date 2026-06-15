@@ -77,6 +77,10 @@ class PanNumberSlider(NumberEntity):
         self._state = round(value, 2)
         self.async_write_ha_state()
 
+        from . import const
+        if const.CARGANDO_RECETA_BLOQUEO:
+            return
+
         if self._clave in ["harina_1", "harina_2", "harina_3"]:
             h_orig = 1 if self._clave == "harina_1" else (2 if self._clave == "harina_2" else 3)
             await self.hass.services.async_call(DOMAIN, "balancear_harinas", {"harina_origen": h_orig})

@@ -20,7 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     boton_reset = PanResetButton(hass, boton_toggle_yeast, boton_toggle_tz)
     boton_save = PanSaveButton(hass)
     boton_delete = PanDeleteButton(hass)
-    
+
     async_add_entities([
         boton_reset,
         boton_save,
@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     ], True)
 
 class PanResetButton(ButtonEntity):
-    """Botón nativo para restablecer los sliders a los valores de fábrica."""
+    """Botón nativo para restablecer los sliders y harinas a los valores de fábrica."""
 
     def __init__(self, hass: HomeAssistant, boton_levadura, boton_tz):
         self._hass = hass
@@ -44,7 +44,8 @@ class PanResetButton(ButtonEntity):
     def translation_key(self) -> str: return "pan_restablecer_valores"
 
     @property
-    def unique_id(self) -> str: return "porcentaje_panadero_pan_restablecer_valores_unique"
+    def unique_id(self) -> str: 
+        return "porcentaje_panadero_pan_restablecer_valores_unique"
 
     @property
     def icon(self) -> str: return "mdi:lock-reset"
@@ -89,17 +90,47 @@ class PanResetButton(ButtonEntity):
 
         if self._hass.states.get("select.formula_de_receta") is not None:
             await self._hass.services.async_call("select", "select_option", {"entity_id": "select.formula_de_receta", "option": "---"})
-
         if self._hass.states.get("switch.habilitar_ingredientes_extras") is not None:
             await self._hass.services.async_call("switch", "turn_off", {"entity_id": "switch.habilitar_ingredientes_extras"})
-
         if self._hass.states.get("text.nombre_nueva_formula") is not None:
             await self._hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
-
+        if self._hass.states.get("text.nombre_nueva_harina") is not None:
+            await self._hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_harina", "value": ""})
         if self._hass.states.get("select.origen_temperatura_levado") is not None:
             await self._hass.services.async_call("select", "select_option", {"entity_id": "select.origen_temperatura_levado", "option": "Manual (Slider)"})
-            
+        if self._hass.states.get("select.harina_principal_1") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.harina_principal_1", "option": "HARINA 1"})
+        if self._hass.states.get("select.harina_secundaria_2") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.harina_secundaria_2", "option": "HARINA 2"})
+        if self._hass.states.get("select.harina_secundaria_3") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.harina_secundaria_3", "option": "HARINA 3"})
+        if self._hass.states.get("select.retirar_harina_del_inventario") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.retirar_harina_del_inventario", "option": "---"})
+        if self._hass.states.get("select.eliminar_harina") is not None:
+            await self._hass.services.async_call("select", "select_option", {"entity_id": "select.eliminar_harina", "option": "---"})
+
+        try:
+            componente_select = self._hass.data.get("select")
+            if componente_select and hasattr(componente_select, "entities"):
+                for entidad in componente_select.entities:
+                    if hasattr(entidad, "unique_id"):
+                        if entidad.unique_id == "porcentaje_panadero_select_selector_harina_1_unique":
+                            entidad._current_option = "HARINA 1"
+                            entidad.async_write_ha_state()
+                        elif entidad.unique_id == "porcentaje_panadero_select_selector_harina_2_unique":
+                            entidad._current_option = "HARINA 2"
+                            entidad.async_write_ha_state()
+                        elif entidad.unique_id == "porcentaje_panadero_select_selector_harina_3_unique":
+                            entidad._current_option = "HARINA 3"
+                            entidad.async_write_ha_state()
+                        elif entidad.unique_id in ["porcentaje_panadero_select_eliminar_harina_unique", "porcentaje_panadero_select_retirar_harina_del_inventario_unique"]:
+                            entidad._current_option = "---"
+                            entidad.async_write_ha_state()
+        except Exception as ex:
+            _LOGGER.error("Error forzando reinicio de estados en RAM del componente: %s", ex)
+
         for entidad_id, valor in valores_fabrica.items():
+
             if self._hass.states.get(entidad_id) is not None:
                 try:
                     await self._hass.services.async_call("number", "set_value", {"entity_id": entidad_id, "value": valor})
@@ -108,12 +139,12 @@ class PanResetButton(ButtonEntity):
 
         if self._boton_levadura:
             self._boton_levadura.async_write_ha_state()
-            
+        
         if self._boton_tz:
             self._boton_tz.async_write_ha_state()
             self._hass.states.async_set(
-                ID_BOTON_TANG_ZHONG, 
-                "agua", 
+                ID_BOTON_TANG_ZHONG,
+                "agua",
                 {
                     "base_liquida": "agua",
                     "options": ["agua", "leche"],
@@ -129,10 +160,13 @@ class PanSaveButton(ButtonEntity):
 
     @property
     def has_entity_name(self) -> bool: return True
+
     @property
     def translation_key(self) -> str: return "pan_guardar_formula"
+
     @property
     def unique_id(self) -> str: return "porcentaje_panadero_pan_guardar_formula_unique"
+
     @property
     def icon(self) -> str: return "mdi:content-save-move"
 
@@ -147,10 +181,13 @@ class PanDeleteButton(ButtonEntity):
 
     @property
     def has_entity_name(self) -> bool: return True
+
     @property
     def translation_key(self) -> str: return "pan_eliminar_formula"
+
     @property
     def unique_id(self) -> str: return "porcentaje_panadero_pan_eliminar_formula_unique"
+
     @property
     def icon(self) -> str: return "mdi:trash-can-outline"
 
@@ -166,12 +203,17 @@ class PanToggleYeastButton(ButtonEntity):
 
     @property
     def has_entity_name(self) -> bool: return True
+
     @property
     def translation_key(self) -> str: return "pan_alternar_tipo_levadura"
+
     @property
-    def unique_id(self) -> str: return "porcentaje_panadero_pan_alternar_tipo_levadura_unique"
+    def unique_id(self) -> str: 
+        return "porcentaje_panadero_pan_alternar_tipo_levadura_unique"
+
     @property
     def icon(self) -> str: return "mdi:swap-horizontal"
+
     @property
     def state(self) -> str:
         global _TIPO_LEVADURA_MEMORIA
@@ -184,6 +226,7 @@ class PanToggleYeastButton(ButtonEntity):
             "tipo_levadura": _TIPO_LEVADURA_MEMORIA,
             "options": ["fresca", "seca"]
         }
+
     async def async_press(self) -> None:
         """Se ejecuta al pulsar físicamente el botón en la pantalla. Aplica el factor de conversión."""
         global _TIPO_LEVADURA_MEMORIA
@@ -215,6 +258,7 @@ class PanToggleYeastButton(ButtonEntity):
     async def async_added_to_hass(self) -> None:
         self.async_write_ha_state()
 
+
 class PanToggleTangZhongButton(ButtonEntity):
     """Botón nativo con estado de texto para alternar el líquido base del Tang-Zhong."""
 
@@ -224,12 +268,16 @@ class PanToggleTangZhongButton(ButtonEntity):
 
     @property
     def has_entity_name(self) -> bool: return True
+
     @property
     def translation_key(self) -> str: return "pan_alternar_tang_zhong_base"
+
     @property
     def unique_id(self) -> str: return "porcentaje_panadero_pan_alternar_tz_base_unique"
+
     @property
     def icon(self) -> str: return "mdi:water-percent-alert"
+
     @property
     def state(self) -> str:
         global _BASE_TANG_ZHONG_MEMORIA
@@ -252,6 +300,7 @@ class PanToggleTangZhongButton(ButtonEntity):
 
     async def async_added_to_hass(self) -> None:
         self.async_write_ha_state()
+
 
 def obtener_tipo_levadura_actual() -> str:
     global _TIPO_LEVADURA_MEMORIA

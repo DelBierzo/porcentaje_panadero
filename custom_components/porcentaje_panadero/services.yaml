@@ -1,34 +1,44 @@
 guardar_formula:
-  fields:
-    nombre:
-      selector:
-        text:
-
-eliminar_formula:
-  fields:
-    nombre:
-      selector:
-        text:
-
-cargar_formula_en_sliders:
-  fields:
-    nombre:
-      selector:
-        text:
-
-alternar_tipo_levadura:
-  fields: {}
-
-alternar_tang_zhong_base:
-  fields: {}
+  name: "Guardar o Actualizar Fórmula"
+  description: "Toma los valores actuales de los deslizadores e ingredientes y los vuelca en formulas.json."
 
 confirmar_sobreescritura:
-  fields: {}
+  name: "Confirmar Sobreescritura de Fórmula"
+  description: "Servicio forzado de escritura ejecutado tras la confirmación de la alerta push en el dispositivo móvil."
+
+eliminar_formula:
+  name: "Solicitar Eliminación de Fórmula"
+  description: "Dispara un evento bus para pedir confirmación móvil antes de borrar la receta activa del obrador."
+
+confirmar_eliminacion:
+  name: "Confirmar Eliminación de Fórmula"
+  description: "Servicio definitivo que elimina la receta del archivo formulas.json y restablece los deslizadores."
+
+alternar_tipo_levadura:
+  name: "Alternar Tipo de Levadura"
+  description: "Conmuta de forma inteligente los porcentajes de levadura multiplicando por 3 o dividiendo entre 3 según sea fresca o seca."
+
+alternar_tang_zhong_base:
+  name: "Alternar Líquido Base Tang-Zhong"
+  description: "Alterna la base del escaldado entre agua o leche y recalcula automáticamente los balances netos."
 
 balancear_harinas:
+  name: "Balancear Porcentajes de Harinas"
+  description: "Mantiene la suma de las harinas al 100% de forma reactiva y limpia los extras si la pestaña está oculta."
   fields:
     harina_origen:
+      name: "Harina de Origen"
+      description: "Número identificador (1, 2 o 3) de la harina que ha cambiado para calcular las restantes."
+      required: true
       selector:
         number:
           min: 1
           max: 3
+
+anadir_harina:
+  name: "Añadir Harina al Inventario"
+  description: "Toma el string escrito en el cuadro text.nombre_nueva_formula y lo registra de forma persistente en harinas.json."
+
+eliminar_harina:
+  name: "Eliminar Harina del Inventario"
+  description: "Elimina definitivamente de harinas.json la opción seleccionada en el menú select.eliminar_harina."
