@@ -5,6 +5,7 @@ import asyncio
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
+from homeassistant.components.http import StaticPathConfig
 import homeassistant.helpers.config_validation as cv
 from .button import (
     obtener_tipo_levadura_actual,
@@ -64,9 +65,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "entidad_termometro": entry.data.get("entidad_termometro", "manual")
     }
 
-    # 🟢 SOLUCIÓN DEFINTIVA: Añadimos await para ejecutar la función asíncrona de forma nativa
-    from homeassistant.components.http import StaticPathConfig
-    
+    # 🟢 SOLUCIÓN DEFINITIVA: Añadimos await para ejecutar la función asíncrona de forma nativa
     await hass.http.async_register_static_paths([
         StaticPathConfig(
             url_path="/porcentaje_panadero_ui",
