@@ -36,14 +36,19 @@
       "formula_de_receta": { "name": "Fórmula de Receta" },
       "tipo_de_prefermento": { "name": "Tipo de Prefermento" },
       "harina_para_prefermento": { "name": "Harina para Prefermento" },
-      "origen_temperatura_levado": { "name": "Origen Temperatura Levado" }
+      "origen_temperatura_levado": { "name": "Origen Temperatura Levado" },
+      "selector_harina_1": { "name": "Harina Principal (1)" },
+      "selector_harina_2": { "name": "Harina Secundaria (2)" },
+      "selector_harina_3": { "name": "Harina Secundaria (3)" },
+      "eliminar_harina": { "name": "Retirar Harina del Inventario" }
     },
     "switch": {
       "habilitar_ingredientes_extras": { "name": "Habilitar Ingredientes Extras" },
       "calcular_hidratacion_real": { "name": "Calcular Hidratación Real" }
     },
     "text": {
-      "nombre_nueva_formula": { "name": "Nombre para Guardar" }
+      "nombre_nueva_formula": { "name": "Nombre para Guardar Receta" },
+      "nombre_nueva_harina": { "name": "Nombre de la Harina a Registrar" }
     },
     "number": {
       "masa_final_objetivo": { "name": "Cantidad de Masa" },

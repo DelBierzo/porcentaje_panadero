@@ -79,11 +79,6 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ---
 
-## ⚠️ Configuración de Avisos y Alertas
-
-Para habilitar la seguridad al eliminar o alterar una fórmula, debes añadir las automatizaciones del archivo [`Automatizaciones.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Automatizaciones.yaml) a tu servidor. Esto te permitirá confirmar o denegar la acción directamente desde una notificación interactiva en tu teléfono móvil.
-
-
 ## 📝 Notas Importantes sobre el Sensor Físico de Temperatura
 
 Si durante la instalación inicial del asistente configuras un **sensor de temperatura físico** (Zigbee, Wi-Fi, etc.) en lugar del slider manual, ten en cuenta el siguiente paso para tu interfaz visual:
@@ -93,7 +88,7 @@ Si durante la instalación inicial del asistente configuras un **sensor de tempe
 
 ## 🎛️ Tarjetas Lovelace (Modos de Uso)
 
-La integración genera de forma automática **73 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
+La integración genera de forma automática **78 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
 ### 🔹 Modo Básico Requisitos: [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 Este modo requiere la descarga previa de los siguientes complementos desde **HACS**:
@@ -105,8 +100,8 @@ Este modo requiere la descarga previa de los siguientes complementos desde **HAC
 Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
 
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Personaliza los estilos CSS de las filas.
-* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
+* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
 * 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Características extendidas para los Tiles nativos.
 * 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Ventanas flotantes integradas.
 
@@ -144,11 +139,6 @@ Define the **final dough weight** in grams and the rest of the calculation value
 
 ---
 
-## ⚠️ Safety Alerts Setup
-
-To enable actionable safety alerts when deleting or modifying a formula, you must add the automations from the [`automations.yaml`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/automations.yaml) file to your server. This allows you to confirm or deny the action directly from an interactive notification on your mobile phone.
-
-
 ## 📝 Important Notes on Physical Temperature Sensors
 
 If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during the initial setup instead of using the manual sliders, please note the following step for your dashboard:
@@ -158,7 +148,7 @@ If you configure a **physical temperature sensor** (Zigbee, Wi-Fi, etc.) during 
 
 ## 🎛️ Lovelace Cards (Usage Modes)
 
-The integration automatically generates **73 native entities** that you can utilize in your dashboard through two different modes:
+The integration automatically generates **78 native entities** that you can utilize in your dashboard through two different modes:
 
 ### 🔹 Basic Mode Requirements: [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/english/Lovelace_Basic_Card.yaml)
 This mode requires downloading the following frontend cards/plugins from **HACS** beforehand:
@@ -170,8 +160,8 @@ This mode requires downloading the following frontend cards/plugins from **HACS*
 This mode unlocks the full potential of the visual interface and requires downloading the following frontend cards/plugins from **HACS** beforehand:
 
 * 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customize rows CSS styling.
-* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
 * 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
+* 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
 * 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Extended button and slider features for native Tiles.
 * 📦 [Popup Card](https://github.com/olivierplante/popup-card) — Integrated contextual floating windows.
 

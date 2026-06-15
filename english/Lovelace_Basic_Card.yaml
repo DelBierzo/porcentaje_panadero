@@ -1,225 +1,57 @@
 type: vertical-stack
 cards:
-  - type: vertical-stack
-    cards:
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: button.restablecer_parametros_base
-          - entity: select.formula_de_receta
-          - entity: number.masa_final_objetivo
-          - entity: number.harina_1
-          - entity: number.harina_2
-          - entity: number.harina_3
-          - entity: number.agua_hidratacion
-          - entity: number.sal
-          - entity: number.levadura
-          - type: conditional
-            conditions:
-              - entity: button.alternar_fresca_seca
-                state: fresca
-            row:
-              entity: button.alternar_fresca_seca
-              name: Fresh Yeast
-              icon: mdi:yeast
-          - type: conditional
-            conditions:
-              - entity: button.alternar_fresca_seca
-                state: seca
-            row:
-              entity: button.alternar_fresca_seca
-              name: Instant Dry Yeast
-              icon: mdi:yeast
-          - entity: number.prefermento
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-            row:
-              entity: select.tipo_de_prefermento
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state_not: masa madre
-            row:
-              entity: number.levadura_prefermento
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: masa madre
-            row:
-              entity: number.inoculo_masa_madre
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: masa madre
-            row:
-              entity: number.hidratacion_masa_madre
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-            row:
-              entity: select.harina_para_prefermento
-          - entity: switch.habilitar_ingredientes_extras
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.tang_zhong
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.tang_zhong
-                above: 0
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-              - condition: numeric_state
-                entity: number.leche_liquida
-                above: 0
-              - entity: button.alternar_tang_zhong_agua_leche
-                state: agua
-            row:
-              entity: button.alternar_tang_zhong_agua_leche
-              name: Tang-Zhong (Water)
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.tang_zhong
-                above: 0
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-              - condition: numeric_state
-                entity: number.leche_liquida
-                above: 0
-              - entity: button.alternar_tang_zhong_agua_leche
-                state: leche
-            row:
-              entity: button.alternar_tang_zhong_agua_leche
-              name: Tang-Zhong (Milk)
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.malta
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.azucar
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.aove
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.mantequilla
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.leche_en_polvo
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.leche_liquida
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-            row:
-              entity: number.huevo
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: switch.habilitar_ingredientes_extras
-                state: "on"
-              - condition: or
-                conditions:
-                  - condition: numeric_state
-                    above: 0
-                    entity: number.leche_liquida
-                  - condition: numeric_state
-                    above: 0
-                    entity: number.huevo
-            row:
-              entity: switch.calcular_hidratacion_real
-        title: 🥖 The Baker's Corner
-  - type: markdown
-    visibility:
-      - condition: numeric_state
-        above: 0
-        entity: number.tang_zhong
-    content: >
-      {% set sensor = 'sensor.tang_zhong_total' %} {% set sensor_masa =
-      'number.masa_final_objetivo' %} {% set sensor_pct = 'number.tang_zhong' %}
-      {% set total = states(sensor) | float(0) %} {% set masa_obj =
-      states(sensor_masa)
-
-      | float(1000) | round(0) %} {% set pct_tz = states(sensor_pct) | float(0)
-      | round(0) %} {% set harina = state_attr(sensor, 'harina_g') | float(0) %}
-      {% set liquido = state_attr(sensor, 'liquido_total_g') | float(0) %} {%
-      set leche = state_attr(sensor, 'leche_utilizada_g') | float(0) %} {% set
-      agua_asis = state_attr(sensor, 'agua_asistencia_g') | float(0) | round(1)
-      %} {% set base = state_attr(sensor, 'base_solicitada') | default('agua',
-      true) %}
-
-      {% if total > 0 %}
-        ### <font color= '#ff9800'>**Tang-Zhong:**</font>  *{{ total }} g* ( {{ pct_tz }}% )
-        
-        * **FLOUR TO SCALD: {{ harina }} g** *(FLOUR 1)*
-        * **REQUIRED LIQUID (1:5): {{ liquido }} g** *(BASE: {{ base | upper }})*
-        
-        {% if base == 'leche' and leche > 0 and agua_asis > 0 %}
-        ---
-        
-        * **MILK: {{ leche }} g**
-        * **WATER: {{ agua_asis }} g**
-
-      <font color='#ff9800'>⚠️ **MIXED SCALDING ALERT!**
-
-      The formula lacks sufficient milk, water must be added.</font>
-        {% endif %}
-        
-        {# If milk is sufficient, no liquid line is displayed #}
-      {% endif %}
   - type: entities
     entities:
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.tang_zhong
+            above: 0
+        row:
+          type: custom:hui-element
+          card_type: markdown
+          card_mod:
+            style: |
+              ha-card {
+                background: transparent !important;
+                --ha-card-background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+              }
+          content: >
+            {% set sensor = 'sensor.tang_zhong_total' %}  {% set sensor_masa =
+            'number.masa_final_objetivo' %}  {% set sensor_pct =
+            'number.tang_zhong' %}  {% set total = states(sensor) | float(0) %} 
+            {% set masa_obj = states(sensor_masa) | float(1000) | round(0) %} 
+            {% set pct_tz = states(sensor_pct) | float(0) | round(0) %}  {% set
+            harina = state_attr(sensor, 'harina_g') | float(0) %}  {% set
+            liquido = state_attr(sensor, 'liquido_total_g') | float(0) %}  {%
+            set leche = state_attr(sensor, 'leche_utilizada_g') | float(0) %} 
+            {% set agua_asis = state_attr(sensor, 'agua_asistencia_g') |
+            float(0) | round(1) %}  {% set base = state_attr(sensor,
+            'base_solicitada') | default('agua', true) %}
+
+            {% if total > 0 %}
+              ### <font color= '#ff9800'>**Tang-Zhong:**</font>  *{{ total }} g* ( {{ pct_tz }}% )
+              
+              * **FLOUR TO SCALD: {{ harina }} g**
+                *({{ state_attr('sensor.pan_harina_prefermento', 'nombre_harina_real') | upper }})*
+              
+              * **REQUIRED LIQUID (1:5): {{ liquido }} g**
+                *(BASE: {{ base | upper }})*
+              
+              {% if base == 'leche' and leche > 0 and agua_asis > 0 %}
+              ---
+              
+              * **MILK: {{ leche }} g**
+              * **WATER: {{ agua_asis }} g**
+
+              <font color='#ff9800'>⚠️ **!MIXED SCALDING NOTICE!**
+
+              The formula does not have enough milk, water must be added.</font>
+              {% endif %}
+              
+            {% endif %}
       - type: conditional
         conditions:
           - condition: numeric_state
@@ -295,7 +127,7 @@ cards:
           type: custom:template-entity-row
           entity: sensor.pan_inoculo_masa_madre
           name: >-
-            • SOURDOUGH INOCULUM ({{ states('sensor.porcentaje_inoculo_receta')
+            SOURDOUGH INOCULUM ({{ states('sensor.porcentaje_inoculo_receta')
             }}%)
           state: "{{ states('sensor.pan_inoculo_masa_madre') }} g"
           tap_action:
@@ -310,7 +142,9 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_levadura_prefermento
-          name: • PRE-FERMENT YEAST ({{ states('number.levadura_prefermento') }}%)
+          name: >-
+            {{ states('button.alternar_fresca_seca') | upper }} YEAST ({{
+            states('number.levadura_prefermento') }}%)
           state: "{{ states('sensor.pan_levadura_prefermento') }} g"
           tap_action:
             action: none
@@ -325,8 +159,8 @@ cards:
           tap_action:
             action: none
           name: >-
-            • {{ states('select.harina_para_prefermento') | upper }} !! ({{
-            states('sensor.harina_prefermentada') }}%)
+            {{ state_attr('sensor.pan_harina_prefermento', 'nombre_harina_real')
+            | upper }} ({{ states('sensor.harina_prefermentada') }}%)
           state: "{{ states('sensor.pan_harina_prefermento') }} g"
       - type: conditional
         conditions:
@@ -336,7 +170,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_agua_prefermento
-          name: • WATER ({{ states('sensor.hidratacion_del_prefermento') }}%)
+          name: WATER ({{ states('sensor.hidratacion_del_prefermento') }}%)
           state: "{{ states('sensor.pan_agua_prefermento') }} g"
           tap_action:
             action: none
@@ -365,7 +199,9 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_harina_1_neta
-          name: • FLOUR 1 ({{ states('sensor.porcentaje_neto_harina_1') }}%)
+          name: >-
+            {{ states('select.harina_principal_1') | upper }} ({{
+            states('sensor.porcentaje_neto_harina_1') }}%)
           state: "{{ states('sensor.pan_harina_1_neta') }} g"
           tap_action:
             action: none
@@ -377,7 +213,9 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_harina_2_neta
-          name: • FLOUR 2 ({{ states('sensor.porcentaje_neto_harina_2') }}%)
+          name: >-
+            {{ states('select.harina_secundaria_2') | upper }} ({{
+            states('sensor.porcentaje_neto_harina_2') }}%)
           state: "{{ states('sensor.pan_harina_2_neta') }} g"
           tap_action:
             action: none
@@ -389,7 +227,9 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_harina_3_neta
-          name: • FLOUR 3 ({{ states('sensor.porcentaje_neto_harina_3') }}%)
+          name: >-
+            {{ states('select.harina_secundaria_3') | upper }} ({{
+            states('sensor.porcentaje_neto_harina_3') }}%)
           state: "{{ states('sensor.pan_harina_3_neta') }} g"
           tap_action:
             action: none
@@ -401,7 +241,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_agua_neta
-          name: • WATER ({{ states('sensor.porcentaje_hidratacion_final') }}%)
+          name: WATER ({{ states('sensor.porcentaje_hidratacion_final') }}%)
           state: "{{ states('sensor.pan_agua_neta') }} g"
           tap_action:
             action: none
@@ -413,7 +253,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_sal_neta
-          name: • SALT ({{ states('number.sal') }}%)
+          name: SALT ({{ states('number.sal') }}%)
           state: "{{ states('sensor.pan_sal_neta') }} g"
           tap_action:
             action: none
@@ -426,7 +266,7 @@ cards:
           type: custom:template-entity-row
           entity: sensor.pan_levadura_neta
           name: >-
-            • YEAST {{ states('button.alternar_fresca_seca') | upper }} ({{
+            {{ states('button.alternar_fresca_seca') | upper }} YEAST ({{
             states('number.levadura') }}%)
           state: "{{ states('sensor.pan_levadura_neta') }} g"
           tap_action:
@@ -440,7 +280,7 @@ cards:
           type: custom:template-entity-row
           entity: number.prefermento
           name: >-
-            • {{ states('select.tipo_de_prefermento') | upper }} ({{
+            {{ states('select.tipo_de_prefermento') | upper }} ({{
             states('sensor.pan_prefermento_total') }}%)
           state: >-
             {{ state_attr('sensor.pan_prefermento_total',
@@ -455,7 +295,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_malta
-          name: • MALT ({{ states('number.malta') }}%)
+          name: MALT ({{ states('number.malta') }}%)
           state: "{{ states('sensor.pan_malta') }} g"
           tap_action:
             action: none
@@ -467,7 +307,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_azucar
-          name: • SUGAR ({{ states('number.azucar') }}%)
+          name: SUGAR ({{ states('number.azucar') }}%)
           state: "{{ states('sensor.pan_azucar') }} g"
           tap_action:
             action: none
@@ -479,7 +319,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_mantequilla
-          name: • BUTTER ({{ states('number.mantequilla') }}%)
+          name: BUTTER ({{ states('number.mantequilla') }}%)
           state: "{{ states('sensor.pan_mantequilla') }} g"
           tap_action:
             action: none
@@ -492,7 +332,7 @@ cards:
           type: custom:template-entity-row
           entity: sensor.pan_aove
           name: >-
-            • EVOO {% if is_state('select.formula_de_receta','pizza_detroit')
+            EVOO {% if is_state('select.formula_de_receta','pizza_detroit')
             %}(grease the pan){%endif%} ({{ states('number.aove') }}%)
           state: "{{ states('sensor.pan_aove') }} g"
           tap_action:
@@ -505,7 +345,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_leche
-          name: • MILK ({{ states('number.leche_liquida') }}%)
+          name: MILK ({{ states('number.leche_liquida') }}%)
           state: "{{ states('sensor.pan_leche') }} g"
           tap_action:
             action: none
@@ -517,7 +357,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_leche_polvo
-          name: • POWDERED MILK 26%fat ({{ states('number.leche_en_polvo') }}%)
+          name: MILK POWDER 26% fat ({{ states('number.leche_en_polvo') }}%)
           state: "{{ states('sensor.pan_leche_polvo') }} g"
           tap_action:
             action: none
@@ -529,7 +369,7 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.pan_huevo
-          name: • EGG ({{ states('number.huevo') }}%)
+          name: EGG ({{ states('number.huevo') }}%)
           state: "{{ states('sensor.pan_huevo') }} g"
           tap_action:
             action: none
@@ -541,17 +381,209 @@ cards:
         row:
           type: custom:template-entity-row
           entity: sensor.tang_zhong_total
-          name: • TANG-ZHONG ({{ states('number.tang_zhong') }}%)
+          name: TANG-ZHONG ({{ states('number.tang_zhong') }}%)
           state: "{{ states('sensor.tang_zhong_total') }} g"
           tap_action:
             action: none
-    title: 📝Formula
+    title: 📝 Formula
+  - title: 🌾 Formula Flour
+    type: entities
+    entities:
+      - entity: select.harina_principal_1
+        name: 🥇 Flour Brand 1
+      - entity: select.harina_secundaria_2
+        name: 🥈 Flour Brand 2
+      - entity: select.harina_secundaria_3
+        name: 🥉 Flour Brand 3
   - type: entities
-    title: 🌡️ Dough Water Temperature
+    show_header_toggle: false
+    entities:
+      - type: call-service
+        name: " "
+        action_name: RESET
+        service: button.press
+        service_data:
+          entity_id: button.restablecer_parametros_base
+      - entity: select.formula_de_receta
+      - entity: number.masa_final_objetivo
+      - entity: number.harina_1
+      - entity: number.harina_2
+      - entity: number.harina_3
+      - entity: number.agua_hidratacion
+      - entity: number.sal
+      - entity: number.levadura
+      - type: conditional
+        conditions:
+          - entity: button.alternar_fresca_seca
+            state: fresca
+        row:
+          entity: button.alternar_fresca_seca
+          name: Fresh Yeast
+          icon: mdi:yeast
+      - type: conditional
+        conditions:
+          - entity: button.alternar_fresca_seca
+            state: seca
+        row:
+          entity: button.alternar_fresca_seca
+          name: Dry Yeast
+          icon: mdi:yeast
+      - entity: number.prefermento
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.prefermento
+            above: 0
+        row:
+          entity: select.tipo_de_prefermento
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.prefermento
+            above: 0
+          - condition: state
+            entity: select.tipo_de_prefermento
+            state_not: masa madre
+        row:
+          entity: number.levadura_prefermento
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.prefermento
+            above: 0
+          - condition: state
+            entity: select.tipo_de_prefermento
+            state: masa madre
+        row:
+          entity: number.inoculo_masa_madre
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.prefermento
+            above: 0
+          - condition: state
+            entity: select.tipo_de_prefermento
+            state: masa madre
+        row:
+          entity: number.hidratacion_masa_madre
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.prefermento
+            above: 0
+        row:
+          entity: select.harina_para_prefermento
+      - entity: switch.habilitar_ingredientes_extras
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.tang_zhong
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.tang_zhong
+            above: 0
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+          - condition: numeric_state
+            entity: number.leche_liquida
+            above: 0
+          - entity: button.alternar_tang_zhong_agua_leche
+            state: agua
+        row:
+          entity: button.alternar_tang_zhong_agua_leche
+          name: Tang-Zhong (Water)
+      - type: conditional
+        conditions:
+          - condition: numeric_state
+            entity: number.tang_zhong
+            above: 0
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+          - condition: numeric_state
+            entity: number.leche_liquida
+            above: 0
+          - entity: button.alternar_tang_zhong_agua_leche
+            state: leche
+        row:
+          entity: button.alternar_tang_zhong_agua_leche
+          name: Tang-Zhong (Milk)
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.malta
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.azucar
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.aove
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.mantequilla
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.leche_en_polvo
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.leche_liquida
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+        row:
+          entity: number.huevo
+      - type: conditional
+        conditions:
+          - condition: state
+            entity: switch.habilitar_ingredientes_extras
+            state: "on"
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                above: 0
+                entity: number.leche_liquida
+              - condition: numeric_state
+                above: 0
+                entity: number.huevo
+        row:
+          entity: switch.calcular_hidratacion_real
+    title: 🥖 Calculator
+  - type: entities
+    title: 🌡️ Kneading Water Temperature
     show_header_toggle: false
     entities:
       - entity: number.temperatura_objetivo_masa
-        name: Target Dough Temp
+        name: Target Dough Temp.
       - type: conditional
         conditions:
           - condition: state
@@ -559,7 +591,7 @@ cards:
             state_not: "true"
         row:
           entity: number.temperatura_ambiente
-          name: Room Temp
+          name: Ambient Temp.
       - type: conditional
         conditions:
           - condition: state
@@ -567,9 +599,9 @@ cards:
             state: "true"
         row:
           entity: sensor.temperatura_real
-          name: Room Temp
+          name: Ambient Temp.
       - entity: number.temperatura_harina
-        name: Flour Temp
+        name: Flour Temp.
       - type: conditional
         conditions:
           - condition: numeric_state
@@ -577,11 +609,11 @@ cards:
             entity: number.prefermento
         row:
           entity: number.temperatura_prefermento
-          name: Preferment Temp
+          name: Preferment Temp.
       - entity: number.temperatura_friccion_amasadora
-        name: Mixer Friction Temp
+        name: Mixer Temp.
       - entity: sensor.pan_temperatura_agua_ideal
-        name: Ideal Water Temp
+        name: Water Temperature
         tap_action:
           action: none
         card_mod:
@@ -596,13 +628,11 @@ cards:
                 font-weight: bold !important;
               }
   - type: entities
-    title: 📈 Proofing & Fermentation
+    title: 📈 Leavening Time Control
     show_header_toggle: false
     entities:
       - entity: sensor.tiempo_de_levado_estimado
-        name: Estimated Proofing Time
       - entity: sensor.hora_de_masa_lista_aproximada
-        name: Approximate Ready Time
       - type: conditional
         conditions:
           - condition: state
@@ -610,7 +640,7 @@ cards:
             state_not: "true"
         row:
           entity: number.temperatura_ambiente
-          name: Manual adjustment
+          name: Manual Adjustment
       - type: conditional
         conditions:
           - condition: state
@@ -618,7 +648,6 @@ cards:
             state: "true"
         row:
           entity: select.origen_temperatura_levado
-          name: Choose Temp Source
       - type: conditional
         conditions:
           - condition: state
@@ -629,7 +658,7 @@ cards:
             state: Sensor Físico
         row:
           entity: sensor.temperatura_real
-          name: Environment Temperature
+          name: Ambient Temperature
       - type: conditional
         conditions:
           - condition: state
@@ -642,7 +671,7 @@ cards:
           entity: number.temperatura_ambiente
           name: Manual Adjustment
   - type: entities
-    title: 📋Info
+    title: 📋 Total Info
     show_header_toggle: false
     entities:
       - type: custom:template-entity-row
@@ -674,12 +703,42 @@ cards:
         tap_action:
           action: none
   - type: entities
-    title: 💾 Recipe Management
+    title: 💾 Formula Management
     show_header_toggle: false
     entities:
+      - type: section
+        label: ADD NEW FORMULA
       - entity: text.nombre_nueva_formula
-        name: "Name to save:"
-      - entity: button.guardar_receta_nueva
-        name: Save / Update Formula
-      - entity: button.eliminar_receta_activa
-        name: Delete Active Formula
+        name: "NAME TO SAVE FORMULA:"
+      - type: call-service
+        name: " "
+        action_name: 💾 SAVE
+        service: porcentaje_panadero.guardar_formula
+      - type: section
+        label: CURRENTLY SELECTED FORMULA MANAGEMENT
+      - type: call-service
+        name: UPDATE
+        icon: mdi:content-save-plus
+        action_name: 💾 SAVE
+        service: porcentaje_panadero.confirmar_sobreescritura
+      - type: call-service
+        name: DELETE
+        icon: mdi:delete
+        action_name: ❌ DELETE
+        service: porcentaje_panadero.confirmar_eliminacion
+      - type: section
+        label: REGISTER FLOUR IN DATABASE
+      - entity: text.nombre_nueva_harina
+        name: "ADD FLOUR BRAND / TYPE:"
+      - type: call-service
+        name: " "
+        action_name: 💾 SAVE
+        service: porcentaje_panadero.anadir_harina
+      - type: section
+        label: DELETE FLOUR FROM DATABASE
+      - entity: select.porcentaje_panadero_pan_select_retirar_harina_del_inventario
+        name: "SELECT FLOUR TO DELETE:"
+      - type: call-service
+        name: " "
+        action_name: ❌ DELETE
+        service: porcentaje_panadero.eliminar_harina

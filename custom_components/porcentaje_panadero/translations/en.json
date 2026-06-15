@@ -1,10 +1,10 @@
 {
-  "title": "Baker's Percentage",
+  "title": "Bakery Percentage",
   "config": {
     "step": {
       "user": {
-        "title": "Bakery Setup",
-        "description": "Do you want to install the baker's calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to dynamically choose between that sensor or a static manual temperature (ideal for simulating a constant proofing temperature). By default, manual control will be used.",
+        "title": "Domotic Bakery Configuration",
+        "description": "Do you want to install the bakery calculator on your server? If you have a physical temperature sensor in your kitchen, you can optionally add it below. This will allow you to control fermentation by dynamically selecting between that sensor or a manual static temperature. By default, manual control will be used.",
         "data": {
           "usar_sensor_fisico": "I have a physical temperature sensor in my kitchen/bakery",
           "entidad_termometro": "Select the physical temperature sensor"
@@ -15,7 +15,7 @@
       "sensor_no_seleccionado": "You must choose a physical temperature sensor from the list if you check the box."
     },
     "abort": {
-      "already_configured": "The baker's calculator is already configured on your system."
+      "already_configured": "The bakery calculator is already configured on your system."
     }
   },
   "entity": {
@@ -36,17 +36,22 @@
       "formula_de_receta": { "name": "Recipe Formula" },
       "tipo_de_prefermento": { "name": "Preferment Type" },
       "harina_para_prefermento": { "name": "Flour for Preferment" },
-      "origen_temperatura_levado": { "name": "Proofing Temp Source" }
+      "origen_temperatura_levado": { "name": "Proofing Temp Source" },
+      "selector_harina_1": { "name": "Main Flour (1)" },
+      "selector_harina_2": { "name": "Secondary Flour (2)" },
+      "selector_harina_3": { "name": "Secondary Flour (3)" },
+      "eliminar_harina": { "name": "Remove Flour from Inventory" }
     },
     "switch": {
       "habilitar_ingredientes_extras": { "name": "Enable Extra Ingredients" },
       "calcular_hidratacion_real": { "name": "Calculate Real Hydration" }
     },
     "text": {
-      "nombre_nueva_formula": { "name": "Name to Save" }
+      "nombre_nueva_formula": { "name": "Recipe Name to Save" },
+      "nombre_nueva_harina": { "name": "Flour Name to Save" }
     },
     "number": {
-      "masa_final_objetivo": { "name": "Dough Amount" },
+      "masa_final_objetivo": { "name": "Dough Quantity" },
       "harina_1": { "name": "Flour 1" },
       "harina_2": { "name": "Flour 2" },
       "harina_3": { "name": "Flour 3" },
@@ -64,11 +69,11 @@
       "leche_en_polvo": { "name": "Milk Powder" },
       "leche_liquida": { "name": "Milk" },
       "huevo": { "name": "Egg" },
-      "temperatura_objetivo_masa": { "name": "Dough Temp" },
+      "temperatura_objetivo_masa": { "name": "Dough Temp." },
       "temperatura_ambiente": { "name": "Room Temp." },
-      "temperatura_harina": { "name": "Flour Temp" },
-      "temperatura_prefermento": { "name": "Preferment Temp" },
-      "temperatura_friccion_amasadora": { "name": "Mixer Friction Temp" },
+      "temperatura_harina": { "name": "Flour Temp." },
+      "temperatura_prefermento": { "name": "Preferment Temp." },
+      "temperatura_friccion_amasadora": { "name": "Mixer Friction Temp." },
       "tang_zhong": { "name": "Tang-Zhong" }
     },
     "sensor": {
@@ -86,7 +91,7 @@
       "harina_prefermento": { "name": "Preferment Flour" },
       "agua_prefermento": { "name": "Preferment Water" },
       "levadura_prefermento": { "name": "Preferment Yeast" },
-      "temperatura_agua_ideal": { "name": "Ideal Water Temp" },
+      "temperatura_agua_ideal": { "name": "Ideal Water Temp." },
       "malta": { "name": "Malt" },
       "azucar": { "name": "Sugar" },
       "aove": { "name": "EVOO" },
@@ -101,14 +106,14 @@
       "temperatura_utilizada": { "name": "Room Temp." },
       "sensor_fisico_instalado": { "name": "Physical Sensor Installed" },
       "temperatura_real": { "name": "Real Temperature" },
-      "porcentaje_hidratacion_final": { "name": "Direct Kneading Water" },
+      "porcentaje_hidratacion_final": { "name": "Direct Mix Water" },
       "porcentaje_hidratacion_prefermento": { "name": "Water Contributed by Preferment" },
       "porcentaje_harina_prefermento": { "name": "Total Prefermented Flour" },
-      "porcentaje_harina_1_neta": { "name": "Net Percentage Flour 1" },
-      "porcentaje_harina_2_neta": { "name": "Net Percentage Flour 2" },
-      "porcentaje_harina_3_neta": { "name": "Net Percentage Flour 3" },
-      "porcentaje_inoculo_puro": { "name": "Net Percentage Inoculum" },
-      "porcentaje_hidratacion_total_real": { "name": "Real Total Hydration" }
+      "porcentaje_harina_1_neta": { "name": "Net Flour 1 Percentage" },
+      "porcentaje_harina_2_neta": { "name": "Net Flour 2 Percentage" },
+      "porcentaje_harina_3_neta": { "name": "Net Flour 3 Percentage" },
+      "porcentaje_inoculo_puro": { "name": "Recipe Inoculum Percentage" },
+      "porcentaje_hidratacion_total_real": { "name": "Real Total Hydration Recipe" }
     }
   }
 }

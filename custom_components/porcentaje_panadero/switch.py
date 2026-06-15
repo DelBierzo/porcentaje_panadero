@@ -8,7 +8,7 @@ _LOGGER = logging.getLogger(__name__)
 DOMAIN = "porcentaje_panadero"
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
-    """Levanta los tres interruptores nativos bajo el flujo de configuración con persistencia."""
+    """Levanta los interruptores nativos bajo el flujo de configuración con persistencia."""
     async_add_entities([
         PanExtrasSwitch("habilitar_ingredientes_extras", "mdi:basket-plus"),
         PanExtrasSwitch("calcular_hidratacion_real", "mdi:water-percent")
@@ -42,7 +42,7 @@ class PanExtrasSwitch(SwitchEntity, RestoreEntity):
     async def async_added_to_hass(self):
         """Se ejecuta al arrancar el servidor. Gestiona la persistencia selectiva."""
         await super().async_added_to_hass()
-        
+
         if self._clave == "habilitar_ingredientes_extras":
             self._is_on = False
             _LOGGER.info("Interruptor '%s' inicializado en APAGADO por política de seguridad.", self._clave)
@@ -50,7 +50,7 @@ class PanExtrasSwitch(SwitchEntity, RestoreEntity):
             old_state = await self.async_get_last_state()
             if old_state:
                 self._is_on = old_state.state == "on"
-                _LOGGER.info("Interruptor '%s' restaurado del disco en estado: %s", self._clave, old_state.state)
+            _LOGGER.info("Interruptor '%s' restaurado del disco en estado: %s", self._clave, old_state.state if old_state else "off")
 
     async def async_turn_on(self, **kwargs) -> None:
         self._is_on = True
