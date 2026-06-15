@@ -6,13 +6,10 @@
   "dependencies": [
     "http"
   ],
-  "lovelace_plugins": [
-    "custom_components/porcentaje_panadero/www/porcentaje-panadero-card.js"
-  ],
-  "documentation": "https://github.com/DelBierzo/porcentaje_panadero",
+  "documentation": "https://github.com",
   "integration_type": "service",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/DelBierzo/porcentaje_panadero/issues",
+  "issue_tracker": "https://github.com/issues",
   "requirements": [],
   "version": "3.0.1"
 }
