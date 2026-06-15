@@ -5,6 +5,7 @@ import asyncio
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
+from homeassistant.components.http import StaticPathConfig
 import homeassistant.helpers.config_validation as cv
 from .button import (
     obtener_tipo_levadura_actual,
@@ -64,8 +65,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "entidad_termometro": entry.data.get("entidad_termometro", "manual")
     }
 
+    # 🟢 SOLUCIÓN DEFINITIVA: Añadimos await para ejecutar la función asíncrona de forma nativa
+    await hass.http.async_register_static_paths([
+        StaticPathConfig(
+            url_path="/porcentaje_panadero_ui",
+            path=hass.config.path("custom_components/porcentaje_panadero/www"),
+            cache_headers=False
+        )
+    ])
+
     def buscar_estado_entidad(nombre_base, default_val=0.0):
         """Busca la entidad en el Core probando todas las variantes unificadas posibles."""
+
+
         if nombre_base in ["nombre_nueva_formula", "pan_nombre_nueva_formula"]:
             st_texto = hass.states.get("text.nombre_nueva_formula")
             if st_texto and st_texto.state not in ["unavailable", "unknown", ""]:
