@@ -1,1184 +1,5 @@
 type: vertical-stack
 cards:
-  - type: heading
-    heading_style: title
-    badges:
-      - type: entity
-        show_state: true
-        show_icon: true
-        entity: sensor.receta_en_el_obrador
-        tap_action:
-          action: none
-        color: primary
-  - type: custom:expander-card
-    cards:
-      - type: markdown
-        visibility:
-          - condition: numeric_state
-            above: 0
-            entity: number.tang_zhong
-        content: >
-          {% set sensor = 'sensor.tang_zhong_total' %} {% set sensor_masa =
-          'number.masa_final_objetivo' %} {% set sensor_pct =
-          'number.tang_zhong' %} {% set total = states(sensor) | float(0) %} {%
-          set masa_obj = states(sensor_masa) | float(1000) | round(0) %} {% set
-          pct_tz = states(sensor_pct) | float(0) | round(0) %} {% set harina =
-          state_attr(sensor, 'harina_g') | float(0) %} {% set liquido =
-          state_attr(sensor, 'liquido_total_g') | float(0) %} {% set leche =
-          state_attr(sensor, 'leche_utilizada_g') | float(0) %} {% set agua_asis
-          = state_attr(sensor, 'agua_asistencia_g') | float(0) | round(1) %} {%
-          set base = state_attr(sensor, 'base_solicitada') | default('agua',
-          true) %}
-
-          {% if total > 0 %}
-            ### <font color= '#ff9800'>**Tang-Zhong:**</font>  *{{ total }} g* ( {{ pct_tz }}% )
-            
-            * **HARINA A ESCALDAR: {{ harina }} g**
-              *({{ state_attr('sensor.pan_harina_prefermento', 'nombre_harina_real') | upper }})*
-            
-            * **LÍQUIDO REQUERIDO (1:5): {{ liquido }} g**
-              *(BASE: {{ base | upper }})*
-            
-            {% if base == 'leche' and leche > 0 and agua_asis > 0 %}
-            ---
-            
-            * **LECHE: {{ leche }} g**
-            * **AGUA: {{ agua_asis }} g**
-
-          <font color='#ff9800'>⚠️ **¡AVISO DE ESCALDADO MIXTO!**
-
-          La fórmula no tiene suficiente leche, hay que añadir agua.</font>
-            {% endif %}
-            
-            {# Si la leche llega no se muestra ninguna línea de líquido #}
-          {% endif %}
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: masa madre
-            row:
-              type: section
-              label: " "
-              card_mod:
-                style: |
-                  .divider {
-                    display: flex;
-                    align-items: center;
-                  }
-                  .label::before {
-                    content: "REFRESCO MASA MADRE";
-                    font-weight: bold;
-                    color: var(--accent-color);
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: biga
-            row:
-              type: section
-              label: " "
-              card_mod:
-                style: |
-                  .divider {
-                    display: flex;
-                    align-items: center;
-                  }
-                  .label::before {
-                    content: "ELABORACIÓN BIGA";
-                    font-weight: bold;
-                    color: var(--accent-color);
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: poolish
-            row:
-              type: section
-              label: " "
-              card_mod:
-                style: |
-                  .divider {
-                    display: flex;
-                    align-items: center;
-                  }
-                  .label::before {
-                    content: "ELABORACIÓN POOLISH";
-                    font-weight: bold;
-                    color: var(--accent-color);
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - condition: state
-                entity: select.tipo_de_prefermento
-                state: masa madre
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_inoculo_masa_madre
-              name: >-
-                INÓCULO MASA MADRE ({{
-                states('sensor.porcentaje_inoculo_receta') }}%)
-              state: "{{ states('sensor.pan_inoculo_masa_madre') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }             
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-              - entity: select.tipo_de_prefermento
-                state_not: masa madre
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_levadura_prefermento
-              name: >-
-                LEVADURA {{ states('button.alternar_fresca_seca') | upper }} ({{
-                states('number.levadura_prefermento') }}%)
-              state: "{{ states('sensor.pan_levadura_prefermento') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_harina_prefermento
-              tap_action:
-                action: none
-              name: >-
-                {{ state_attr('sensor.pan_harina_prefermento',
-                'nombre_harina_real') | upper }} ({{
-                states('sensor.harina_prefermentada') }}%)
-              state: "{{ states('sensor.pan_harina_prefermento') }} g"
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_agua_prefermento
-              name: AGUA ({{ states('sensor.hidratacion_del_prefermento') }}%)
-              state: "{{ states('sensor.pan_agua_prefermento') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: section
-            label: " "
-            card_mod:
-              style: |
-                .divider {
-                  display: flex;
-                  align-items: center;
-                }
-                .label::before {
-                  content: "{% set f = states('sensor.receta_en_el_obrador') | trim %}{% if f in ['---', ''] %}MÉTODO EMPÍRICO {% else %}{{ f | replace('_', ' ') | upper }} {% endif %}";
-                  font-weight: bold;
-                  color: var(--accent-color);
-                }
-                .label::after {
-                  content: "{{ states('number.masa_final_objetivo') | float(0) | round(0) }}g";
-                  font-weight: bold;
-                  font-size: 1.2rem !important;
-                  color: var(--secondary-text-color);
-                }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.harina_1
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_harina_1_neta
-              name: >-
-                {{ states('select.harina_principal_1') | upper }} ({{
-                states('sensor.porcentaje_neto_harina_1') }}%)
-              state: "{{ states('sensor.pan_harina_1_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_harina_2_neta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_harina_2_neta
-              name: >-
-                {{ states('select.harina_secundaria_2') | upper }} ({{
-                states('sensor.porcentaje_neto_harina_2') }}%)
-              state: "{{ states('sensor.pan_harina_2_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_harina_3_neta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_harina_3_neta
-              name: >-
-                {{ states('select.harina_secundaria_3') | upper }} ({{
-                states('sensor.porcentaje_neto_harina_3') }}%)
-              state: "{{ states('sensor.pan_harina_3_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_agua_neta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_agua_neta
-              name: AGUA ({{ states('sensor.porcentaje_hidratacion_final') }}%)
-              state: "{{ states('sensor.pan_agua_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_sal_neta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_sal_neta
-              name: SAL ({{ states('number.sal') }}%)
-              state: "{{ states('sensor.pan_sal_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }  
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_levadura_neta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_levadura_neta
-              name: >-
-                LEVADURA {{ states('button.alternar_fresca_seca') | upper }} ({{
-                states('number.levadura') }}%)
-              state: "{{ states('sensor.pan_levadura_neta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: number.prefermento
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: number.prefermento
-              name: >-
-                {{ states('select.tipo_de_prefermento') | upper }} ({{
-                states('sensor.pan_prefermento_total') }}%)
-              state: >-
-                {{ state_attr('sensor.pan_prefermento_total',
-                'gramos_totales_reales') }} g
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_malta
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_malta
-              name: MALTA ({{ states('number.malta') }}%)
-              state: "{{ states('sensor.pan_malta') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_azucar
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_azucar
-              name: AZÚCAR ({{ states('number.azucar') }}%)
-              state: "{{ states('sensor.pan_azucar') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_mantequilla
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_mantequilla
-              name: MANTEQUILLA ({{ states('number.mantequilla') }}%)
-              state: "{{ states('sensor.pan_mantequilla') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_aove
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_aove
-              name: >-
-                AOVE {% if is_state('select.formula_de_receta','pizza_detroit')
-                %}(untar el molde){%endif%} ({{ states('number.aove') }}%)
-              state: "{{ states('sensor.pan_aove') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_leche
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_leche
-              name: LECHE ({{ states('number.leche_liquida') }}%)
-              state: "{{ states('sensor.pan_leche') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_leche_polvo
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_leche_polvo
-              name: LECHE EN POLVO 26%mg ({{ states('number.leche_en_polvo') }}%)
-              state: "{{ states('sensor.pan_leche_polvo') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.pan_huevo
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.pan_huevo
-              name: HUEVO ({{ states('number.huevo') }}%)
-              state: "{{ states('sensor.pan_huevo') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }       
-          - type: conditional
-            conditions:
-              - condition: numeric_state
-                entity: sensor.tang_zhong_total
-                above: 0
-            row:
-              type: custom:template-entity-row
-              entity: sensor.tang_zhong_total
-              name: TANG-ZHONG ({{ states('number.tang_zhong') }}%)
-              state: "{{ states('sensor.tang_zhong_total') }} g"
-              tap_action:
-                action: none
-              card_mod:
-                style: |
-                  div.state {
-                    font-size: 1.2rem !important;
-                  }
-                  .info {
-                    font-size: 14px !important;
-                    font-weight: bold !important;
-                  }       
-    clear: false
-    clear-children: true
-    title-card-clickable: false
-    title-card-button-overlay: false
-    title: FÓRMULA
-    icon: mdi:flask-outline
-    title-card:
-      type: tile
-      grid_options:
-        columns: 12
-        rows: auto
-      entity: select.formula_de_receta
-      name: FÓRMULA
-      icon: ""
-      color: green
-      show_entity_picture: false
-      hide_state: true
-      vertical: false
-      features:
-        - type: select-options
-      features_position: inline
-      card_mod:
-        style:
-          ha-tile-info$: |
-            .secondary {
-              font-size: 1.2rem !important;
-            }
-      tap_action:
-        action: fire-dom-event
-        popup_card:
-          title: FÓRMULA
-          content:
-            type: vertical-stack
-            cards:
-              - type: markdown
-                text_only: true
-                card_mod:
-                  style: |
-                    ha-card {
-                      background: transparent !important;
-                      --ha-card-background: transparent !important;
-                      box-shadow: none !important;
-                      border: none !important;
-                    }
-                visibility:
-                  - condition: numeric_state
-                    above: 0
-                    entity: number.tang_zhong
-                content: >
-                  {% set sensor = 'sensor.tang_zhong_total' %} {% set
-                  sensor_masa = 'number.masa_final_objetivo' %} {% set
-                  sensor_pct = 'number.tang_zhong' %} {% set total =
-                  states(sensor) | float(0) %} {% set masa_obj =
-                  states(sensor_masa) | float(1000) | round(0) %} {% set pct_tz
-                  = states(sensor_pct) | float(0) | round(0) %} {% set harina =
-                  state_attr(sensor, 'harina_g') | float(0) %} {% set liquido =
-                  state_attr(sensor, 'liquido_total_g') | float(0) %} {% set
-                  leche = state_attr(sensor, 'leche_utilizada_g') | float(0) %}
-                  {% set agua_asis = state_attr(sensor, 'agua_asistencia_g') |
-                  float(0) | round(1) %} {% set base = state_attr(sensor,
-                  'base_solicitada') | default('agua', true) %}
-
-                  {% if total > 0 %}
-                    ### <font color= '#ff9800'>**Tang-Zhong:**</font>  *{{ total }} g* ( {{ pct_tz }}% )
-                    
-                    * **HARINA A ESCALDAR: {{ harina }} g**
-                      *({{ state_attr('sensor.pan_harina_prefermento', 'nombre_harina_real') | upper }})*
-                    
-                    * **LÍQUIDO REQUERIDO (1:5): {{ liquido }} g**
-                      *(BASE: {{ base | upper }})*
-                    
-                    {% if base == 'leche' and leche > 0 and agua_asis > 0 %}
-                    ---
-                    
-                    * **LECHE: {{ leche }} g**
-                    * **AGUA: {{ agua_asis }} g**
-
-                  <font color='#ff9800'>⚠️ **¡AVISO DE ESCALDADO MIXTO!**
-
-                  La fórmula no tiene suficiente leche, hay que añadir
-                  agua.</font>
-                    {% endif %}
-                  {% endif %}
-              - type: entities
-                card_mod:
-                  style: |
-                    ha-card {
-                      background: transparent !important;
-                      --ha-card-background: transparent !important;
-                      box-shadow: none !important;
-                      border: none !important;
-                    }
-                show_header_toggle: false
-                entities:
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                      - condition: state
-                        entity: select.tipo_de_prefermento
-                        state: masa madre
-                    row:
-                      type: section
-                      label: " "
-                      card_mod:
-                        style: |
-                          .divider {
-                            display: flex;
-                            align-items: center;
-                          }
-                          .label::before {
-                            content: "REFRESCO MASA MADRE";
-                            font-weight: bold;
-                            color: var(--accent-color);
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                      - condition: state
-                        entity: select.tipo_de_prefermento
-                        state: biga
-                    row:
-                      type: section
-                      label: " "
-                      card_mod:
-                        style: |
-                          .divider {
-                            display: flex;
-                            align-items: center;
-                          }
-                          .label::before {
-                            content: "ELABORACIÓN BIGA";
-                            font-weight: bold;
-                            color: var(--accent-color);
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                      - condition: state
-                        entity: select.tipo_de_prefermento
-                        state: poolish
-                    row:
-                      type: section
-                      label: " "
-                      card_mod:
-                        style: |
-                          .divider {
-                            display: flex;
-                            align-items: center;
-                          }
-                          .label::before {
-                            content: "ELABORACIÓN POOLISH";
-                            font-weight: bold;
-                            color: var(--accent-color);
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                      - condition: state
-                        entity: select.tipo_de_prefermento
-                        state: masa madre
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_inoculo_masa_madre
-                      name: >-
-                        INÓCULO MASA MADRE ({{
-                        states('sensor.porcentaje_inoculo_receta') }}%)
-                      state: "{{ states('sensor.pan_inoculo_masa_madre') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }             
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                      - entity: select.tipo_de_prefermento
-                        state_not: masa madre
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_levadura_prefermento
-                      name: >-
-                        LEVADURA {{ states('button.alternar_fresca_seca') |
-                        upper }} ({{ states('number.levadura_prefermento') }}%)
-                      state: "{{ states('sensor.pan_levadura_prefermento') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_harina_prefermento
-                      tap_action:
-                        action: none
-                      name: >-
-                        {{ state_attr('sensor.pan_harina_prefermento',
-                        'nombre_harina_real') | upper }} ({{
-                        states('sensor.harina_prefermentada') }}%)
-                      state: "{{ states('sensor.pan_harina_prefermento') }} g"
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_agua_prefermento
-                      name: >-
-                        AGUA ({{ states('sensor.hidratacion_del_prefermento')
-                        }}%)
-                      state: "{{ states('sensor.pan_agua_prefermento') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: section
-                    label: " "
-                    card_mod:
-                      style: |
-                        .divider {
-                          display: flex;
-                          align-items: center;
-                        }
-                        .label::before {
-                          content: "{% set f = states('sensor.receta_en_el_obrador') | trim %}{% if f in ['---', ''] %}MÉTODO EMPÍRICO {% else %}{{ f | replace('_', ' ') | upper }} {% endif %}";
-                          font-weight: bold;
-                          color: var(--accent-color);
-                        }
-                        .label::after {
-                          content: "{{ states('number.masa_final_objetivo') | float(0) | round(0) }}g";
-                          font-weight: bold;
-                          font-size: 1.2rem !important;
-                          color: var(--secondary-text-color);
-                        }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.harina_1
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_harina_1_neta
-                      name: >-
-                        {{ states('select.harina_principal_1') | upper }} ({{
-                        states('sensor.porcentaje_neto_harina_1') }}%)
-                      state: "{{ states('sensor.pan_harina_1_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_harina_2_neta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_harina_2_neta
-                      name: >-
-                        {{ states('select.harina_secundaria_2') | upper }} ({{
-                        states('sensor.porcentaje_neto_harina_2') }}%)
-                      state: "{{ states('sensor.pan_harina_2_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_harina_3_neta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_harina_3_neta
-                      name: >-
-                        {{ states('select.harina_secundaria_3') | upper }} ({{
-                        states('sensor.porcentaje_neto_harina_3') }}%)
-                      state: "{{ states('sensor.pan_harina_3_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_agua_neta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_agua_neta
-                      name: >-
-                        AGUA ({{ states('sensor.porcentaje_hidratacion_final')
-                        }}%)
-                      state: "{{ states('sensor.pan_agua_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_sal_neta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_sal_neta
-                      name: SAL ({{ states('number.sal') }}%)
-                      state: "{{ states('sensor.pan_sal_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }  
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_levadura_neta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_levadura_neta
-                      name: >-
-                        LEVADURA {{ states('button.alternar_fresca_seca') |
-                        upper }} ({{ states('number.levadura') }}%)
-                      state: "{{ states('sensor.pan_levadura_neta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: number.prefermento
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: number.prefermento
-                      name: >-
-                        {{ states('select.tipo_de_prefermento') | upper }} ({{
-                        states('sensor.pan_prefermento_total') }}%)
-                      state: >-
-                        {{ state_attr('sensor.pan_prefermento_total',
-                        'gramos_totales_reales') }} g
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_malta
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_malta
-                      name: MALTA ({{ states('number.malta') }}%)
-                      state: "{{ states('sensor.pan_malta') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_azucar
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_azucar
-                      name: AZÚCAR ({{ states('number.azucar') }}%)
-                      state: "{{ states('sensor.pan_azucar') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_mantequilla
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_mantequilla
-                      name: MANTEQUILLA ({{ states('number.mantequilla') }}%)
-                      state: "{{ states('sensor.pan_mantequilla') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_aove
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_aove
-                      name: >-
-                        AOVE {% if
-                        is_state('select.formula_de_receta','pizza_detroit')
-                        %}(untar el molde){%endif%} ({{ states('number.aove')
-                        }}%)
-                      state: "{{ states('sensor.pan_aove') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_leche
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_leche
-                      name: LECHE ({{ states('number.leche_liquida') }}%)
-                      state: "{{ states('sensor.pan_leche') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_leche_polvo
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_leche_polvo
-                      name: >-
-                        LECHE EN POLVO 26%mg ({{ states('number.leche_en_polvo')
-                        }}%)
-                      state: "{{ states('sensor.pan_leche_polvo') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.pan_huevo
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.pan_huevo
-                      name: HUEVO ({{ states('number.huevo') }}%)
-                      state: "{{ states('sensor.pan_huevo') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }       
-                  - type: conditional
-                    conditions:
-                      - condition: numeric_state
-                        entity: sensor.tang_zhong_total
-                        above: 0
-                    row:
-                      type: custom:template-entity-row
-                      entity: sensor.tang_zhong_total
-                      name: TANG-ZHONG ({{ states('number.tang_zhong') }}%)
-                      state: "{{ states('sensor.tang_zhong_total') }} g"
-                      tap_action:
-                        action: none
-                      card_mod:
-                        style: |
-                          div.state {
-                            font-size: 1.2rem !important;
-                          }
-                          .info {
-                            font-size: 14px !important;
-                            font-weight: bold !important;
-                          }       
-    padding: 0em
-    expanded: false
   - type: custom:expander-card
     cards:
       - type: vertical-stack
@@ -2076,53 +897,176 @@ cards:
     icon: mdi:calculator
     padding: 0em
   - type: custom:expander-card
+    title: Expander Card
     cards:
-      - type: tile
-        entity: number.temperatura_objetivo_masa
-        name: MASA
-        icon: ""
-        color: green
-        show_entity_picture: false
-        hide_state: false
-        vertical: false
-        tap_action:
-          action: none
-        features:
-          - style: slider
-            type: numeric-input
-        features_position: inline
-        card_mod:
-          style:
-            ha-tile-info$: |
-              .secondary {
-                font-size: 1.2rem !important;
-              }
+      - type: custom:porcentaje-panadero-formula-card
+    clear-children: true
+    padding: 0em
+    child-margin-top: 0em
+    title-card:
+      type: tile
+      entity: text.nombre_nueva_formula
+      name: FÓRMULA
+      icon: mdi:file-document-edit
+      color: green
+      hide_state: true
+      vertical: false
+      tap_action:
+        action: none
+      features_position: bottom
+    title-card-clickable: true
+  - type: custom:expander-card
+    cards:
       - type: vertical-stack
         cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - type: section
+                label: TEMPERATURA IDEAL DEL AGUA
+          - type: tile
+            entity: number.temperatura_objetivo_masa
+            name: MASA
+            icon: ""
+            color: green
+            show_entity_picture: false
+            hide_state: false
+            vertical: false
+            tap_action:
+              action: none
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+            card_mod:
+              style:
+                ha-tile-info$: |
+                  .secondary {
+                    font-size: 1.2rem !important;
+                  }
+          - type: vertical-stack
+            cards:
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.sensor_fisico_instalado
+                    state_not: "true"
+                card:
+                  type: vertical-stack
+                  cards:
+                    - type: tile
+                      entity: number.temperatura_ambiente
+                      name: AMBIENTE
+                      vertical: false
+                      tap_action:
+                        action: none
+                      features:
+                        - style: slider
+                          type: numeric-input
+                      features_position: inline
+                      card_mod:
+                        style:
+                          ha-tile-info$: |
+                            .secondary {
+                              font-size: 1.2rem !important;
+                            }
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.sensor_fisico_instalado
+                    state: "true"
+                card:
+                  type: vertical-stack
+                  cards:
+                    - type: tile
+                      entity: sensor.temperatura_real
+                      name: AMBIENTE
+                      color: primary
+                      show_entity_picture: false
+                      hide_state: false
+                      vertical: false
+                      tap_action:
+                        action: none
+                      features_position: bottom
+                      card_mod:
+                        style:
+                          ha-tile-info$: |
+                            .secondary {
+                              font-size: 1.2rem !important;
+                            }
+          - type: tile
+            entity: number.temperatura_harina
+            name: HARINA
+            icon: ""
+            color: primary
+            show_entity_picture: false
+            hide_state: false
+            vertical: false
+            tap_action:
+              action: none
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+            card_mod:
+              style:
+                ha-tile-info$: |
+                  .secondary {
+                    font-size: 1.2rem !important;
+                  }
           - type: conditional
             conditions:
-              - condition: state
-                entity: sensor.sensor_fisico_instalado
-                state_not: "true"
+              - condition: numeric_state
+                above: 0
+                entity: number.prefermento
             card:
-              type: vertical-stack
-              cards:
-                - type: tile
-                  entity: number.temperatura_ambiente
-                  name: AMBIENTE
-                  vertical: false
-                  tap_action:
-                    action: none
-                  features:
-                    - style: slider
-                      type: numeric-input
-                  features_position: inline
-                  card_mod:
-                    style:
-                      ha-tile-info$: |
-                        .secondary {
-                          font-size: 1.2rem !important;
-                        }
+              type: tile
+              entity: number.temperatura_prefermento
+              name: PREFERMENTO
+              icon: ""
+              color: purple
+              show_entity_picture: false
+              hide_state: false
+              vertical: false
+              tap_action:
+                action: none
+              features:
+                - style: slider
+                  type: numeric-input
+              features_position: inline
+              card_mod:
+                style:
+                  ha-tile-info$: |
+                    .secondary {
+                      font-size: 1.2rem !important;
+                    }
+          - type: tile
+            entity: number.temperatura_friccion_amasadora
+            name: AMASADORA
+            icon: ""
+            color: deep-purple
+            show_entity_picture: false
+            hide_state: false
+            vertical: false
+            tap_action:
+              action: none
+            features:
+              - style: slider
+                type: numeric-input
+            features_position: inline
+            card_mod:
+              style:
+                ha-tile-info$: |
+                  .secondary {
+                    font-size: 1.2rem !important;
+                  }
+      - type: vertical-stack
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - type: section
+                label: TEMPERATURA DE LEVADO
           - type: conditional
             conditions:
               - condition: state
@@ -2132,114 +1076,65 @@ cards:
               type: vertical-stack
               cards:
                 - type: tile
-                  entity: sensor.temperatura_real
-                  name: AMBIENTE
-                  color: primary
-                  show_entity_picture: false
-                  hide_state: false
+                  entity: select.origen_temperatura_levado
+                  name: ELIGE ORIGEN TEMP.
+                  hide_state: true
                   vertical: false
                   tap_action:
                     action: none
-                  features_position: bottom
-                  card_mod:
-                    style:
-                      ha-tile-info$: |
-                        .secondary {
-                          font-size: 1.2rem !important;
-                        }
-      - type: tile
-        entity: number.temperatura_harina
-        name: HARINA
-        icon: ""
-        color: primary
-        show_entity_picture: false
-        hide_state: false
-        vertical: false
-        tap_action:
-          action: none
-        features:
-          - style: slider
-            type: numeric-input
-        features_position: inline
-        card_mod:
-          style:
-            ha-tile-info$: |
-              .secondary {
-                font-size: 1.2rem !important;
-              }
-      - type: conditional
-        conditions:
-          - condition: numeric_state
-            above: 0
-            entity: number.prefermento
-        card:
-          type: tile
-          entity: number.temperatura_prefermento
-          name: PREFERMENTO
-          icon: ""
-          color: purple
-          show_entity_picture: false
-          hide_state: false
-          vertical: false
-          tap_action:
-            action: none
-          features:
-            - style: slider
-              type: numeric-input
-          features_position: inline
-          card_mod:
-            style:
-              ha-tile-info$: |
-                .secondary {
-                  font-size: 1.2rem !important;
-                }
-      - type: tile
-        entity: number.temperatura_friccion_amasadora
-        name: AMASADORA
-        icon: ""
-        color: deep-purple
-        show_entity_picture: false
-        hide_state: false
-        vertical: false
-        tap_action:
-          action: none
-        features:
-          - style: slider
-            type: numeric-input
-        features_position: inline
-        card_mod:
-          style:
-            ha-tile-info$: |
-              .secondary {
-                font-size: 1.2rem !important;
-              }
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: sensor.pan_temperatura_agua_ideal
-            name: TEMPERATURA IDEAL AGUA
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                .: |
-                  :host {
-                    --card-mod-icon-color: #2196f3;
-                  }
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.2rem !important;
-                    font-weight: bold !important;
-                  }
+                  features:
+                    - type: select-options
+                  features_position: inline
+                - type: conditional
+                  conditions:
+                    - entity: select.origen_temperatura_levado
+                      state: Sensor Físico
+                  card:
+                    type: tile
+                    entity: sensor.temperatura_real
+                    name: AMBIENTE
+                    vertical: false
+                    tap_action:
+                      action: none
+                    features_position: bottom
+                    card_mod:
+                      style:
+                        ha-tile-info$: |
+                          .secondary {
+                            font-size: 1.2rem !important;
+                          }
+                - type: conditional
+                  conditions:
+                    - entity: select.origen_temperatura_levado
+                      state: Manual (Slider)
+                  card:
+                    type: tile
+                    entity: number.temperatura_ambiente
+                    name: AJUSTE MANUAL
+                    vertical: false
+                    tap_action:
+                      action: none
+                    features:
+                      - style: slider
+                        type: numeric-input
+                    features_position: inline
+                    card_mod:
+                      style:
+                        ha-tile-info$: |
+                          .secondary {
+                            font-size: 1.2rem !important;
+                          }
     title-card:
       type: tile
       entity: text.nombre_nueva_formula
-      hide_state: true
-      name: CONTROL TÉRMICO TEMPERATURAS
+      name: CONTROL TÉRMICO
       icon: mdi:thermometer
       color: red
+      hide_state: true
+      vertical: false
       tap_action:
         action: none
+      features_position: bottom
     title-card-button-overlay: false
     clear-children: true
     title-card-padding: 0em
@@ -2250,269 +1145,36 @@ cards:
   - type: custom:expander-card
     title: Expander Card
     cards:
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - entity: sensor.tiempo_de_levado_estimado
-            name: TIEMPO DE LEVADO ESTIMADO
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.2rem !important;
-                    font-weight: bold !important;
-                  }
-          - entity: sensor.hora_de_masa_lista_aproximada
-            name: HORA APROXIMADA DE MASA LISTA
-            tap_action:
-              action: none
-            card_mod:
-              style:
-                hui-generic-entity-row $: |
-                  .state {
-                    font-size: 1.2rem !important;
-                    font-weight: bold !important;
-                  }
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.sensor_fisico_instalado
-                state: "true"
-            row:
-              type: divider
-      - type: conditional
-        conditions:
-          - condition: state
-            entity: sensor.sensor_fisico_instalado
-            state: "true"
-        card:
-          type: vertical-stack
-          cards:
-            - type: tile
-              entity: select.origen_temperatura_levado
-              name: ELIGE ORIGEN TEMP.
-              hide_state: true
-              vertical: false
-              tap_action:
-                action: none
-              features:
-                - type: select-options
-              features_position: inline
-            - type: conditional
-              conditions:
-                - entity: select.origen_temperatura_levado
-                  state: Sensor Físico
-              card:
-                type: tile
-                entity: sensor.temperatura_real
-                name: AMBIENTE
-                vertical: false
-                tap_action:
-                  action: none
-                features_position: bottom
-                card_mod:
-                  style:
-                    ha-tile-info$: |
-                      .secondary {
-                        font-size: 1.2rem !important;
-                      }
-            - type: conditional
-              conditions:
-                - entity: select.origen_temperatura_levado
-                  state: Manual (Slider)
-              card:
-                type: tile
-                entity: number.temperatura_ambiente
-                name: AJUSTE MANUAL
-                vertical: false
-                tap_action:
-                  action: none
-                features:
-                  - style: slider
-                    type: numeric-input
-                features_position: inline
-                card_mod:
-                  style:
-                    ha-tile-info$: |
-                      .secondary {
-                        font-size: 1.2rem !important;
-                      }
-    title-card-clickable: true
+      - type: custom:porcentaje-panadero-info-card
     clear-children: true
-    child-margin-top: 0em
     padding: 0em
+    child-margin-top: 0em
     title-card:
       type: tile
       entity: text.nombre_nueva_formula
-      name: CONTROL TIEMPO LEVADO
-      icon: mdi:clock-end
-      hide_state: true
-      vertical: false
-      tap_action:
-        action: none
-      features_position: bottom
-  - type: custom:expander-card
-    title: Expander Card
-    cards:
-      - type: entities
-        show_header_toggle: false
-        entities:
-          - type: custom:template-entity-row
-            entity: sensor.pan_harina_total
-            name: • TOTAL HARINA ({{ states('sensor.porcentaje_harina_total') }}%)
-            state: "{{ states('sensor.pan_harina_total') }} g"
-            tap_action:
-              action: none
-            card_mod:
-              style: |
-                div.state {
-                  font-size: 1.2rem !important;
-                }
-                .info {
-                  font-size: 14px !important;
-                  font-weight: bold !important;
-                }
-          - type: custom:template-entity-row
-            entity: sensor.pan_agua_total
-            name: • TOTAL AGUA ({{ states('number.agua_hidratacion') }}%)
-            state: "{{ states('sensor.pan_agua_total') }} g"
-            tap_action:
-              action: none
-            card_mod:
-              style: |
-                div.state {
-                  font-size: 1.2rem !important;
-                }
-                .info {
-                  font-size: 14px !important;
-                  font-weight: bold !important;
-                }
-          - type: custom:template-entity-row
-            entity: sensor.pan_prefermento_total
-            name: >-
-              • TOTAL {{ states('select.tipo_de_prefermento') | upper }} ({{
-              states('sensor.pan_prefermento_total') }}%)
-            state: >-
-              {{ state_attr('sensor.pan_prefermento_total',
-              'gramos_totales_reales') }} g
-            tap_action:
-              action: none
-            card_mod:
-              style: |
-                div.state {
-                  font-size: 1.2rem !important;
-                }
-                .info {
-                  font-size: 14px !important;
-                  font-weight: bold !important;
-                }
-          - type: custom:template-entity-row
-            entity: sensor.tang_zhong_total
-            name: • TOTAL TANG-ZHON ({{ states('number.tang_zhong') }}%)
-            state: "{{ states('sensor.tang_zhong_total') }} g"
-            tap_action:
-              action: none
-            card_mod:
-              style: |
-                div.state {
-                  font-size: 1.2rem !important;
-                }
-                .info {
-                  font-size: 14px !important;
-                  font-weight: bold !important;
-                }
-    title-card-clickable: true
-    clear-children: true
-    child-margin-top: 0em
-    padding: 0em
-    title-card:
-      type: tile
-      entity: text.nombre_nueva_formula
-      name: INFO TOTALES
+      name: TEMPERATURA / LEVADO / TOTALES
       icon: mdi:information
       hide_state: true
       vertical: false
       tap_action:
         action: none
       features_position: bottom
+    title-card-clickable: true
   - type: custom:expander-card
+    title: Expander Card
     cards:
-      - type: vertical-stack
-        cards:
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - type: section
-                label: AÑADIR FÓRMULA NUEVA
-              - entity: text.nombre_nueva_formula
-                name: "NOMBRE PARA GUARDAR FÓRMULA:"
-              - type: call-service
-                name: " "
-                action_name: 💾 GUARDAR
-                service: porcentaje_panadero.guardar_formula
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - type: section
-                label: GESTIÓN DE FÓRMULA SELECCIONADA ACTUALMENTE
-              - type: call-service
-                name: ACTUALIZAR
-                action_name: 💾 GUARDAR
-                service: porcentaje_panadero.confirmar_sobreescritura
-              - type: call-service
-                name: ELIMINAR
-                action_name: ❌ ELIMINAR
-                service: porcentaje_panadero.confirmar_eliminacion
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - type: section
-                label: REGISTRAR HARINA EN LA BASE DE DATOS
-              - entity: text.nombre_nueva_harina
-                name: MARCA / TIPO DE HARINA
-              - type: call-service
-                name: " "
-                action_name: 💾 GUARDAR
-                service: porcentaje_panadero.anadir_harina
-              - type: section
-                label: ELIMINAR HARINA DE LA BASE DE DATOS
-              - entity: >-
-                  select.porcentaje_panadero_pan_select_retirar_harina_del_inventario
-                name: SELECCIONA HARINA A ELIMINAR
-              - type: call-service
-                name: " "
-                action_name: ❌ ELIMINAR
-                service: porcentaje_panadero.eliminar_harina
+      - type: custom:porcentaje-panadero-control-panel-card
+    clear-children: true
+    padding: 0em
+    child-margin-top: 0em
     title-card:
       type: tile
-      grid_options:
-        columns: 12
-        rows: auto
-      entity: button.restablecer_parametros_base
-      name: PANEL CONTROL
-      icon: mdi:refresh
-      show_entity_picture: false
+      entity: text.nombre_nueva_formula
+      name: PANEL DE CONTROL
+      icon: mdi:view-dashboard-edit
       hide_state: true
       vertical: false
       tap_action:
         action: none
-      icon_tap_action:
-        action: none
-      features:
-        - type: button
-          action_name: RESETEAR VALORES
-      features_position: inline
-      card_mod:
-        style:
-          ha-tile-info$: |
-            .secondary {
-              font-size: 1.2rem !important;
-            }
-    title-card-button-overlay: false
-    clear-children: true
-    padding: 0em
-    child-margin-top: 0em
-    icon: mdi:cog
+      features_position: bottom
     title-card-clickable: true
