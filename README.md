@@ -87,7 +87,9 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 Con esto incorporamos las tarjetas:
 
 ```
+type: custom:porcentaje-panadero-calculadora-card
 type: custom:porcentaje-panadero-formula-card
+type: custom:porcentaje-panadero-control-termico-card
 type: custom:porcentaje-panadero-info-card
 type: custom:porcentaje-panadero-control-panel-card
 ```
@@ -103,19 +105,12 @@ Si durante la instalación inicial del asistente configuras un **sensor de tempe
 
 La integración genera de forma automática **78 entidades nativas** que puedes explotar en tu interfaz a través de dos modalidades:
 
-### 🔹 Modo Básico Requisitos: [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
-Este modo requiere la descarga previa de los siguientes complementos desde **HACS**:
+### 🔹 Modo Básico : [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Personaliza los estilos CSS de las filas.
-* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
- 
 ### 🔸 Modo Avanzado Requisitos: [`tarjeta avanzada`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-Este modo exprime al máximo la interfaz visual y requiere la descarga previa de los siguientes complementos desde **HACS**:
+Exprime al máximo la interfaz visual, requiere la descarga previa del complemento "expander-card" desde **HACS**:
 
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Personaliza los estilos CSS de las filas.
-* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Plantillas avanzadas en las filas de la báscula neta.
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
-* 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Características extendidas para los Tiles nativos.
 
 ---
 
@@ -154,7 +149,9 @@ Define the **final dough weight** in grams and the rest of the calculation value
 With this, we incorporate the cards:
 
 ```
+type: custom:porcentaje-panadero-calculadora-card
 type: custom:porcentaje-panadero-formula-card
+type: custom:porcentaje-panadero-control-termico-card
 type: custom:porcentaje-panadero-info-card
 type: custom:porcentaje-panadero-control-panel-card
 ```
@@ -171,19 +168,12 @@ If during the initial setup wizard you configure a **physical temperature sensor
 
 The integration automatically generates **78 native entities** that you can utilize in your interface through two modes:
 
-### 🔹 Basic Mode Requirements: [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
-This mode requires downloading the following add-ons from **HACS** beforehand:
+### 🔹 Basic Mode : [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customizes the CSS styles of rows.
-* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
- 
 ### 🔸 Advanced Mode Requirements: [`advanced card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-This mode squeezes the visual interface to its fullest and requires downloading the following add-ons from **HACS** beforehand:
+Get the most out of the UI by installing 'expander-card' from **HACS** first.
 
-* 📦 [card-mod](https://github.com/thomasloven/lovelace-card-mod) — Customize rows CSS styling.
-* 📦 [template-entity-row](https://github.com/thomasloven/lovelace-template-entity-row) — Advanced templates in the net scale rows.
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
-* 📦 [Custom Features for Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) — Extended button and slider features for native Tiles.
 
 ---
 
