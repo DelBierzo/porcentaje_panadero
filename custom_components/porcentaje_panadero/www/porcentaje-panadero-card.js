@@ -257,79 +257,220 @@ customElements.define('porcentaje-panadero-info-card', PorcentajePanaderoInfoCar
 
 
 class PorcentajePanaderoControlPanelCard extends HTMLElement {
-  constructor() { super(); this.attachShadow({ mode: 'open' }); this._htmlInyectado = false; }
-  set hass(hass) { this._hass = hass; if (!this.content) this.initCard(); this.updateCard(); }
-  setConfig(config) { this.config = config; }
+  constructor() { 
+    super(); 
+    this.attachShadow({ mode: 'open' }); 
+    this._htmlInyectado = false;
+    this._notifGuardarArriba = ""; 
+    this._notifActualizarAbajo = ""; 
+    this._notifEliminarAbajo = ""; 
+    this._notifAnadirHarina = ""; 
+    this._notifEliminarHarina = ""; 
+  }
+  
+  set hass(hass){ 
+    this._hass = hass; 
+    if (!this.content) this.initCard(); 
+    this.updateCard(); 
+  }
+  
+  setConfig(config){ 
+    this.config = config;
+  }
+  
   initCard() {
     const style = document.createElement('style');
     style.textContent = `
       ha-card { padding: 18px; font-family: var(--paper-font-body1_-_font-family, inherit); border-radius: var(--ha-card-border-radius, 16px); }
       .sub-seccion { border-left: 4px solid var(--primary-color, #ff9800); padding-left: 12px; margin: 20px 0 12px 0; font-size: 13px; font-weight: bold; color: var(--primary-text-color); text-transform: uppercase; letter-spacing: 0.5px; }
+      .receta-activa-label { font-size: 13px; font-weight: bold; color: var(--accent-color, #ff9800); margin: -4px 0 14px 16px; text-transform: uppercase; display: block; letter-spacing: 0.5px; }
+      .receta-vacia-label { font-size: 13px; font-weight: bold; color: var(--secondary-text-color, #727272); margin: -4px 0 14px 16px; text-transform: uppercase; display: block; letter-spacing: 0.5px; opacity: 0.8; }
       .divider { height: 1px; background-color: var(--divider-color, rgba(0,0,0,0.1)); margin: 16px 0; width: 100%; }
       .fila-inline { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; width: 100%; box-sizing: border-box; }
-      .input-text-pan { flex: 1; padding: 11px; border-radius: 6px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; }
-      .btn-guardar { background-color: var(--success-color, #4caf50); color: white; border: none; padding: 11px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
-      .btn-eliminar { background-color: var(--error-color, #db4437); color: white; border: none; padding: 11px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
+      .input-text-pan { flex: 1; height: 36px; padding: 0 11px; border-radius: 6px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; box-sizing: border-box; }
+      .btn-guardar, .btn-eliminar, .btn-gestion-bloque button { height: 36px; font-size: 12px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; color: white; white-space: nowrap; transition: all 0.2s ease; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; }
+      .btn-guardar { background-color: var(--success-color, #4caf50); padding: 0 16px; }
+      .btn-eliminar { background-color: var(--error-color, #db4437); padding: 0 16px; }
       .btn-gestion-bloque { display: flex; gap: 10px; margin-bottom: 14px; }
-      .btn-gestion-bloque button { flex: 1; height: 42px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; color: white; }
+      .btn-gestion-bloque button { flex: 1; }
       select { width: 100%; padding: 11px; border-radius: 6px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; font-weight: bold; margin-bottom: 12px; box-sizing: border-box; }
     `;
-    const card = document.createElement('ha-card'); this.content = document.createElement('div');
-    card.appendChild(this.content); this.shadowRoot.appendChild(style); this.shadowRoot.appendChild(card);
+    const card = document.createElement('ha-card'); 
+    this.content = document.createElement('div');
+    card.appendChild(this.content); 
+    this.shadowRoot.appendChild(style);
+    this.shadowRoot.appendChild(card);
   }
   updateCard() {
-    if (!this._hass) return; const lang = this._hass.language || 'es'; const isEn = lang.startsWith('en');
+    if (!this._hass) return; 
+    const lang = this._hass.language || 'es'; 
+    const isEn = lang.startsWith('en');
     const valFormulaNueva = this._hass.states['text.nombre_nueva_formula']?.state || '';
     const valHarinaNueva = this._hass.states['text.nombre_nueva_harina']?.state || '';
     const selectorRetirarHarina = this._hass.states['select.porcentaje_panadero_pan_select_retirar_harina_del_inventario'];
     const harinaSeleccionadaRetirar = selectorRetirarHarina?.state || '';
     const opcionesRetirarHarina = selectorRetirarHarina?.attributes['options'] || [];
+    
+    let recetaActiva = this._hass.states['sensor.receta_en_el_obrador']?.state || '',
+        recetaLimpia = recetaActiva.trim().toLowerCase();
+        
+    let esMetodoEmpirico = false;
+    if (!recetaActiva || recetaLimpia === '---' || recetaLimpia === 'unknown' || recetaLimpia === 'none' || recetaLimpia === '' || recetaLimpia.includes('empírico') || recetaLimpia.includes('empirical')){
+      recetaActiva = isEn ? 'NO FORMULA SELECTED' : 'NINGUNA FÓRMULA SELECCIONADA';
+      esMetodoEmpirico = true;
+    }
 
-    if (!this._htmlInyectado) {
+    if (this._htmlInyectado && !this.shadowRoot.getElementById('receta-actual-cargada')) {
+      this._htmlInyectado = false;
+    }
+
+    if (!this._htmlInyectado){
       const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
-
+      
       this.content.innerHTML = `
         ${titleYaml}
         <div class="sub-seccion">${isEn ? 'ADD NEW FORMULA' : 'AÑADIR FÓRMULA NUEVA'}</div>
-        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-formula-nueva" placeholder="${isEn ? 'Formula name...' : 'Nombre de la fórmula...'}" value="${valFormulaNueva}"><button class="btn-guardar" id="btn-guardar-formula-nueva">💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
+        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-formula-nueva" placeholder="${isEn ? 'Formula name...' : 'Nombre de la fórmula...'}" value="${valFormulaNueva}"><button class="btn-guardar" id="btn-guardar-formula-nueva"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: #2196f3;">${isEn ? 'CURRENT FORMULA MANAGEMENT' : 'GESTIÓN DE FÓRMULA SELECCIONADA'}</div>
-        <div class="btn-gestion-bloque"><button style="background-color: #2196f3;" id="btn-actualizar-formula">💾 ${isEn ? 'UPDATE / SAVE' : 'ACTUALIZAR / GUARDAR'}</button><button style="background-color: var(--error-color, #db4437);" id="btn-eliminar-formula">❌ ${isEn ? 'DELETE' : 'ELIMINAR'}</button></div>
+        <span id="receta-actual-cargada">---</span>
+        <div class="btn-gestion-bloque">
+          <button style="background-color: #2196f3;" id="btn-actualizar-formula"> 💾 ${isEn ? 'UPDATE' : 'ACTUALIZAR'}</button>
+          <button style="background-color: var(--error-color, #db4437);" id="btn-eliminar-formula"> ❌ ${isEn ? 'DELETE' : 'ELIMINAR'}</button>
+        </div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: var(--success-color, #4caf50);">${isEn ? 'REGISTER FLOUR IN DATABASE' : 'REGISTRAR HARINA EN LA BASE DE DATOS'}</div>
-        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-harina-nueva" placeholder="${isEn ? 'Brand / Type...' : 'Marca / Tipo de harina...'}" value="${valHarinaNueva}"><button class="btn-guardar" id="btn-anadir-harina">💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
+        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-harina-nueva" placeholder="${isEn ? 'Brand / Type...' : 'Marca / Tipo de harina...'}" value="${valHarinaNueva}"><button class="btn-guardar" id="btn-anadir-harina"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: var(--error-color, #db4437);">${isEn ? 'DELETE FLOUR FROM DATABASE' : 'ELIMINAR HARINA DE LA BASE DE DATOS'}</div>
-        <select id="select-retirar-harina"></select><button class="btn-eliminar" style="width: 100%; height: 42px;" id="btn-eliminar-harina-inv">❌ ${isEn ? 'DELETE SELECTED' : 'ELIMINAR HARINA SELECCIONADA'}</button>
+        <select id="select-retirar-harina"></select>
+        <button class="btn-eliminar" style="width: 100%; margin-top: 4px;" id="btn-eliminar-harina-inv">❌ ${isEn ? 'DELETE SELECTED' : 'ELIMINAR HARINA SELECCIONADA'}</button>
       `;
-      this.registrarEventosPanelGral(); this._htmlInyectado = true;
+      this.registrarEventosPanelGral(); 
+      this._htmlInyectado = true;
+    }
+    const labelReceta = this.shadowRoot.getElementById('receta-actual-cargada');
+    if (labelReceta) {
+      labelReceta.textContent = recetaActiva;
+      labelReceta.className = esMetodoEmpirico ? 'receta-vacia-label' : 'receta-activa-label';
     }
 
+    const btnGuardarArriba = this.shadowRoot.getElementById('btn-guardar-formula-nueva');
+    if (btnGuardarArriba) {
+      if (this._notifGuardarArriba === "exito") {
+        btnGuardarArriba.textContent = isEn ? "¡SAVED!" : "¡GUARDADA!";
+        btnGuardarArriba.style.backgroundColor = "#2e7d32"; 
+        btnGuardarArriba.disabled = true;
+      } else {
+        btnGuardarArriba.textContent = ` 💾 ${isEn ? 'SAVE' : 'GUARDAR'}`;
+        btnGuardarArriba.style.backgroundColor = "var(--success-color, #4caf50)";
+        btnGuardarArriba.disabled = false;
+      }
+    }
+
+    const btnActAbajo = this.shadowRoot.getElementById('btn-actualizar-formula');
+    if (btnActAbajo) {
+      if (this._notifActualizarAbajo === "exito") {
+        btnActAbajo.textContent = isEn ? "¡UPDATED!" : "¡ACTUALIZADA!";
+        btnActAbajo.style.backgroundColor = "var(--success-color, #4caf50)";
+        btnActAbajo.disabled = true;
+      } else {
+        btnActAbajo.textContent = ` 💾 ${isEn ? 'UPDATE' : 'ACTUALIZAR'}`;
+        btnActAbajo.style.backgroundColor = "#2196f3";
+        btnActAbajo.disabled = false;
+      }
+    }
+
+    const btnElimAbajo = this.shadowRoot.getElementById('btn-eliminar-formula');
+    if (btnElimAbajo) {
+      if (this._notifEliminarAbajo === "exito") {
+        btnElimAbajo.textContent = isEn ? "¡DELETED!" : "¡ELIMINADA!";
+        btnElimAbajo.style.backgroundColor = "#ff9800"; 
+        btnElimAbajo.disabled = true;
+      } else {
+        btnElimAbajo.textContent = ` ❌ ${isEn ? 'DELETE' : 'ELIMINAR'}`;
+        btnElimAbajo.style.backgroundColor = "var(--error-color, #db4437)";
+        btnElimAbajo.disabled = false;
+      }
+    }
+
+    const btnRegHarina = this.shadowRoot.getElementById('btn-anadir-harina');
+    if (btnRegHarina) {
+      if (this._notifAnadirHarina === "exito") {
+        btnRegHarina.textContent = isEn ? "¡ADDED!" : "¡AÑADIDA!";
+        btnRegHarina.style.backgroundColor = "#2e7d32";
+        btnRegHarina.disabled = true;
+      } else {
+        btnRegHarina.textContent = ` 💾 ${isEn ? 'SAVE' : 'GUARDAR'}`;
+        btnRegHarina.style.backgroundColor = "var(--success-color, #4caf50)";
+        btnRegHarina.disabled = false;
+      }
+    }
+
+    const btnDelHarina = this.shadowRoot.getElementById('btn-eliminar-harina-inv');
+    if (btnDelHarina) {
+      if (this._notifEliminarHarina === "exito") {
+        btnDelHarina.textContent = isEn ? "¡DELETED!" : "¡ELIMINADA!";
+        btnDelHarina.style.backgroundColor = "#ff9800";
+        btnDelHarina.disabled = true;
+      } else {
+        btnDelHarina.textContent = `❌ ${isEn ? 'DELETE SELECTED' : 'ELIMINAR HARINA SELECCIONADA'}`;
+        btnDelHarina.style.backgroundColor = "var(--error-color, #db4437)";
+        btnDelHarina.disabled = false;
+      }
+    }
+    
     const activeEl = this.shadowRoot.activeElement;
     const inpForm = this.shadowRoot.getElementById('input-formula-nueva'); if (inpForm && inpForm !== activeEl) inpForm.value = valFormulaNueva;
     const inpHar = this.shadowRoot.getElementById('input-harina-nueva'); if (inpHar && inpHar !== activeEl) inpHar.value = valHarinaNueva;
-
+    
     const selRetHar = this.shadowRoot.getElementById('select-retirar-harina');
-    if (selRetHar && selRetHar !== activeEl) {
-      selRetHar.innerHTML = `<option value="">${isEn ? 'Select flour to delete...' : 'Selecciona harina a eliminar...'}</option>` + 
-        opcionesRetirarHarina.map(opt => `<option value="${opt}" ${opt === harinaSeleccionadaRetirar ? 'selected' : ''}>${opt}</option>`).join('');
+    if (selRetHar && selRetHar !== activeEl){
+      selRetHar.innerHTML = `<option value="">${isEn ? 'Select flour to delete...' : 'Selecciona harina a eliminar...'}</option>` +
+      opcionesRetirarHarina.map(opt => `<option value="${opt}" ${opt === harinaSeleccionadaRetirar ? 'selected' : ''}>${opt}</option>`).join('');
     }
   }
-
+  
   registrarEventosPanelGral() {
-    this.shadowRoot.getElementById('input-formula-nueva').addEventListener('change', (e) => { this._hass.callService('text', 'set_value', { entity_id: 'text.nombre_nueva_formula', value: e.target.value }); });
-    this.shadowRoot.getElementById('input-harina-nueva').addEventListener('change', (e) => { this._hass.callService('text', 'set_value', { entity_id: 'text.nombre_nueva_harina', value: e.target.value }); });
-    this.shadowRoot.getElementById('select-retirar-harina').addEventListener('change', (e) => { this._hass.callService('select', 'select_option', { entity_id: 'select.porcentaje_panadero_pan_select_retirar_harina_del_inventario', option: e.target.value }); });
-
-    this.shadowRoot.getElementById('btn-guardar-formula-nueva').addEventListener('click', () => { this._hass.callService('porcentaje_panadero', 'guardar_formula'); });
-    this.shadowRoot.getElementById('btn-actualizar-formula').addEventListener('click', () => { this._hass.callService('porcentaje_panadero', 'confirmar_sobreescritura'); });
-    this.shadowRoot.getElementById('btn-eliminar-formula').addEventListener('click', () => { this._hass.callService('porcentaje_panadero', 'confirmar_eliminacion'); });
-    this.shadowRoot.getElementById('btn-anadir-harina').addEventListener('click', () => { this._hass.callService('porcentaje_panadero', 'anadir_harina'); });
-    this.shadowRoot.getElementById('btn-eliminar-harina-inv').addEventListener('click', () => { this._hass.callService('porcentaje_panadero', 'eliminar_harina'); });
+    this.shadowRoot.getElementById('input-formula-nueva').addEventListener('change',(e) => { this._hass.callService('text', 'set_value',{ entity_id: 'text.nombre_nueva_formula', value: e.target.value }); });
+    this.shadowRoot.getElementById('input-harina-nueva').addEventListener('change',(e) => { this._hass.callService('text', 'set_value',{ entity_id: 'text.nombre_nueva_harina', value: e.target.value }); });
+    this.shadowRoot.getElementById('select-retirar-harina').addEventListener('change',(e) => { this._hass.callService('select', 'select_option',{ entity_id: 'select.porcentaje_panadero_pan_select_retirar_harina_del_inventario', option: e.target.value }); });
+    
+    this.shadowRoot.getElementById('btn-guardar-formula-nueva').addEventListener('click', () => { 
+      this._hass.callService('porcentaje_panadero', 'guardar_formula'); 
+      this._notifGuardarArriba = "exito"; this.updateCard();
+      setTimeout(() => { this._notifGuardarArriba = ""; this.updateCard(); }, 3000);
+    });
+    
+    this.shadowRoot.getElementById('btn-actualizar-formula').addEventListener('click', () => { 
+      this._hass.callService('porcentaje_panadero', 'confirmar_sobreescritura'); 
+      this._notifActualizarAbajo = "exito"; this.updateCard();
+      setTimeout(() => { this._notifActualizarAbajo = ""; this.updateCard(); }, 3000);
+    });
+    
+    this.shadowRoot.getElementById('btn-eliminar-formula').addEventListener('click', () => { 
+      this._hass.callService('porcentaje_panadero', 'confirmar_eliminacion'); 
+      this._notifEliminarAbajo = "exito"; this.updateCard();
+      setTimeout(() => { this._notifEliminarAbajo = ""; this.updateCard(); }, 3000);
+    });
+    
+    this.shadowRoot.getElementById('btn-anadir-harina').addEventListener('click', () => { 
+      this._hass.callService('porcentaje_panadero', 'anadir_harina'); 
+      this._notifAnadirHarina = "exito"; this.updateCard();
+      setTimeout(() => { this._notifAnadirHarina = ""; this.updateCard(); }, 3000);
+    });
+    
+    this.shadowRoot.getElementById('btn-eliminar-harina-inv').addEventListener('click', () => { 
+      this._hass.callService('porcentaje_panadero', 'eliminar_harina'); 
+      this._notifEliminarHarina = "exito"; this.updateCard();
+      setTimeout(() => { this._notifEliminarHarina = ""; this.updateCard(); }, 3000);
+    });
   }
-  getCardSize() { return 10; }
+  
+  getCardSize() { return 10;}
 }
 customElements.define('porcentaje-panadero-control-panel-card', PorcentajePanaderoControlPanelCard);
+
 
 
 
