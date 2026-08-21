@@ -81,7 +81,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 	Configuración > Paneles > Recursos
 
 	AÑADIR RECURSO
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.7`
 	* **Tipo de recurso:** Módulo JavaScript (`JavaScript Module`)
 
 Con esto incorporamos las tarjetas:
@@ -143,7 +143,7 @@ Define the **final dough weight** in grams and the rest of the calculation value
 	Settings > Dashboards > Resources
 
 	ADD RESOURCE
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.7`
 	* **Resource type:** JavaScript Module (`JavaScript Module`)
 
 With this, we incorporate the cards:
