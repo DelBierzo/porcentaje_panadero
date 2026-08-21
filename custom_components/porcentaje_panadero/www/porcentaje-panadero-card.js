@@ -15,70 +15,96 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
     this.config = config; 
   }
 
-  initCard() {
-    const style = document.createElement('style');
-    style.textContent = `
-      ha-card { padding: 16px; font-family: var(--paper-font-body1_-_font-family, inherit); box-sizing: border-box; }
-      .control-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; width: 100%; box-sizing: border-box; }
-      .select-formula-receta { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; font-weight: bold; width: 60%; }
-      .btn-reset-receta { background-color: var(--error-color, #db4437); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
-      .obrador-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; display: flex; color: var(--primary-text-color); width: 100%; align-items: center; }
-      .panel-section { border-left: 3px solid var(--accent-color); padding-left: 10px; margin: 16px 0 8px 0; font-weight: bold; text-transform: uppercase; font-size: 14px; color: var(--accent-color); }
-      .ingrediente-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); font-size: 14px !important; font-family: inherit !important; }
-      .ingrediente-nombre { font-weight: 500 !important; font-size: 14px !important; } 
-      .ingrediente-gramos { font-weight: bold !important; font-size: 16px !important; }
-    `;
-    const card = document.createElement('ha-card'); 
-    this.content = document.createElement('div');
-    card.appendChild(this.content); 
-    this.shadowRoot.appendChild(style); 
-    this.shadowRoot.appendChild(card);
-  }
+    initCard() {
+        const style = document.createElement('style');
+        style.textContent = `
+            ha-card { padding: 16px; font-family: var(--paper-font-body1_-_font-family, inherit); box-sizing: border-box; }
+            .control-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 16px; width: 100%; box-sizing: border-box; }
+            .select-formula-receta { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; font-weight: bold; width: 60%; }
+            .btn-reset-receta { background-color: var(--error-color, #db4437); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; white-space: nowrap; }
+            .obrador-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; display: flex; color: var(--primary-text-color); width: 100%; align-items: center; }
+            .panel-section { border-left: 3px solid var(--accent-color); padding-left: 10px; margin: 16px 0 8px 0; font-weight: bold; text-transform: uppercase; font-size: 14px; color: var(--accent-color); }
+            .ingrediente-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--divider-color, #e0e0e0); font-size: 14px !important; font-family: inherit !important; }
+            .ingrediente-nombre { font-weight: 500 !important; font-size: 14px !important; }
+            .ingrediente-gramos { font-weight: bold !important; font-size: 16px !important; }
+        `;
+        const card = document.createElement('ha-card');
+        this.content = document.createElement('div');
+        card.appendChild(this.content);
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(card);
+        
+        // Inicializamos el interruptor de renderizado limpio
+        this._opcionesRellenadas = false;
+    }
 
   updateCard() {
-    if (!this._hass) return; 
+    if (!this._hass) return;
     const lang = this._hass.language || 'es', isEn = lang.startsWith('en');
-    const selectReceta = this._hass.states['select.formula_de_receta'], recetaSeleccionada = selectReceta?.state || '---', opcionesRecetas = selectReceta?.attributes['options'] || [];
-    let recetaActiva = this._hass.states['sensor.receta_en_el_obrador']?.state || '', recetaLimpia = recetaActiva.trim().toLowerCase();
+    const selectReceta = this._hass.states['select.formula_de_receta'];
+    const recetaSeleccionada = selectReceta?.state || '---';
+    const opcionesRecetas = selectReceta?.attributes['options'] || [];
     
-    if (!recetaActiva || recetaLimpia === '---' || recetaLimpia === 'unknown' || recetaLimpia === 'none' || recetaLimpia === '') { 
-      recetaActiva = isEn ? 'EMPIRICAL METHOD !' : 'MÉTODO EMPÍRICO !'; 
+    let recetaActiva = this._hass.states['sensor.receta_en_el_obrador']?.state || '',
+        recetaLimpia = recetaActiva.trim().toLowerCase();
+
+    if (!recetaActiva || recetaLimpia === '---' || recetaLimpia === 'unknown' || recetaLimpia === 'none' || recetaLimpia === '') {
+        recetaActiva = isEn ? 'EMPIRICAL METHOD !' : 'MÉTODO EMPÍRICO !';
     }
-    
-    const h1 = parseFloat(this._hass.states['sensor.pan_harina_1_neta']?.state || 0), h2 = parseFloat(this._hass.states['sensor.pan_harina_2_neta']?.state || 0), h3 = parseFloat(this._hass.states['sensor.pan_harina_3_neta']?.state || 0);
-    const agua = parseFloat(this._hass.states['sensor.pan_agua_neta']?.state || 0), sal = parseFloat(this._hass.states['sensor.pan_sal_neta']?.state || 0), leva = parseFloat(this._hass.states['sensor.pan_levadura_neta']?.state || 0);
+
+    const h1 = parseFloat(this._hass.states['sensor.pan_harina_1_neta']?.state || 0), 
+          h2 = parseFloat(this._hass.states['sensor.pan_harina_2_neta']?.state || 0), 
+          h3 = parseFloat(this._hass.states['sensor.pan_harina_3_neta']?.state || 0);
+          
+    const agua = parseFloat(this._hass.states['sensor.pan_agua_neta']?.state || 0), 
+          sal = parseFloat(this._hass.states['sensor.pan_sal_neta']?.state || 0), 
+          leva = parseFloat(this._hass.states['sensor.pan_levadura_neta']?.state || 0);
+          
     const marcaH1 = this._hass.states['select.harina_principal_1']?.state || (isEn ? 'FLOUR 1' : 'HARINA 1');
-    const tzTotal = parseFloat(this._hass.states['sensor.tang_zhong_total']?.state || 0), pctPref = parseFloat(this._hass.states['number.prefermento']?.state || 0);
+    const tzTotal = parseFloat(this._hass.states['sensor.tang_zhong_total']?.state || 0),
+          pctPref = parseFloat(this._hass.states['number.prefermento']?.state || 0);
 
     if (!this._htmlInyectado) {
-      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
-      
-      this.content.innerHTML = `
-        ${titleYaml}
-        <div class="control-header">
-          <select class="select-formula-receta" id="select-formula-card"></select>
-          <button class="btn-reset-receta" id="btn-reset-card">🔄 ${isEn ? 'RESET' : 'RESTABLECER'}</button>
-        </div>
-        <div class="obrador-title">
-          <span id="cabecera-receta-dinamica" style="font-size:14px !important; font-weight:normal; margin-left:auto; color:var(--secondary-text-color); text-transform: uppercase; letter-spacing: 0.5px;"></span>
-        </div>
-        <div id="bloque-tangzhong-dinamico"></div>
-        <div id="bloque-prefermento-dinamico"></div>
-        <div class="panel-section">${isEn ? 'FINAL KNEADING INGREDIENTS' : 'INGREDIENTES AMASADO FINAL'}</div>
-        <div id="lista-ingredientes"></div>
-      `;
-      this.registrarEventosCard(); 
-      this._htmlInyectado = true;
+        const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+        
+        this.content.innerHTML = `
+            ${titleYaml}
+            <div class="control-header">
+                <select class="select-formula-receta" id="select-formula-card"></select>
+                <button class="btn-reset-receta" id="btn-reset-card">${isEn ? 'RESET' : 'RESTABLECER'}</button>
+            </div>
+            <div class="obrador-title">
+                <span id="cabecera-receta-dinamica" style="font-size:14px !important; font-weight: normal; margin-left:auto; color:var(--secondary-text-color); text-transform: uppercase; letter-spacing: 0.5px;"></span>
+            </div>
+            <div id="bloque-tangzhong-dinamico"></div>
+            <div id="bloque-prefermento-dinamico"></div>
+            <div class="panel-section">${isEn ? 'FINAL KNEADING INGREDIENTS' : 'INGREDIENTES AMASADO FINAL'}</div>
+            <div id="lista-ingredientes"></div>
+        `;
+        this.registrarEventosCard();
+        this._htmlInyectado = true;
     }
 
-    const activeEl = this.shadowRoot.activeElement, selF = this.shadowRoot.getElementById('select-formula-card');
-    
-    if (selF && selF !== activeEl) { 
-      selF.innerHTML = opcionesRecetas.map(opt => `<option value="${opt}" ${opt === recetaSeleccionada ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join(''); 
+    // --- PARCHE DE CONTROL ANTIBUCLES EN EL SELECTOR ---
+    const activeEl = this.shadowRoot.activeElement;
+    const selF = this.shadowRoot.getElementById('select-formula-card');
+    if (selF) {
+        const opcionesString = opcionesRecetas.join(',');
+        // Rellenamos el HTML interno del select únicamente si las opciones de la base de datos cambian
+        if (!this._opcionesRellenadas || this._cacheOpciones !== opcionesString) {
+            selF.innerHTML = opcionesRecetas.map(opt => `<option value="${opt}">${opt.toUpperCase()}</option>`).join('');
+            this._opcionesRellenadas = true;
+            this._cacheOpciones = opcionesString;
+        }
+        // Actualizamos la opción seleccionada visualmente sin machacar el elemento HTML
+        if (activeEl !== selF) {
+            selF.value = recetaSeleccionada;
+        }
     }
-    
-    const cabeceraTexto = this.shadowRoot.getElementById('cabecera-receta-dinamica'); 
+
+    const cabeceraTexto = this.shadowRoot.getElementById('cabecera-receta-dinamica');
     if (cabeceraTexto) cabeceraTexto.textContent = recetaActiva;
+
     
     const cf = (n, g) => `<div class="ingrediente-row"><span class="ingrediente-nombre">${n}</span><span class="ingrediente-gramos">${g ? `${g} g` : ''}</span></div>`;
 
@@ -111,12 +137,37 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
           const textoLevaPref = isEn ? `${tL} YEAST` : `LEVADURA ${tL}`;
           hP += `<div class="ingrediente-row"><span style="font-weight: 500;">${textoLevaPref} (${pL}%)</span><span class="ingrediente-gramos">${lPref} g</span></div>`; 
         }
-        const pctHP = this._hass.states['sensor.harina_prefermentada']?.state || '0', pctAP = this._hass.states['sensor.hidratacion_del_prefermento']?.state || '100';
-        hP += `<div class="ingrediente-row"><span style="font-weight: 500;">${marcaH1.toUpperCase()} (${pctHP}%)</span><span class="ingrediente-gramos">${hPref} g</span></div><div class="ingrediente-row"><span style="font-weight: 500;">${isEn?'WATER':'AGUA'} (${pctAP}%)</span><span class="ingrediente-gramos">${aPref} g</span></div>`;
+		
+        const pctHP = this._hass.states['sensor.harina_prefermentada']?.state || '0', 
+              pctAP = this._hass.states['sensor.hidratacion_del_prefermento']?.state || '100';
+        
+        // Leemos los gramos de harina del prefermento directamente del estado del bus de HA
+        const gramosHarinaPrefermento = this._hass.states['sensor.pan_harina_prefermento']?.state || '0';
+        const gramosAguaPrefermento = this._hass.states['sensor.pan_agua_prefermento']?.state || '0';
+
+        // Leemos directamente del bus lo que el usuario ve en su selector
+        const selectorHarinaPref = this._hass.states['select.harina_para_prefermento']?.state || 'harina 1';
+        const prefLimpio = selectorHarinaPref.toLowerCase();
+
+        // Nombres comerciales configurados
+        const marcaH1 = this._hass.states['select.harina_principal_1']?.state || 'HARINA 1';
+        const marcaH2 = this._hass.states['select.harina_secondary_2']?.state || this._hass.states['select.harina_secundaria_2']?.state || 'HARINA 2';
+        const marcaH3 = this._hass.states['select.harina_secondary_3']?.state || this._hass.states['select.harina_secundaria_3']?.state || 'HARINA 3';
+
+        // Decisión por número contenido
+        let nombreHarinaPrefermento = marcaH1;
+        if (prefLimpio.includes('2')) {
+            nombreHarinaPrefermento = marcaH2;
+        } else if (prefLimpio.includes('3')) {
+            nombreHarinaPrefermento = marcaH3;
+        }
+
+        hP += `<div class="ingrediente-row"><span style="font-weight: 500;">${nombreHarinaPrefermento.toUpperCase()} (${pctHP}%)</span><span class="ingrediente-gramos">${gramosHarinaPrefermento} g</span></div><div class="ingrediente-row"><span style="font-weight: 500;">${isEn?'WATER':'AGUA'} (${pctAP}%)</span><span class="ingrediente-gramos">${gramosAguaPrefermento} g</span></div>`;
       } divP.innerHTML = hP;
     }
 
     const lista = this.shadowRoot.getElementById('lista-ingredientes');
+
     if (lista) {
       let hI = ''; const pH1 = this._hass.states['sensor.porcentaje_neto_harina_1']?.state || '0', pH2 = this._hass.states['sensor.porcentaje_neto_harina_2']?.state || '0', pH3 = this._hass.states['sensor.porcentaje_neto_harina_3']?.state || '0';
       const pA = this._hass.states['sensor.porcentaje_hidratacion_final']?.state || '0', pS = this._hass.states['number.sal']?.state || '2', pL = this._hass.states['number.levadura']?.state || '0';
