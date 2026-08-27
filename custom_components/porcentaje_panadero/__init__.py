@@ -452,6 +452,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Descarga de forma limpia las plataformas y los servicios de la integración al recargar."""
+    _LOGGER.info("Descargando de forma segura los servicios y plataformas de Porcentaje Panadero.")
+
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    
+    if unload_ok:
+        for servicio in [
+            "guardar_formula", "confirmar_sobreescritura", "eliminar_formula", 
+            "confirmar_eliminacion", "cargar_formula_en_sliders", "alternar_tipo_levadura", 
+            "alternar_tang_zhong_base", "balancear_harinas", "anadir_harina", "eliminar_harina"
+        ]:
+            hass.services.async_remove(DOMAIN, servicio)
+            
+        if DOMAIN in hass.data:
+            hass.data.pop(DOMAIN)
+
+    return unload_ok
+
 # ==========================================
 #     MÓDULOS DE LECTURA E INYECCIÓN DE UI
 # ==========================================
@@ -831,8 +850,8 @@ async def cargar_formula_en_sliders_service(call: ServiceCall):
             await asyncio.sleep(0.3)
             
             await hass.services.async_call(DOMAIN, "balancear_harinas", {"harina_origen": 1})
-
-        
+ 
+ 
 async def alternar_tipo_levadura_service(call: ServiceCall):
     """Conmuta entre levadura aplicando el factor x3 o /3 leyendo los números reales actuales."""
     tipo_actual = obtener_tipo_levadura_actual()
@@ -840,7 +859,7 @@ async def alternar_tipo_levadura_service(call: ServiceCall):
 
     st_leva = call.hass.states.get("number.levadura")
     st_leva_pref = call.hass.states.get("number.levadura_prefermento")
-
+    
     pct_leva_principal = float(st_leva.state) if st_leva and st_leva.state not in ["unavailable", "unknown", ""] else 0.7
     pct_leva_pref_val = float(st_leva_pref.state) if st_leva_pref and st_leva_pref.state not in ["unavailable", "unknown", ""] else 0.0
 
@@ -854,24 +873,26 @@ async def alternar_tipo_levadura_service(call: ServiceCall):
     if pct_leva_pref_val > 0 and call.hass.states.get("number.levadura_prefermento") is not None:
         await call.hass.services.async_call("number", "set_value", {"entity_id": "number.levadura_prefermento", "value": nuevo_pct_pref})
 
-    estado_actual = call.hass.states.get(ID_BOTON_LEVADURA)
-    atributos_base = dict(estado_actual.attributes) if estado_actual else {}
-    atributos_base["tipo_levadura"] = nuevo_tipo
-    atributos_base["options"] = ["fresca", "seca"]
-    call.hass.states.async_set(ID_BOTON_LEVADURA, nuevo_tipo, atributos_base)
+    componente_button = call.hass.data.get("button")
+    if componente_button and hasattr(componente_button, "entities"):
+        for entidad in componente_button.entities:
+            if entidad.entity_id == ID_BOTON_LEVADURA:
+                entidad.async_write_ha_state()
 
 
 async def alternar_tang_zhong_base_service(call: ServiceCall):
     """Conmuta la base líquida del Tang-Zhong y fuerza el balanceo matemático de líquidos."""
     base_actual = obtener_base_tz_actual()
     nueva_base = "leche" if base_actual == "agua" else "agua"
+    
     establecer_base_tz_actual(nueva_base)
 
-    estado_tz = call.hass.states.get(ID_BOTON_TANG_ZHONG)
-    atributos_tz = dict(estado_tz.attributes) if estado_tz else {}
-    atributos_tz["base_liquida"] = nueva_base
-    atributos_tz["options"] = ["agua", "leche"]
-    call.hass.states.async_set(ID_BOTON_TANG_ZHONG, nueva_base, atributos_tz)
+    componente_button = call.hass.data.get("button")
+    if componente_button and hasattr(componente_button, "entities"):
+        for entidad in componente_button.entities:
+            if entidad.entity_id == ID_BOTON_TANG_ZHONG:
+                entidad.async_write_ha_state()
+
     await call.hass.services.async_call(DOMAIN, "balancear_harinas", {"harina_origen": 1})
 
 
@@ -963,7 +984,6 @@ async def gestion_eliminar_harina_service(call: ServiceCall):
 
 async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
     """Notifica los cambios a la UI de Lovelace y actualiza la RAM interna separando comodines."""
-
     marcas_reales = [h for h in lista_harinas if h not in ["HARINA 1", "HARINA 2", "HARINA 3", "---"]]
     lista_bascula = list(marcas_reales)
     
@@ -984,24 +1004,14 @@ async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
                     elif entidad._clave == "retirar_harina_del_inventario":
                         entidad._options = lista_purga
                         entidad.async_write_ha_state()
-    except Exception as ex:
-        _LOGGER.error("No se pudo sincronizar la lista de harinas en la RAM del componente: %s", ex)
+                    
+                    elif entidad.entity_id in ["select.harina_principal_1", "select.harina_secundaria_2", "select.harina_secundaria_3"]:
+                        entidad._options = lista_bascula
+                        entidad.async_write_ha_state()
+                    
+                    elif entidad.entity_id == "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario":
+                        entidad._options = lista_purga
+                        entidad.async_write_ha_state()
 
-    try:
-        for entidad_id in ["select.harina_principal_1", "select.harina_secundaria_2", "select.harina_secundaria_3"]:
-            estado_actual = hass.states.get(entidad_id)
-            if estado_actual:
-                hass.states.async_set(entidad_id, estado_actual.state, {
-                    **dict(estado_actual.attributes),
-                    "options": lista_bascula
-                })
-
-        id_purga = "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario"
-        estado_purga = hass.states.get(id_purga)
-        if estado_purga:
-            hass.states.async_set(id_purga, estado_purga.state, {
-                **dict(estado_purga.attributes),
-                "options": lista_purga
-            })
     except Exception as ex:
-        _LOGGER.debug("Los selectores de interfaz se sincronizarán dinámicamente al terminar de levantar las plataformas: %s", ex)
+        _LOGGER.error("No se pudo sincronizar de forma nativa la lista de harinas en las entidades: %s", ex)
