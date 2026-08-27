@@ -1,44 +1,39 @@
 guardar_formula:
-  name: "Guardar o Actualizar Fórmula"
-  description: "Toma los valores actuales de los deslizadores e ingredientes y los vuelca en formulas.json."
+  name: Guardar Fórmula
+  description: Guarda de forma asíncrona la receta actual con todos sus porcentajes e ingredientes en el almacenamiento seguro de Home Assistant (Store).
 
 confirmar_sobreescritura:
-  name: "Confirmar Sobreescritura de Fórmula"
-  description: "Servicio forzado de escritura ejecutado tras la confirmación de la alerta push en el dispositivo móvil."
-
-eliminar_formula:
-  name: "Solicitar Eliminación de Fórmula"
-  description: "Dispara un evento bus para pedir confirmación móvil antes de borrar la receta activa del obrador."
+  name: Confirmar Sobreescritura
+  description: Sobreescribe y actualiza de forma segura la receta activa en el Store tras la confirmación de la interfaz.
 
 confirmar_eliminacion:
-  name: "Confirmar Eliminación de Fórmula"
-  description: "Servicio definitivo que elimina la receta del archivo formulas.json y restablece los deslizadores."
+  name: Confirmar Eliminación
+  description: Destruye y purga de forma definitiva del Store la receta activa actualmente en el obrador.
 
-alternar_tipo_levadura:
-  name: "Alternar Tipo de Levadura"
-  description: "Conmuta de forma inteligente los porcentajes de levadura multiplicando por 3 o dividiendo entre 3 según sea fresca o seca."
-
-alternar_tang_zhong_base:
-  name: "Alternar Líquido Base Tang-Zhong"
-  description: "Alterna la base del escaldado entre agua o leche y recalcula automáticamente los balances netos."
+cargar_formula_en_sliders:
+  name: Cargar Fórmula en Sliders
+  description: Carga una receta guardada en el Store y mueve de forma asíncrona todos los sliders numéricos e ingredientes en Lovelace.
+  fields:
+    nombre:
+      name: Nombre de la receta
+      description: Identificador de la fórmula que se desea cargar en el obrador.
+      required: true
+      example: pizza_napolitana
 
 balancear_harinas:
-  name: "Balancear Porcentajes de Harinas"
-  description: "Mantiene la suma de las harinas al 100% de forma reactiva y limpia los extras si la pestaña está oculta."
+  name: Balancear Harinas
+  description: Motor matemático reactivo que calcula las harinas netas y líquidos en directo descontando los porcentajes de prefermentos.
   fields:
     harina_origen:
-      name: "Harina de Origen"
-      description: "Número identificador (1, 2 o 3) de la harina que ha cambiado para calcular las restantes."
-      required: true
-      selector:
-        number:
-          min: 1
-          max: 3
+      name: Harina Origen
+      description: ID de la harina que ha cambiado para forzar el balanceo del 100%.
+      required: false
+      example: 1
 
 anadir_harina:
-  name: "Añadir Harina al Inventario"
-  description: "Toma el string escrito en el cuadro text.nombre_nueva_formula y lo registra de forma persistente en harinas.json."
+  name: Añadir Harina al Almacén
+  description: Registra una nueva marca o variedad de harina de forma permanente en el Store de harinas de la integración.
 
 eliminar_harina:
-  name: "Eliminar Harina del Inventario"
-  description: "Elimina definitivamente de harinas.json la opción seleccionada en el menú select.eliminar_harina."
+  name: Eliminar Harina del Almacén
+  description: Purga del Store de harinas del inventario del obrador la variedad de harina seleccionada en el menú de retirada.
