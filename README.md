@@ -1,5 +1,5 @@
 <p align="left"> 
-  <img src="https://github.com/DelBierzo/porcentaje_panadero/blob/main/images/logo.png" width="300" alt="Porcentaje Panadero Logo" />
+  <img src="https://github.com/DelBierzo/porcentaje_panadero/blob/main/custom_components/porcentaje_panadero/brand/icon.png" width="300" alt="Porcentaje Panadero Logo" />
 </p>
  
 ## Porcentaje Panadero / Baker's Percentage (Home Assistant)
@@ -9,7 +9,7 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 ---
 
 ## 🌐 English Abstract (HACS Compliance)
-**Baker's Percentage** is an advanced custom integration for Home Assistant that turns your smart home into a professional bakery station. It dynamically scales flours, liquids, preferments, and extra ingredients based on bakers' percentages, targeting precise final dough weights. It features automated **Tang-Zhong** scaling with mixed-scald milk back-up, hidden liquid compensation (eggs/milk), Arrhenius proofing speed estimations, and local recipe persistence into a JSON file with mobile interactive safety confirmations.
+**Baker's Percentage** is an advanced custom integration for Home Assistant that turns your smart home into a professional bakery station. It dynamically scales flours, liquids, preferments, and extra ingredients based on bakers' percentages, targeting precise final dough weights. It features automated **Tang-Zhong** scaling with mixed-scald milk back-up, hidden liquid compensation (eggs/milk), Arrhenius proofing speed estimations, and secure native recipe persistence via Home Assistant Store.
 
 ---
 
@@ -24,7 +24,6 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 * **Desglose de Prefermentos Avanzado:** Modelos de cálculo nativos para Poolish, Biga y Masa Madre (refrescos, inóculos e hidrataciones) con asignación y descuento dinámico de harinas netas.
 * **Ratio Harina sobre Masa:** Nuevo sensor avanzado que calcula y expone el porcentaje real de la harina total respecto al peso neto de la masa en el bol.
 * **Algoritmo Térmico del Agua:** Calcula la temperatura ideal del agua de amasado cruzando variables manuales de fricción o enlazándose en tiempo real a tu termómetro Zigbee físico de la cocina.
-* **Recetario Local con Confirmaciones Móviles:** Se sincroniza automáticamente con un archivo `formulas.json` local. Lanzamiento de alertas interactivas a tu smartphone ante sobreescrituras o borrados accidentales.
 * **Algoritmo Térmico de Doble Vía:** Calcula la temperatura ideal del agua de amasado monitorizando de forma constante tu cocina (vía termómetro físico Zigbee), mientras que el tiempo de fermentación se calcula de forma independiente según el entorno elegido (encimera real o slider manual para consigna de cámara).
 * **Cinética Biológica Exponencial:** Integra un motor de estimación de levado basado en las curvas termodinámicas reales de Arrhenius (Van 't Hoff). Ofrece predicciones exactas tanto a temperatura ambiente estándar de obrador (24°C) como en aletargamiento de frío extremo en nevera (5°C) para fermentaciones prolongadas.
 
@@ -39,7 +38,6 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 * **Advanced Preferment Breakdown:** Native calculation models for Poolish, Biga, and Sourdough (refreshments, inoculums, and hydration) with dynamic net flour deduction.
 * **Flour-to-Dough Ratio:** New advanced sensor that calculates and displays the exact percentage of total flour relative to the net dough weight.
 * **Water Thermal Algorithm:** Calculates the ideal water temperature by crossing manual friction variables or syncing in real time with your physical Zigbee kitchen thermometer.
-* **Local Recipe Book with Mobile Confirmations:** Syncs automatically with a local `formulas.json` file. Sends interactive smartphone alerts to prevent accidental overwrites or deletions.
 * **Dual-Way Thermal Algorithm:** Calculates the ideal kneading water temperature by constantly tracking your physical Zigbee kitchen thermometer, while independently estimating proofing time based on your chosen environment (live counter-top or manual chamber consign slider).
 * **Exponential Biological Kinetics:** Integrates a proofing speed engine based on true Arrhenius (Van 't Hoff) thermodynamic curves. It yields highly accurate time predictions for both standard room fermentation (24°C) and extreme cold retardation in fridges (5°C) for extended dough maturations.
 
@@ -81,7 +79,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 	Configuración > Paneles > Recursos
 
 	AÑADIR RECURSO
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.7`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.8`
 	* **Tipo de recurso:** Módulo JavaScript (`JavaScript Module`)
 
 Con esto incorporamos las tarjetas:
@@ -143,7 +141,7 @@ Define the **final dough weight** in grams and the rest of the calculation value
 	Settings > Dashboards > Resources
 
 	ADD RESOURCE
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.7`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.0.8`
 	* **Resource type:** JavaScript Module (`JavaScript Module`)
 
 With this, we incorporate the cards:
