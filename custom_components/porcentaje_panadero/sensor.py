@@ -160,7 +160,6 @@ class PanSensor(SensorEntity, RestoreEntity):
 
         self.calcular_matematicas_panaderas()
 
-
     @callback
     def _actualizar_nombre_formula_callback(self, nuevo_nombre):
         """Modifica de forma segura y reactiva el estado del sensor."""
@@ -198,7 +197,6 @@ class PanSensor(SensorEntity, RestoreEntity):
             tipo_pref = get_str("select.tipo_de_prefermento", "poolish").lower().strip()
             hyd_mm = get_float("number.hidratacion_masa_madre", 100.0)
             
-            # Forzamos la lectura limpia del selector de harina del prefermento:
             h_para_pref = get_str("select.porcentaje_panadero_harina_para_prefermento", "").lower().strip()
             if not h_para_pref:
                 h_para_pref = get_str("select.harina_para_prefermento", "harina 1").lower().strip()
@@ -562,9 +560,6 @@ class PanSensor(SensorEntity, RestoreEntity):
 
                 pref_str_limpio = str(est_sel_pref.state).lower().strip() if est_sel_pref else "harina 1"
                 
-                # =============================================================
-                # CORRECCIÓN MAESTRA: Restauramos los ID reales de tu obrador
-                # =============================================================
                 st_h1 = self.hass.states.get("select.harina_principal_1")
                 st_h2 = self.hass.states.get("select.harina_secundaria_2")
                 st_h3 = self.hass.states.get("select.harina_secundaria_3")
@@ -578,7 +573,6 @@ class PanSensor(SensorEntity, RestoreEntity):
 
                 self._attributes["nombre_harina_real"] = nombre_comercial
                 # =============================================================
-
 
             self.async_write_ha_state()
 
