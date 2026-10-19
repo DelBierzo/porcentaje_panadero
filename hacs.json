@@ -1,6 +1,5 @@
 {
   "name": "Porcentaje Panadero",
   "homeassistant": "2026.1.0",
-  "render_readme": true,
-  "filename": "porcentaje-panadero-card.js"
+  "render_readme": true
 }
