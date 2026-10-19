@@ -40,7 +40,8 @@
       "selector_harina_1": { "name": "Harina Principal (1)" },
       "selector_harina_2": { "name": "Harina Secundaria (2)" },
       "selector_harina_3": { "name": "Harina Secundaria (3)" },
-      "eliminar_harina": { "name": "Retirar Harina del Inventario" }
+      "eliminar_harina": { "name": "Retirar Harina del Inventario" },
+      "retirar_harina_del_inventario": { "name": "Retirar Harina del Inventario" }
     },
     "switch": {
       "habilitar_ingredientes_extras": { "name": "Habilitar Ingredientes Extras" },

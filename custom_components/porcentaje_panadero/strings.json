@@ -40,7 +40,8 @@
       "selector_harina_1": { "name": "Main Flour (1)" },
       "selector_harina_2": { "name": "Secondary Flour (2)" },
       "selector_harina_3": { "name": "Secondary Flour (3)" },
-      "eliminar_harina": { "name": "Remove Flour from Inventory" }
+      "eliminar_harina": { "name": "Remove Flour from Inventory" },
+      "retirar_harina_del_inventario": { "name": "Remove Flour from Inventory" }
     },
     "switch": {
       "habilitar_ingredientes_extras": { "name": "Enable Extra Ingredients" },

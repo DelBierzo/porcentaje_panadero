@@ -704,7 +704,8 @@ async def guardar_formula_service(call: ServiceCall):
         })
         return
 
-    nombre_id = str(nombre_raw).strip().replace(" ", "_").lower()
+    nombre_limpio_receta = nombre_raw.strip()
+    nombre_id = str(nombre_limpio_receta).replace(" ", "_").lower()
     
     store = hass.data[DOMAIN]["store_formulas"]
     data = hass.data[DOMAIN]["formulas"]
@@ -714,7 +715,7 @@ async def guardar_formula_service(call: ServiceCall):
     await store.async_save(data)
     _LOGGER.info("Fórmula '%s' persistida con éxito en el Store seguro de Home Assistant.", nombre_id)
 
-    const.RECETA_ACTIVA_MEMORIA = nombre_raw.strip().replace("_", " ").title()
+    const.RECETA_ACTIVA_MEMORIA = nombre_limpio_receta.replace("_", " ").title()
     
     if hass.states.get("text.nombre_nueva_formula") is not None:
         await hass.services.async_call("text", "set_value", {
@@ -724,6 +725,15 @@ async def guardar_formula_service(call: ServiceCall):
 
     hass.bus.fire("porcentaje_panadero_recetas_actualizadas", {})
 
+    if hass.states.get("select.formula_de_receta") is not None:
+        await hass.services.async_call("select", "select_option", {
+            "entity_id": "select.formula_de_receta",
+            "option": const.RECETA_ACTIVA_MEMORIA
+        })
+    
+    await hass.services.async_call(DOMAIN, "cargar_formula_en_sliders", {
+        "nombre": const.RECETA_ACTIVA_MEMORIA
+    })
 
 async def confirmar_sobreescritura_service(call: ServiceCall):
     """Servicio definitivo que se ejecuta tras la confirmación móvil de sobreescritura."""
@@ -814,9 +824,16 @@ async def cargar_formula_en_sliders_service(call: ServiceCall):
                             "entity_id": id_selector, "option": marca_guardada
                         })
                     else:
-                        _LOGGER.info("La harina '%s' ya no existe en el catalogo. Restableciendo.", marca_guardada)
-                        atributos_actuales = dict(state_obj.attributes) if state_obj else {}
-                        hass.states.async_set(id_selector, "unknown", atributos_actuales)
+                        _LOGGER.info("La harina '%s' ya no existe en el catálogo. Restableciendo selector de harinas.", marca_guardada)
+                        await hass.services.async_call(
+                            "select",
+                            "select_option",
+                            {
+                                "entity_id": id_selector,
+                                "option": "---"
+                            },
+                            blocking=True
+                        )
 
             await inyectar_harina_segura("select.harina_principal_1", "harina_1_nombre", "HARINA 1")
             await inyectar_harina_segura("select.harina_secundaria_2", "harina_2_nombre", "HARINA 2")
@@ -952,6 +969,7 @@ async def gestion_anadir_harina_service(call: ServiceCall):
         harinas.append(nueva_harina)
         await store_harinas.async_save(harinas)
 
+    # CORRECCIÓN: Forzar limpieza reactiva inmediata
     if hass.states.get("text.nombre_nueva_harina") is not None:
         await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_harina", "value": ""})
 
@@ -983,7 +1001,7 @@ async def gestion_eliminar_harina_service(call: ServiceCall):
 
 
 async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
-    """Notifica los cambios a la UI de Lovelace y actualiza la RAM interna separando comodines."""
+    """Sincroniza y fuerza la actualización de opciones en Lovelace de forma instantánea."""
     marcas_reales = [h for h in lista_harinas if h not in ["HARINA 1", "HARINA 2", "HARINA 3", "---"]]
     lista_bascula = list(marcas_reales)
     
@@ -994,24 +1012,37 @@ async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
     lista_purga = ["---"] + marcas_reales
 
     try:
-        componente_select = hass.data.get("select")
-        if componente_select and hasattr(componente_select, "entities"):
-            for entidad in componente_select.entities:
-                if hasattr(entidad, "_clave"):
-                    if entidad._clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"]:
-                        entidad._options = lista_bascula
-                        entidad.async_write_ha_state()
-                    elif entidad._clave == "retirar_harina_del_inventario":
-                        entidad._options = lista_purga
-                        entidad.async_write_ha_state()
-                    
-                    elif entidad.entity_id in ["select.harina_principal_1", "select.harina_secundaria_2", "select.harina_secundaria_3"]:
-                        entidad._options = lista_bascula
-                        entidad.async_write_ha_state()
-                    
-                    elif entidad.entity_id == "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario":
-                        entidad._options = lista_purga
-                        entidad.async_write_ha_state()
+        if DOMAIN in hass.data and "harinas" in hass.data[DOMAIN]:
+            hass.data[DOMAIN]["harinas"] = lista_harinas
+
+        componente = hass.data.get("select")
+        if componente and hasattr(componente, "entities"):
+            for entidad in componente.entities:
+                cambiado = False
+                
+                # 1. Forzar la mutación de las opciones en la estructura nativa de la entidad
+                if hasattr(entidad, "_clave") and entidad._clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"]:
+                    entidad._options = lista_bascula
+                    cambiado = True
+                elif hasattr(entidad, "_clave") and entidad._clave == "retirar_harina_del_inventario":
+                    entidad._options = lista_purga
+                    cambiado = True
+                
+                if entidad.entity_id in ["select.selector_harina_1", "select.selector_harina_2", "select.selector_harina_3"]:
+                    entidad._options = lista_bascula
+                    cambiado = True
+                elif entidad.entity_id in ["select.porcentaje_panadero_pan_select_retirar_harina_del_inventario", "select.retirar_harina_del_inventario"]:
+                    entidad._options = lista_purga
+                    cambiado = True
+
+                # 2. CORRECCIÓN CRÍTICA: Forzamos la actualización de los atributos del estado en el bus oficial de HA
+                if cambiado:
+                    # Sobreescribimos el diccionario de atributos interno para que Lovelace lea la nueva lista inmediatamente
+                    entidad._attr_options = lista_bascula if "retirar" not in entidad.entity_id and "inventario" not in entidad.entity_id else lista_purga
+                    entidad.async_write_ha_state()
+
+        # Lanzamos el evento global al bus asíncrono para despertar las tarjetas de Lovelace JS al instante
+        hass.bus.fire("porcentaje_panadero_harinas_actualizadas", {})
 
     except Exception as ex:
         _LOGGER.error("No se pudo sincronizar de forma nativa la lista de harinas en las entidades: %s", ex)

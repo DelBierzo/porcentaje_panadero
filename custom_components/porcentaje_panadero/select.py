@@ -108,32 +108,43 @@ class PanSelectMenu(SelectEntity):
                 return base_init
             return self._options
 
+        # =========================================================================
+        # RESTRICCIÓN MATEMÁTICA PURA PARA LAS HARINAS DEL PREFERMENTO
+        # =========================================================================
         if self._clave == "harina_para_prefermento":
             try:
-                def get_f(eid):
+                def get_pct(eid):
                     st = self.hass.states.get(eid)
                     return float(st.state) if st and st.state not in ["unavailable", "unknown", ""] else 0.0
 
-                h1 = get_f("number.harina_1")
-                h2 = get_f("number.harina_2")
-                h3 = get_f("number.harina_3")
-                peso_h_total = get_f("sensor.harina_total")
-                peso_pref = get_f("sensor.prefermento_total")
+                # Leemos los porcentajes directamente de los sliders (100% síncronos)
+                h1 = get_pct("number.harina_1")
+                h2 = get_pct("number.harina_2")
+                h3 = get_pct("number.harina_3")
+                pct_pref = get_pct("number.prefermento")
 
                 st_tipo = self.hass.states.get("select.tipo_de_prefermento")
                 tipo_pref = st_tipo.state.lower() if st_tipo else "poolish"
-                hyd_mm = get_f("number.hidratacion_masa_madre")
+                hyd_mm = get_pct("number.hidratacion_masa_madre")
 
-                g_req = 0.0
-                if peso_pref > 0:
-                    if tipo_pref == "biga": g_req = peso_pref * 0.6667
-                    elif tipo_pref == "poolish": g_req = peso_pref * 0.5
-                    elif tipo_pref == "masa madre": g_req = peso_pref / (1 + (hyd_mm / 100))
+                # Calculamos qué porcentaje del 100% de la harina se requiere para el prefermento
+                pct_harina_requerida = 0.0
+                if pct_pref > 0:
+                    if tipo_pref == "biga":
+                        # La biga clásica lleva aproximadamente el 66.67% de su peso en harina (relación 100:45 o similar)
+                        pct_harina_requerida = pct_pref * 0.6667
+                    elif tipo_pref == "poolish":
+                        # El poolish es relación 1:1, luego la mitad exacta de su peso es harina (50%)
+                        pct_harina_requerida = pct_pref * 0.5
+                    elif tipo_pref == "masa madre":
+                        # Ecuación de la masa madre según su hidratación configurada
+                        pct_harina_requerida = pct_pref / (1 + (hyd_mm / 100))
 
                 nuevas = []
-                if h1 > 0 and (peso_h_total * (h1 / 100)) >= g_req: nuevas.append("harina 1")
-                if h2 > 0 and (peso_h_total * (h2 / 100)) >= g_req: nuevas.append("harina 2")
-                if h3 > 0 and (peso_h_total * (h3 / 100)) >= g_req: nuevas.append("harina 3")
+                # Validamos si el slider de cada harina cubre el porcentaje requerido por el prefermento
+                if h1 > 0 and h1 >= pct_harina_requerida: nuevas.append("harina 1")
+                if h2 > 0 and h2 >= pct_harina_requerida: nuevas.append("harina 2")
+                if h3 > 0 and h3 >= pct_harina_requerida: nuevas.append("harina 3")
 
                 lista_final = nuevas if nuevas else ["harina 1"]
                 if self._current_option not in lista_final:

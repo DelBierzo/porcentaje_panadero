@@ -562,6 +562,9 @@ class PanSensor(SensorEntity, RestoreEntity):
 
                 pref_str_limpio = str(est_sel_pref.state).lower().strip() if est_sel_pref else "harina 1"
                 
+                # =============================================================
+                # CORRECCIÓN MAESTRA: Restauramos los ID reales de tu obrador
+                # =============================================================
                 st_h1 = self.hass.states.get("select.harina_principal_1")
                 st_h2 = self.hass.states.get("select.harina_secundaria_2")
                 st_h3 = self.hass.states.get("select.harina_secundaria_3")
@@ -574,6 +577,8 @@ class PanSensor(SensorEntity, RestoreEntity):
                     nombre_comercial = st_h3.attributes.get("friendly_name", st_h3.state) if st_h3 and st_h3.state not in ["unavailable", "unknown", ""] else "Harina 3"
 
                 self._attributes["nombre_harina_real"] = nombre_comercial
+                # =============================================================
+
 
             self.async_write_ha_state()
 
