@@ -1020,7 +1020,6 @@ async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
             for entidad in componente.entities:
                 cambiado = False
                 
-                # 1. Forzar la mutación de las opciones en la estructura nativa de la entidad
                 if hasattr(entidad, "_clave") and entidad._clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"]:
                     entidad._options = lista_bascula
                     cambiado = True
@@ -1035,13 +1034,10 @@ async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
                     entidad._options = lista_purga
                     cambiado = True
 
-                # 2. CORRECCIÓN CRÍTICA: Forzamos la actualización de los atributos del estado en el bus oficial de HA
                 if cambiado:
-                    # Sobreescribimos el diccionario de atributos interno para que Lovelace lea la nueva lista inmediatamente
                     entidad._attr_options = lista_bascula if "retirar" not in entidad.entity_id and "inventario" not in entidad.entity_id else lista_purga
                     entidad.async_write_ha_state()
 
-        # Lanzamos el evento global al bus asíncrono para despertar las tarjetas de Lovelace JS al instante
         hass.bus.fire("porcentaje_panadero_harinas_actualizadas", {})
 
     except Exception as ex:
