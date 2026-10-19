@@ -75,13 +75,13 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero`
 4. En **Categoría**, selecciona estrictamente **Integración** (*Integration*) y haz clic en **Añadir**.
 5. Descarga la última versión, ve a Ajustes y **Reinicia** Home Assistant.
-6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Añadir integración**, busca `Porcentaje Panadero` y configúrala con un solo clic.
+6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Ayudantes ➔ Crear ayudante**, busca `Porcentaje Panadero` y configúrala con un solo clic.
 7. Asegúrate de añadir el recurso correspondiente si no se añade automáticamente mediante HACS:
 
 	Configuración > Paneles > Recursos
 
 	AÑADIR RECURSO
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.1.0`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.3.0`
 	* **Tipo de recurso:** Módulo JavaScript (`JavaScript Module`)
 
 Con esto incorporamos las tarjetas:
@@ -137,13 +137,13 @@ Define the **final dough weight** in grams and the rest of the calculation value
 3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero`
 4. In **Category**, strictly select **Integration** and click **Add**.
 5. Download the latest version, go to Settings, and **Restart** Home Assistant.
-6. Go to **Settings ➔ Devices & services ➔ Add integration**, search for `Porcentaje Panadero` and configure it with a single click.
+6. Go to **Settings ➔ Devices and services ➔ Helpers ➔ Create helper**, search for `Baker Percentage` and set it up with a single click.
 7. Make sure to add the corresponding resource if it is not automatically added via HACS:
 
 	Settings > Dashboards > Resources
 
 	ADD RESOURCE
-	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.1.0`
+	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=4.3.0`
 	* **Resource type:** JavaScript Module (`JavaScript Module`)
 
 With this, we incorporate the cards:
