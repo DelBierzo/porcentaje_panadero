@@ -92,7 +92,13 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
         const opcionesString = opcionesRecetas.join(',');
         // Rellenamos el HTML interno del select únicamente si las opciones de la base de datos cambian
         if (!this._opcionesRellenadas || this._cacheOpciones !== opcionesString) {
-            selF.innerHTML = opcionesRecetas.map(opt => `<option value="${opt}">${opt.toUpperCase()}</option>`).join('');
+            selF.innerHTML = ''; // Vaciamos de forma segura
+            opcionesRecetas.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt.toUpperCase(); // Desinfecta el texto automáticamente contra hackers
+                selF.appendChild(option);
+            });
             this._opcionesRellenadas = true;
             this._cacheOpciones = opcionesString;
         }
@@ -351,11 +357,13 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     card.appendChild(this.content); 
     this.shadowRoot.appendChild(style);
     this.shadowRoot.appendChild(card);
+    this._cacheHarinas = "";
   }
   updateCard() {
     if (!this._hass) return; 
     const lang = this._hass.language || 'es'; 
     const isEn = lang.startsWith('en');
+    const activeEl = this.shadowRoot.activeElement; // ◄ Añadimos la variable que le faltaba a esta tarjeta
     const valFormulaNueva = this._hass.states['text.nombre_nueva_formula']?.state || '';
     const valHarinaNueva = this._hass.states['text.nombre_nueva_harina']?.state || '';
     const selectorRetirarHarina = this._hass.states['select.porcentaje_panadero_pan_select_retirar_harina_del_inventario'];
@@ -412,12 +420,30 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         btnGuardarArriba.textContent = isEn ? "¡SAVED!" : "¡GUARDADA!";
         btnGuardarArriba.style.backgroundColor = "#2e7d32"; 
         btnGuardarArriba.disabled = true;
+
+        // Aseguramos el vaciado del cuadro físico al tener éxito
+        const cuadroFormulaDefinitivo = this.shadowRoot.getElementById('input-formula-nueva');
+        if (cuadroFormulaDefinitivo) {
+            cuadroFormulaDefinitivo.value = '';
+        }
       } else {
         btnGuardarArriba.textContent = ` 💾 ${isEn ? 'SAVE' : 'GUARDAR'}`;
         btnGuardarArriba.style.backgroundColor = "var(--success-color, #4caf50)";
         btnGuardarArriba.disabled = false;
+
+        // BLINDAJE ANTIBORRADO: Solo actualiza desde Home Assistant si no estás escribiendo en él
+        const inputFormulaNueva = this.shadowRoot.getElementById('input-formula-nueva');
+        if (inputFormulaNueva && this.shadowRoot.activeElement !== inputFormulaNueva) {
+          // Si en Home Assistant está vacío, unknown o unavailable, forzamos que se vea vacío en pantalla
+          if (valFormulaNueva === 'unknown' || valFormulaNueva === 'unavailable' || valFormulaNueva === '') {
+            inputFormulaNueva.value = '';
+          } else {
+            inputFormulaNueva.value = valFormulaNueva;
+          }
+        }
       }
     }
+
 
     const btnActAbajo = this.shadowRoot.getElementById('btn-actualizar-formula');
     if (btnActAbajo) {
@@ -451,12 +477,19 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         btnRegHarina.textContent = isEn ? "¡ADDED!" : "¡AÑADIDA!";
         btnRegHarina.style.backgroundColor = "#2e7d32";
         btnRegHarina.disabled = true;
+        
+        // CORRECCIÓN DIRECTA: Forzamos al cuadro de texto de la pantalla a quedarse en blanco
+        const cuadroTextoDefinitivo = this.shadowRoot.getElementById('input-harina-nueva');
+        if (cuadroTextoDefinitivo) {
+            cuadroTextoDefinitivo.value = '';
+        }
       } else {
         btnRegHarina.textContent = ` 💾 ${isEn ? 'SAVE' : 'GUARDAR'}`;
         btnRegHarina.style.backgroundColor = "var(--success-color, #4caf50)";
         btnRegHarina.disabled = false;
       }
     }
+
 
     const btnDelHarina = this.shadowRoot.getElementById('btn-eliminar-harina-inv');
     if (btnDelHarina) {
@@ -471,15 +504,34 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
       }
     }
     
-    const activeEl = this.shadowRoot.activeElement;
-    const inpForm = this.shadowRoot.getElementById('input-formula-nueva'); if (inpForm && inpForm !== activeEl) inpForm.value = valFormulaNueva;
-    const inpHar = this.shadowRoot.getElementById('input-harina-nueva'); if (inpHar && inpHar !== activeEl) inpHar.value = valHarinaNueva;
-    
-    const selRetHar = this.shadowRoot.getElementById('select-retirar-harina');
-    if (selRetHar && selRetHar !== activeEl){
-      selRetHar.innerHTML = `<option value="">${isEn ? 'Select flour to delete...' : 'Selecciona harina a eliminar...'}</option>` +
-      opcionesRetirarHarina.map(opt => `<option value="${opt}" ${opt === harinaSeleccionadaRetirar ? 'selected' : ''}>${opt}</option>`).join('');
-    }
+        const selRetHar = this.shadowRoot.getElementById('select-retirar-harina');
+        if (selRetHar) {
+            const stringOpcionesHarinas = opcionesRetirarHarina.join(',');
+            
+            if (this._cacheHarinas !== stringOpcionesHarinas || selRetHar.innerHTML === '') {
+                selRetHar.innerHTML = ''; 
+                
+                opcionesRetirarHarina.forEach(opt => {
+                    // CORRECCIÓN DIRECTA: Purgamos tanto los guiones como los textos por defecto
+                    if (opt === '---' || opt === '' || opt.toLowerCase().includes('select')) return;
+                    
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (opt === harinaSeleccionadaRetirar) {
+                        option.selected = true;
+                    }
+                    selRetHar.appendChild(option);
+                });
+                
+                this._cacheHarinas = stringOpcionesHarinas; 
+            }
+            
+            if (selRetHar !== activeEl) {
+                selRetHar.value = harinaSeleccionadaRetirar;
+            }
+        }
+
   }
   
   registrarEventosPanelGral() {
@@ -487,8 +539,11 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     this.shadowRoot.getElementById('input-harina-nueva').addEventListener('change',(e) => { this._hass.callService('text', 'set_value',{ entity_id: 'text.nombre_nueva_harina', value: e.target.value }); });
     this.shadowRoot.getElementById('select-retirar-harina').addEventListener('change',(e) => { this._hass.callService('select', 'select_option',{ entity_id: 'select.porcentaje_panadero_pan_select_retirar_harina_del_inventario', option: e.target.value }); });
     
+    // CORRECCIÓN: Borrado inmediato en la pantalla al pulsar guardar receta y temporizador de restablecimiento
     this.shadowRoot.getElementById('btn-guardar-formula-nueva').addEventListener('click', () => { 
       this._hass.callService('porcentaje_panadero', 'guardar_formula'); 
+      const cuadroFormula = this.shadowRoot.getElementById('input-formula-nueva');
+      if (cuadroFormula) cuadroFormula.value = '';
       this._notifGuardarArriba = "exito"; this.updateCard();
       setTimeout(() => { this._notifGuardarArriba = ""; this.updateCard(); }, 3000);
     });
@@ -507,6 +562,8 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     
     this.shadowRoot.getElementById('btn-anadir-harina').addEventListener('click', () => { 
       this._hass.callService('porcentaje_panadero', 'anadir_harina'); 
+      const inputHarina = this.shadowRoot.getElementById('input-harina-nueva');
+      if (inputHarina) inputHarina.value = '';
       this._notifAnadirHarina = "exito"; this.updateCard();
       setTimeout(() => { this._notifAnadirHarina = ""; this.updateCard(); }, 3000);
     });
@@ -516,14 +573,21 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
       this._notifEliminarHarina = "exito"; this.updateCard();
       setTimeout(() => { this._notifEliminarHarina = ""; this.updateCard(); }, 3000);
     });
+
+    if (!this._escuchaHarinasRegistrada && this._hass && this._hass.connection) {
+      this._hass.connection.subscribeEvents(() => {
+        this._cacheHarinas = "";
+        this.updateCard();
+      }, "porcentaje_panadero_harinas_actualizadas");
+      this._escuchaHarinasRegistrada = true;
+    }
   }
+
+
   
   getCardSize() { return 10;}
 }
 customElements.define('porcentaje-panadero-control-panel-card', PorcentajePanaderoControlPanelCard);
-
-
-
 
 
 class PorcentajePanaderoControlTermicoCard extends HTMLElement {
@@ -618,15 +682,37 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
       const valorSeleccionado = entState.state || '---';
       const selectExistente = targetDiv.querySelector('.tile-select');
 
-      if (!selectExistente) {
-        targetDiv.innerHTML = `
-          <div class="tile-row tile-row-select">
-            <span class="tile-name">${nombre}</span>
-            <select class="tile-select">
-              ${opciones.map(opt => `<option value="${opt}" ${opt === valorSeleccionado ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join('')}
-            </select>
-          </div>
-        `;
+      // CORRECCIÓN: Si el número de harinas o su contenido cambia, invalidamos la caché inmediatamente
+      const opcionesStringActual = opciones.join(',');
+      if (!selectExistente || targetDiv._cacheOpcionesSelect !== opcionesStringActual) {
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'tile-row tile-row-select';
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'tile-name';
+        labelSpan.textContent = nombre;
+        containerDiv.appendChild(labelSpan);
+        
+        const selectEl = document.createElement('select');
+        selectEl.className = 'tile-select';
+        
+        opciones.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.textContent = opt.toUpperCase();
+            if (opt === valorSeleccionado) {
+                option.selected = true;
+            }
+            selectEl.appendChild(option);
+        });
+        
+        containerDiv.appendChild(selectEl);
+        targetDiv.innerHTML = '';
+        targetDiv.appendChild(containerDiv);
+        
+        // Guardamos el string exacto en el elemento del DOM para validar cambios futuros
+        targetDiv._cacheOpcionesSelect = opcionesStringActual;
+        
         targetDiv.querySelector('.tile-select').addEventListener('change', (e) => {
           this._hass.callService('select', 'select_option', { entity_id: entidad, option: e.target.value });
         });
@@ -791,11 +877,35 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
     this._hass = hass; 
     if (!this.content) this.initCard(); 
     this.updateCard(); 
+    // Ejecuta la escucha al actualizar datos
+    this.registrarEscuchaHarinasCalculadora();
   }
   
   setConfig(config) { 
     this.config = config; 
   }
+
+  connectedCallback() {
+    this.registrarEscuchaHarinasCalculadora();
+  }
+
+  registrarEscuchaHarinasCalculadora() {
+    if (!this._escuchaHarinasCalculadoraRegistrada && this._hass && this._hass.connection) {
+      this._hass.connection.subscribeEvents(() => {
+        const selectoresIds = ['select-h1', 'select-h2', 'select-h3'];
+        selectoresIds.forEach(id => {
+          const contenedor = this.shadowRoot.getElementById(id);
+          if (contenedor) {
+            delete contenedor._cacheOpcionesSelect;
+          }
+        });
+        this.updateCard();
+      }, "porcentaje_panadero_harinas_actualizadas");
+      this._escuchaHarinasCalculadoraRegistrada = true;
+    }
+  }
+
+
 
   initCard() {
     const style = document.createElement('style');
@@ -876,6 +986,7 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
     const marcaHarina2 = this._hass.states['select.harina_secundaria_2']?.state || (isEn ? 'FLOUR 2' : 'HARINA 2');
     const marcaHarina3 = this._hass.states['select.harina_secundaria_3']?.state || (isEn ? 'FLOUR 3' : 'HARINA 3');
 
+
     if (!this._htmlInyectado) {
       const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
       
@@ -936,26 +1047,52 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
       
       const opciones = entState.attributes['options'] || [];
       const valorSeleccionado = entState.state || '---';
-      const selectExistente = targetDiv.querySelector('.tile-select');
+      
+      // Creamos un string con las opciones actuales para saber si han cambiado de verdad
+      const opcionesString = opciones.join(',');
+      let selectEl = targetDiv.querySelector('.tile-select');
 
-      if (!selectExistente) {
-        targetDiv.innerHTML = `
-          <div class="tile-row tile-row-select">
-            <span class="tile-name">${nombre}</span>
-            <select class="tile-select">
-              ${opciones.map(opt => `<option value="${opt}" ${opt === valorSeleccionado ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join('')}
-            </select>
-          </div>
-        `;
-        targetDiv.querySelector('.tile-select').addEventListener('change', (e) => {
+      // Si el selector no existe o la lista de harinas ha cambiado, lo redibujamos
+      if (!selectEl || targetDiv._cacheOpciones !== opcionesString) {
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'tile-row tile-row-select';
+        
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'tile-name';
+        labelSpan.textContent = nombre;
+        containerDiv.appendChild(labelSpan);
+        
+        selectEl = document.createElement('select');
+        selectEl.className = 'tile-select';
+        
+        opciones.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt.toUpperCase();
+          if (opt === valorSeleccionado) option.selected = true;
+          selectEl.appendChild(option);
+        });
+        
+        containerDiv.appendChild(selectEl);
+        targetDiv.innerHTML = '';
+        targetDiv.appendChild(containerDiv);
+        
+        // Guardamos la lista en la caché del contenedor para evitar bucles
+        targetDiv._cacheOpciones = opcionesString;
+        
+        selectEl.addEventListener('change', (e) => {
           this._hass.callService('select', 'select_option', { entity_id: entidad, option: e.target.value });
         });
       } else {
-        if (this.shadowRoot.activeElement !== selectExistente && selectExistente.value !== valorSeleccionado) {
-          selectExistente.value = valorSeleccionado;
+        // Si la lista de harinas es la misma, solo actualizamos la opción seleccionada visualmente
+        if (this.shadowRoot.activeElement !== selectEl && selectEl.value !== valorSeleccionado) {
+          selectEl.value = valorSeleccionado;
         }
       }
+      targetDiv.style.display = 'block';
     };
+
+
 
     const actualizarSliderFila = (contenedorId, nombre, entidad, sufijo = '%', manualStep = null, claseColorSlider = 'slider-orange') => {
       const targetDiv = this.shadowRoot.getElementById(contenedorId);
@@ -1023,15 +1160,18 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
     };
 
     actualizarSliderFila('slider-masa-objetivo', isEn ? 'TOTAL DOUGH WEIGHT' : 'CANTIDAD DE MASA', 'number.masa_final_objetivo', 'g', 50, 'slider-green');
+    
+    // CORRECCIÓN DE IDS: Alineado perfecto con tu arquitectura original
     actualizarSelectFila('select-h1', isEn ? 'FLOUR TYPE 1' : 'HARINA 1', 'select.harina_principal_1');
     actualizarSelectFila('select-h2', isEn ? 'FLOUR TYPE 2' : 'HARINA 2', 'select.harina_secundaria_2');
     actualizarSelectFila('select-h3', isEn ? 'FLOUR TYPE 3' : 'HARINA 3', 'select.harina_secundaria_3');
-
+	
     actualizarSliderFila('slider-h1', marcaHarina1.toUpperCase(), 'number.harina_1', '%', null, 'slider-orange');
     actualizarSliderFila('slider-h2', marcaHarina2.toUpperCase(), 'number.harina_2', '%', null, 'slider-orange');
     actualizarSliderFila('slider-h3', marcaHarina3.toUpperCase(), 'number.harina_3', '%', null, 'slider-orange');
     actualizarSliderFila('slider-agua', isEn ? 'WATER' : 'AGUA', 'number.agua_hidratacion', '%', null, 'slider-orange');
     actualizarSliderFila('slider-sal', isEn ? 'SALT' : 'SAL', 'number.sal', '%', null, 'slider-orange');
+
 
     const divTipoLeva = this.shadowRoot.getElementById('row-tipo-levadura');
     if (divTipoLeva) {

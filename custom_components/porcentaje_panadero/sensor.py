@@ -160,7 +160,6 @@ class PanSensor(SensorEntity, RestoreEntity):
 
         self.calcular_matematicas_panaderas()
 
-
     @callback
     def _actualizar_nombre_formula_callback(self, nuevo_nombre):
         """Modifica de forma segura y reactiva el estado del sensor."""
@@ -198,7 +197,6 @@ class PanSensor(SensorEntity, RestoreEntity):
             tipo_pref = get_str("select.tipo_de_prefermento", "poolish").lower().strip()
             hyd_mm = get_float("number.hidratacion_masa_madre", 100.0)
             
-            # Forzamos la lectura limpia del selector de harina del prefermento:
             h_para_pref = get_str("select.porcentaje_panadero_harina_para_prefermento", "").lower().strip()
             if not h_para_pref:
                 h_para_pref = get_str("select.harina_para_prefermento", "harina 1").lower().strip()
@@ -574,6 +572,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                     nombre_comercial = st_h3.attributes.get("friendly_name", st_h3.state) if st_h3 and st_h3.state not in ["unavailable", "unknown", ""] else "Harina 3"
 
                 self._attributes["nombre_harina_real"] = nombre_comercial
+                # =============================================================
 
             self.async_write_ha_state()
 
