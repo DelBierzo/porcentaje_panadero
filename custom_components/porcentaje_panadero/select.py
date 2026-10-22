@@ -157,9 +157,17 @@ class PanSelectMenu(SelectEntity):
 
     async def async_recargar_recetas(self):
         """Lee las fórmulas desde la caché asíncrona y actualiza las opciones del menú."""
+        from . import const
         data = self.hass.data[DOMAIN].get("formulas", {})
         if data:
-            self._options = ["---"] + list(data.keys())
+            nuevas_opciones = ["---"]
+            for k in data.keys():
+                # Si coincide con la receta activa en memoria, forzamos su nombre estético exacto
+                if const.RECETA_ACTIVA_MEMORIA != "---" and k == const.RECETA_ACTIVA_MEMORIA.strip().replace(" ", "_").lower():
+                    nuevas_opciones.append(const.RECETA_ACTIVA_MEMORIA)
+                else:
+                    nuevas_opciones.append(k.replace("_", " "))
+            self._options = nuevas_opciones
         else:
             self._options = ["---"]
         self.async_write_ha_state()
@@ -251,7 +259,7 @@ class PanSelectMenu(SelectEntity):
 
         if self._clave == "formula_de_receta" and option != "---":
             from . import const
-            const.RECETA_ACTIVA_MEMORIA = option.replace("_", " ").title()
+            const.RECETA_ACTIVA_MEMORIA = option
 
         self._current_option = option
         self.async_write_ha_state()
@@ -283,5 +291,11 @@ class PanSelectMenu(SelectEntity):
 
         await self.hass.services.async_call(DOMAIN, "balancear_harinas", {"harina_origen": 1})
 
-
+    def _valid_option_or_raise(self, option: str) -> None:
+        """Valida la opción entrante ignorando diferencias de mayúsculas y minúsculas."""
+        if self._clave == "formula_de_receta":
+            opciones_minusculas = [opt.lower() for opt in self._options]
+            if option.lower() in opciones_minusculas:
+                return
+        super()._valid_option_or_raise(option)
 
