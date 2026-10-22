@@ -697,11 +697,6 @@ async def guardar_formula_service(call: ServiceCall):
 
     if not nombre_raw or str(nombre_raw).strip() in ["", "---", "unknown", "unavailable"]:
         _LOGGER.warning("Intento de guardado fallido: No hay nombre en el cuadro de texto ni receta activa.")
-        await hass.services.async_call("persistent_notification", "create", {
-            "title": "Error de Guardado",
-            "message": "No se puede guardar la receta porque el campo **Nombre para guardar** esta vacio.",
-            "notification_id": "porcentaje_panadero_vacio"
-        })
         return
 
     nombre_limpio_receta = nombre_raw.strip()
@@ -711,29 +706,32 @@ async def guardar_formula_service(call: ServiceCall):
     data = hass.data[DOMAIN]["formulas"]
 
     data[nombre_id] = obtener_datos_interfaz(hass)
-
     await store.async_save(data)
-    _LOGGER.info("Fórmula '%s' persistida con éxito en el Store seguro de Home Assistant.", nombre_id)
+    _LOGGER.info("Fórmula '%s' persistida con éxito en el Store seguro.", nombre_id)
 
-    const.RECETA_ACTIVA_MEMORIA = nombre_limpio_receta.replace("_", " ").title()
-    
+    const.RECETA_ACTIVA_MEMORIA = nombre_limpio_receta
+
     if hass.states.get("text.nombre_nueva_formula") is not None:
         await hass.services.async_call("text", "set_value", {
             "entity_id": "text.nombre_nueva_formula", 
             "value": ""
         })
 
+    componente_select = hass.data.get("select")
+    if componente_select and hasattr(componente_select, "entities"):
+        for entidad in componente_select.entities:
+            if entidad.entity_id == "select.formula_de_receta":
+                await entidad.async_recargar_recetas()
+
     hass.bus.fire("porcentaje_panadero_recetas_actualizadas", {})
+
+    await asyncio.sleep(0.1)
 
     if hass.states.get("select.formula_de_receta") is not None:
         await hass.services.async_call("select", "select_option", {
             "entity_id": "select.formula_de_receta",
             "option": const.RECETA_ACTIVA_MEMORIA
         })
-    
-    await hass.services.async_call(DOMAIN, "cargar_formula_en_sliders", {
-        "nombre": const.RECETA_ACTIVA_MEMORIA
-    })
 
 async def confirmar_sobreescritura_service(call: ServiceCall):
     """Servicio definitivo que se ejecuta tras la confirmación móvil de sobreescritura."""
