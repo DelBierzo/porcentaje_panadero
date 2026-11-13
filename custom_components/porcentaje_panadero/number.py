@@ -18,7 +18,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         ("sal", 2.0, 0.0, 5.0, 0.1, "%", "mdi:shaker-outline"),
         ("levadura", 0.7, 0.0, 9.0, 0.01, "%", "mdi:yeast"),
         ("prefermento", 0.0, 0.0, 100.0, 1.0, "%", "mdi:chart-bubble"),
-        ("hidratacion_masa_madre", 100.0, 50.0, 150.0, 1.0, "%", "mdi:flask-round-bottom"),
+        ("hidratacion_masa_madre", 100.0, 20.0, 150.0, 1.0, "%", "mdi:flask-round-bottom"),
         ("inoculo_masa_madre", 33.3, 0.0, 100.0, 0.1, "%", "mdi:flask-plus"),
         ("levadura_prefermento", 0.2, 0.0, 3.0, 0.01, "%", "mdi:yeast"),
         ("malta", 0.0, 0.0, 3.0, 0.1, "%", "mdi:grain"),
@@ -30,9 +30,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         ("huevo", 0.0, 0.0, 50.0, 0.1, "%", "mdi:egg"),
         ("temperatura_objetivo_masa", 24.0, 0.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("temperatura_harina", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_prefermento", 20.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_friccion_amasadora", 0.0, 0.0, 20.0, 0.5, "°C", "mdi:thermometer"),
-        ("temperatura_ambiente", 24.0, 4.0, 32.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_prefermento", 22.0, 0.0, 35.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_friccion_amasadora", 8.0, 0.0, 20.0, 0.5, "°C", "mdi:thermometer"),
+        ("temperatura_ambiente", 24.0, 0.0, 32.0, 0.5, "°C", "mdi:thermometer"),
         ("tang_zhong", 0.0, 0.0, 20.0, 1.0, "%", "mdi:pot-steam"),
     ]
 

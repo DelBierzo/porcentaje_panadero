@@ -734,31 +734,45 @@ async def guardar_formula_service(call: ServiceCall):
         })
 
 async def confirmar_sobreescritura_service(call: ServiceCall):
-    """Servicio definitivo que se ejecuta tras la confirmación móvil de sobreescritura."""
+    """Servicio definitivo que se ejecuta tras la confirmación de sobreescritura."""
     from . import const
     hass = call.hass
 
     nombre_raw = const.RECETA_ACTIVA_MEMORIA
     if not nombre_raw or str(nombre_raw).strip() in ["", "---", "unknown", "unavailable"]:
+        _LOGGER.warning("Intento de actualización fallido: No hay ninguna receta activa en el obrador.")
         return
 
-    nombre_id = str(nombre_raw).strip().replace(" ", "_").lower()
+    nombre_limpio_receta = str(nombre_raw).strip()
+    nombre_id = nombre_limpio_receta.replace(" ", "_").lower()
     
     store = hass.data[DOMAIN]["store_formulas"]
     data = hass.data[DOMAIN]["formulas"]
     
     data[nombre_id] = obtener_datos_interfaz(hass)
-
     await store.async_save(data)
-    _LOGGER.info("Fórmula '%s' actualizada en el Store seguro tras confirmación externa.", nombre_id)
+    _LOGGER.info("Fórmula '%s' actualizada en el Store seguro.", nombre_id)
 
     if hass.states.get("text.nombre_nueva_formula") is not None:
         await hass.services.async_call("text", "set_value", {"entity_id": "text.nombre_nueva_formula", "value": ""})
 
-    const.RECETA_ACTIVA_MEMORIA = nombre_raw.strip().replace("_", " ").title()
-    
+    const.RECETA_ACTIVA_MEMORIA = nombre_limpio_receta
+
+    componente_select = hass.data.get("select")
+    if componente_select and hasattr(componente_select, "entities"):
+        for entidad in componente_select.entities:
+            if entidad.entity_id == "select.formula_de_receta":
+                await entidad.async_recargar_recetas()
+
+    hass.bus.fire("porcentaje_panadero_recetas_actualizadas", {})
+
+    await asyncio.sleep(0.1)
+
     if hass.states.get("select.formula_de_receta") is not None:
-        await hass.services.async_call("select", "select_option", {"entity_id": "select.formula_de_receta", "option": "---"})
+        await hass.services.async_call("select", "select_option", {
+            "entity_id": "select.formula_de_receta",
+            "option": const.RECETA_ACTIVA_MEMORIA
+        })
 
 async def eliminar_formula_service(call: ServiceCall):
     """Usa la memoria de Python para saber que receta borrar disparando la confirmacion."""

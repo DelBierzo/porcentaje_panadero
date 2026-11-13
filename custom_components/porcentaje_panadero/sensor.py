@@ -329,7 +329,7 @@ class PanSensor(SensorEntity, RestoreEntity):
                     return de_respaldo
 
             # 1. TEMPERATURA A UTILIZAR PARA ESTIMAR LOS TIEMPOS DE FERMENTACIÓN
-            if origen_temp == "Sensor Fisico" and self._usar_fisico and self._entidad_termometro != "manual":
+            if origen_temp == "Sensor Físico" and self._usar_fisico and self._entidad_termometro != "manual":
                 t_fermentacion = get_termometro_real(self._entidad_termometro, 22.0)
             else:
                 t_fermentacion = get_float("number.temperatura_ambiente", 22.0)
@@ -413,17 +413,23 @@ class PanSensor(SensorEntity, RestoreEntity):
                 pct_leva_normalizado = pct_leva * 3.0
             else:
                 pct_leva_normalizado = pct_leva
-
+                
             # VELOCIDAD METABÓLICA BASE REAL REFERENCIADA A 24°C
             velocidad_levadura = pct_leva_normalizado * 0.25 if pct_leva_normalizado > 0 else 0.0
-            velocidad_masa_madre = 0.0
+            velocidad_prefermento = 0.0
 
-            if tipo_pref == "masa madre" and pct_pref > 0:
-                pct_inoculo_real = get_float("number.inoculo_masa_madre", 33.3)
-                pct_inoculo_calculo = max(5.0, pct_inoculo_real)
-                velocidad_masa_madre = (pct_inoculo_calculo / 100.0) * (pct_pref / 20.0) * 0.15
+            if pct_pref > 0:
+                if tipo_pref == "masa madre":
+                    pct_inoculo_real = get_float("number.inoculo_masa_madre", 33.3)
+                    pct_inoculo_calculo = max(5.0, pct_inoculo_real)
+                    velocidad_prefermento = (pct_inoculo_calculo / 100.0) * (pct_pref / 20.0) * 0.15
+                elif tipo_pref in ["poolish", "biga"]:
+                    # Un poolish o biga maduros aportan carga biológica proporcional a su peso
+                    # Ej: 50% de poolish -> ~3h 30m a 24°C | 30% -> ~5h 30m a 24°C
+                    factor_actividad = 1.0 if pct_leva_pref > 0 else 0.7
+                    velocidad_prefermento = (pct_pref / 100.0) * 0.55 * factor_actividad
 
-            velocidad_total_combinada = velocidad_levadura + velocidad_masa_madre
+            velocidad_total_combinada = velocidad_levadura + velocidad_prefermento
 
             if velocidad_total_combinada <= 0.005:
                 texto_tiempo_levado, texto_reloj_listo = "---", "---"
