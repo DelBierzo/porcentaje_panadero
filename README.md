@@ -68,7 +68,7 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## 📥 Instalación
 
-### Método (Manual):
+### Método:
 
 1. Ve a **Configuración** ➔ **Marketpalace**.
 2. En la esquina superior derecha selecciona **Añadir desde enlace**.
@@ -129,15 +129,14 @@ Define the **final dough weight** in grams and the rest of the calculation value
 
 ## 📥 Installation
 
-### Method 1: HACS (Recommended)
+### Method:
 
-1. Go to **HACS** in your Home Assistant dashboard.
-2. Click on the three vertical dots in the top right corner and select **Custom repositories**.
-3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero`
-4. In **Category**, strictly select **Integration** and click **Add**.
-5. Download the latest version, go to Settings, and **Restart** Home Assistant.
-6. Go to **Settings ➔ Devices and services ➔ Helpers ➔ Create helper**, search for `Baker Percentage` and set it up with a single click.
-7. Make sure to add the corresponding resource if it is not automatically added via HACS:
+1. Go to **Settings** ➔ **Marketplace**.
+2. In the top right corner, select **Add from link**.
+3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero` (If prompted, select **Integration** and click **Add**).
+4. Now search for the **Porcentaje Panadero** repository, and install it.
+
+5. If it is not added automatically, make sure to add the corresponding resource:
 
 	Settings > Dashboards > Resources
 
@@ -145,7 +144,7 @@ Define the **final dough weight** in grams and the rest of the calculation value
 	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=5.0.0`
 	* **Resource type:** JavaScript Module (`JavaScript Module`)
 
-With this, we incorporate the cards:
+With this, we add the cards:
 
 ```
 type: custom:porcentaje-panadero-calculadora-card
