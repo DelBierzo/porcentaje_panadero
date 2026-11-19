@@ -68,15 +68,14 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## 📥 Instalación
 
-### Método 1: HACS (Recomendado)
+### Método (Manual):
 
-1. Ve a **HACS** en tu panel de Home Assistant.
-2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados** (*Repositorios Personalizados*).
-3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero`
-4. En **Categoría**, selecciona estrictamente **Integración** (*Integration*) y haz clic en **Añadir**.
-5. Descarga la última versión, ve a Ajustes y **Reinicia** Home Assistant.
-6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Ayudantes ➔ Crear ayudante**, busca `Porcentaje Panadero` y configúrala con un solo clic.
-7. Asegúrate de añadir el recurso correspondiente si no se añade automáticamente mediante HACS:
+1. Ve a **Configuración** ➔ **Marketpalace**.
+2. En la esquina superior derecha selecciona **Añadir desde enlace**.
+3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero` (Si te pregunta, selecciona **Integración** y haz clic en **Añadir**.
+4. Ahora busca el repositorio **Porcentaje Panadero**, e instala.
+
+5. Si no se añade automáticamente, asegúrate de añadir el recurso correspondiente:
 
 	Configuración > Paneles > Recursos
 
