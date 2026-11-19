@@ -48,8 +48,7 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 ## 📸 Capturas de Pantalla / Screenshots
 
 <p align="center">
-  <img src="images/cap_adv1.png" width="40%" alt="Vista de la Tarjeta Básica">
-  <img src="images/cap_bas.png" width="50%" alt="Vista de la Tarjeta Avanzada">
+  <img src="images/cap_bas.png" width="100%" alt="Tarjetas">
 </p>
 
 ## 🇪🇸 Castellano
