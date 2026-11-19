@@ -48,8 +48,7 @@ Herramienta avanzada para calcular masas de pan basada en el porcentaje panadero
 ## 📸 Capturas de Pantalla / Screenshots
 
 <p align="center">
-  <img src="images/cap_adv1.png" width="40%" alt="Vista de la Tarjeta Básica">
-  <img src="images/cap_bas.png" width="50%" alt="Vista de la Tarjeta Avanzada">
+  <img src="images/cap_bas.png" width="100%" alt="Tarjetas">
 </p>
 
 ## 🇪🇸 Castellano
@@ -68,15 +67,14 @@ Define en gramos la cantidad de **masa final** que deseas y, en **porcentaje**, 
 
 ## 📥 Instalación
 
-### Método 1: HACS (Recomendado)
+### Método:
 
-1. Ve a **HACS** en tu panel de Home Assistant.
-2. Haz clic en los tres puntos verticales de la esquina superior derecha y selecciona **Repositorios personalizados** (*Repositorios Personalizados*).
-3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero`
-4. En **Categoría**, selecciona estrictamente **Integración** (*Integration*) y haz clic en **Añadir**.
-5. Descarga la última versión, ve a Ajustes y **Reinicia** Home Assistant.
-6. Ve a **Ajustes ➔ Dispositivos y servicios ➔ Ayudantes ➔ Crear ayudante**, busca `Porcentaje Panadero` y configúrala con un solo clic.
-7. Asegúrate de añadir el recurso correspondiente si no se añade automáticamente mediante HACS:
+1. Ve a **Configuración** ➔ **Marketpalace**.
+2. En la esquina superior derecha selecciona **Añadir desde enlace**.
+3. Pega la URL de este repositorio: `https://github.com/DelBierzo/porcentaje_panadero` (Si te pregunta, selecciona **Integración** y haz clic en **Añadir**.
+4. Ahora busca el repositorio **Porcentaje Panadero**, e instala.
+
+5. Si no se añade automáticamente, asegúrate de añadir el recurso correspondiente:
 
 	Configuración > Paneles > Recursos
 
@@ -107,10 +105,11 @@ La integración genera de forma automática **78 entidades nativas** que puedes 
 
 ### 🔹 Modo Básico : [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
-### 🔸 Modo Avanzado Requisitos: [`tarjeta avanzada`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-Exprime al máximo la interfaz visual, requiere la descarga previa del complemento "expander-card" desde **HACS**:
+Exprime al máximo la interfaz visual, requiere la descarga previa del complemento "expander-card" desde **Marketpalace**:
 
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
+
+### 🔸 Modo Avanzado: [`tarjeta avanzada`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
 
 ---
 
@@ -130,15 +129,14 @@ Define the **final dough weight** in grams and the rest of the calculation value
 
 ## 📥 Installation
 
-### Method 1: HACS (Recommended)
+### Method:
 
-1. Go to **HACS** in your Home Assistant dashboard.
-2. Click on the three vertical dots in the top right corner and select **Custom repositories**.
-3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero`
-4. In **Category**, strictly select **Integration** and click **Add**.
-5. Download the latest version, go to Settings, and **Restart** Home Assistant.
-6. Go to **Settings ➔ Devices and services ➔ Helpers ➔ Create helper**, search for `Baker Percentage` and set it up with a single click.
-7. Make sure to add the corresponding resource if it is not automatically added via HACS:
+1. Go to **Settings** ➔ **Marketplace**.
+2. In the top right corner, select **Add from link**.
+3. Paste the URL of this repository: `https://github.com/DelBierzo/porcentaje_panadero` (If prompted, select **Integration** and click **Add**).
+4. Now search for the **Porcentaje Panadero** repository, and install it.
+
+5. If it is not added automatically, make sure to add the corresponding resource:
 
 	Settings > Dashboards > Resources
 
@@ -146,7 +144,7 @@ Define the **final dough weight** in grams and the rest of the calculation value
 	* **URL:** `/porcentaje_panadero_ui/porcentaje-panadero-card.js?v=5.0.0`
 	* **Resource type:** JavaScript Module (`JavaScript Module`)
 
-With this, we incorporate the cards:
+With this, we add the cards:
 
 ```
 type: custom:porcentaje-panadero-calculadora-card
@@ -170,10 +168,11 @@ The integration automatically generates **78 native entities** that you can util
 
 ### 🔹 Basic Mode : [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
-### 🔸 Advanced Mode Requirements: [`advanced card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-Get the most out of the UI by installing 'expander-card' from **HACS** first.
+Get the most out of the UI by installing 'expander-card' from **Marketpalace** first.
 
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
+  
+### 🔸 Advanced Mode: [`advanced card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
 
 ---
 
