@@ -107,7 +107,7 @@ La integración genera de forma automática **78 entidades nativas** que puedes 
 ### 🔹 Modo Básico : [`tarjeta básica`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
 ### 🔸 Modo Avanzado Requisitos: [`tarjeta avanzada`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-Exprime al máximo la interfaz visual, requiere la descarga previa del complemento "expander-card" desde **HACS**:
+Exprime al máximo la interfaz visual, requiere la descarga previa del complemento "expander-card" desde **Marketpalace**:
 
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Menús desplegables de la interfaz.
 
@@ -169,7 +169,7 @@ The integration automatically generates **78 native entities** that you can util
 ### 🔹 Basic Mode : [`basic card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Basica.yaml)
 
 ### 🔸 Advanced Mode Requirements: [`advanced card`](https://github.com/DelBierzo/porcentaje_panadero/blob/main/castellano/Tarjeta_Lovelace_Avanzada.yaml)
-Get the most out of the UI by installing 'expander-card' from **HACS** first.
+Get the most out of the UI by installing 'expander-card' from **Marketpalace** first.
 
 * 📦 [expander-card](https://github.com/MelleD/lovelace-expander-card) — Manage drop-down menus in the interface.
 
