@@ -836,15 +836,19 @@ async def cargar_formula_en_sliders_service(call: ServiceCall):
                             "entity_id": id_selector, "option": marca_guardada
                         })
                     else:
-                        _LOGGER.info("La harina '%s' ya no existe en el catálogo. Restableciendo selector de harinas.", marca_guardada)
+                        _LOGGER.info(
+                            "La harina '%s' ya no existe en el catálogo. Restableciendo selector a '%s'.",
+                            marca_guardada,
+                            fallback_default,
+                        )
                         await hass.services.async_call(
                             "select",
                             "select_option",
                             {
                                 "entity_id": id_selector,
-                                "option": "---"
+                                "option": fallback_default,
                             },
-                            blocking=True
+                            blocking=True,
                         )
 
             await inyectar_harina_segura("select.harina_principal_1", "harina_1_nombre", "HARINA 1")
@@ -1032,22 +1036,39 @@ async def sincronizar_selectores_harina(hass: HomeAssistant, lista_harinas):
             for entidad in componente.entities:
                 cambiado = False
                 
-                if hasattr(entidad, "_clave") and entidad._clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"]:
+                clave = getattr(entidad, "_clave", "")
+                eid = entidad.entity_id
+
+                if clave in ["selector_harina_1", "selector_harina_2", "selector_harina_3"] or eid in [
+                    "select.selector_harina_1",
+                    "select.selector_harina_2",
+                    "select.selector_harina_3",
+                    "select.harina_principal_1",
+                    "select.harina_secundaria_2",
+                    "select.harina_secundaria_3",
+                ]:
                     entidad._options = lista_bascula
+                    entidad._attr_options = lista_bascula
+                    if getattr(entidad, "_current_option", None) not in lista_bascula:
+                        if "1" in clave or "1" in eid:
+                            entidad._current_option = "HARINA 1"
+                        elif "2" in clave or "2" in eid:
+                            entidad._current_option = "HARINA 2"
+                        else:
+                            entidad._current_option = "HARINA 3"
                     cambiado = True
-                elif hasattr(entidad, "_clave") and entidad._clave == "retirar_harina_del_inventario":
+
+                elif clave == "retirar_harina_del_inventario" or eid in [
+                    "select.porcentaje_panadero_pan_select_retirar_harina_del_inventario",
+                    "select.retirar_harina_del_inventario",
+                ]:
                     entidad._options = lista_purga
-                    cambiado = True
-                
-                if entidad.entity_id in ["select.selector_harina_1", "select.selector_harina_2", "select.selector_harina_3"]:
-                    entidad._options = lista_bascula
-                    cambiado = True
-                elif entidad.entity_id in ["select.porcentaje_panadero_pan_select_retirar_harina_del_inventario", "select.retirar_harina_del_inventario"]:
-                    entidad._options = lista_purga
+                    entidad._attr_options = lista_purga
+                    if getattr(entidad, "_current_option", None) not in lista_purga:
+                        entidad._current_option = "---"
                     cambiado = True
 
                 if cambiado:
-                    entidad._attr_options = lista_bascula if "retirar" not in entidad.entity_id and "inventario" not in entidad.entity_id else lista_purga
                     entidad.async_write_ha_state()
 
         hass.bus.fire("porcentaje_panadero_harinas_actualizadas", {})
