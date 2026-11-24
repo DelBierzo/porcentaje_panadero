@@ -1,3 +1,10 @@
+const escapeHtml = (str) => String(str ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+  
 class PorcentajePanaderoFormulaCard extends HTMLElement {
   constructor() { 
     super(); 
@@ -33,8 +40,6 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
         card.appendChild(this.content);
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(card);
-        
-        // Inicializamos el interruptor de renderizado limpio
         this._opcionesRellenadas = false;
     }
 
@@ -65,7 +70,7 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
           pctPref = parseFloat(this._hass.states['number.prefermento']?.state || 0);
 
     if (!this._htmlInyectado) {
-        const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+        const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${escapeHtml(this.config.title)}</div>` : '';
         
         this.content.innerHTML = `
             ${titleYaml}
@@ -85,34 +90,40 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
         this._htmlInyectado = true;
     }
 
-    // --- PARCHE DE CONTROL ANTIBUCLES EN EL SELECTOR ---
     const activeEl = this.shadowRoot.activeElement;
     const selF = this.shadowRoot.getElementById('select-formula-card');
     if (selF) {
         const opcionesString = opcionesRecetas.join(',');
-        // Rellenamos el HTML interno del select únicamente si las opciones de la base de datos cambian
         if (!this._opcionesRellenadas || this._cacheOpciones !== opcionesString) {
-            selF.innerHTML = ''; // Vaciamos de forma segura
+            selF.innerHTML = ''; 
+
+            const placeholderOpt = document.createElement('option');
+            placeholderOpt.value = '';
+            placeholderOpt.textContent = '';
+            placeholderOpt.hidden = true;
+            placeholderOpt.disabled = true;
+            placeholderOpt.selected = true;
+            selF.appendChild(placeholderOpt);
+
             opcionesRecetas.forEach(opt => {
+                if (opt === '---' || opt === '') return;
                 const option = document.createElement('option');
                 option.value = opt;
-                option.textContent = opt.toUpperCase(); // Desinfecta el texto automáticamente contra hackers
+                option.textContent = opt.toUpperCase();
                 selF.appendChild(option);
             });
             this._opcionesRellenadas = true;
             this._cacheOpciones = opcionesString;
         }
-        // Actualizamos la opción seleccionada visualmente sin machacar el elemento HTML
         if (activeEl !== selF) {
-            selF.value = recetaSeleccionada;
+            selF.value = '';
         }
     }
 
     const cabeceraTexto = this.shadowRoot.getElementById('cabecera-receta-dinamica');
     if (cabeceraTexto) cabeceraTexto.textContent = recetaActiva;
 
-    
-    const cf = (n, g) => `<div class="ingrediente-row"><span class="ingrediente-nombre">${n}</span><span class="ingrediente-gramos">${g ? `${g} g` : ''}</span></div>`;
+    const cf = (n, g) => `<div class="ingrediente-row"><span class="ingrediente-nombre">${escapeHtml(n)}</span><span class="ingrediente-gramos">${g ? `${escapeHtml(g)} g` : ''}</span></div>`;
 
     const divTZ = this.shadowRoot.getElementById('bloque-tangzhong-dinamico');
     if (divTZ) {
@@ -147,20 +158,15 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
         const pctHP = this._hass.states['sensor.harina_prefermentada']?.state || '0', 
               pctAP = this._hass.states['sensor.hidratacion_del_prefermento']?.state || '100';
         
-        // Leemos los gramos de harina del prefermento directamente del estado del bus de HA
         const gramosHarinaPrefermento = this._hass.states['sensor.pan_harina_prefermento']?.state || '0';
         const gramosAguaPrefermento = this._hass.states['sensor.pan_agua_prefermento']?.state || '0';
-
-        // Leemos directamente del bus lo que el usuario ve en su selector
         const selectorHarinaPref = this._hass.states['select.harina_para_prefermento']?.state || 'harina 1';
         const prefLimpio = selectorHarinaPref.toLowerCase();
 
-        // Nombres comerciales configurados
         const marcaH1 = this._hass.states['select.harina_principal_1']?.state || 'HARINA 1';
         const marcaH2 = this._hass.states['select.harina_secondary_2']?.state || this._hass.states['select.harina_secundaria_2']?.state || 'HARINA 2';
         const marcaH3 = this._hass.states['select.harina_secondary_3']?.state || this._hass.states['select.harina_secundaria_3']?.state || 'HARINA 3';
 
-        // Decisión por número contenido
         let nombreHarinaPrefermento = marcaH1;
         if (prefLimpio.includes('2')) {
             nombreHarinaPrefermento = marcaH2;
@@ -168,7 +174,7 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
             nombreHarinaPrefermento = marcaH3;
         }
 
-        hP += `<div class="ingrediente-row"><span style="font-weight: 500;">${nombreHarinaPrefermento.toUpperCase()} (${pctHP}%)</span><span class="ingrediente-gramos">${gramosHarinaPrefermento} g</span></div><div class="ingrediente-row"><span style="font-weight: 500;">${isEn?'WATER':'AGUA'} (${pctAP}%)</span><span class="ingrediente-gramos">${gramosAguaPrefermento} g</span></div>`;
+        hP += `<div class="ingrediente-row"><span style="font-weight: 500;">${escapeHtml(nombreHarinaPrefermento.toUpperCase())} (${escapeHtml(pctHP)}%)</span><span class="ingrediente-gramos">${escapeHtml(gramosHarinaPrefermento)} g</span></div><div class="ingrediente-row"><span style="font-weight: 500;">${isEn?'WATER':'AGUA'} (${escapeHtml(pctAP)}%)</span><span class="ingrediente-gramos">${escapeHtml(gramosAguaPrefermento)} g</span></div>`;
       } divP.innerHTML = hP;
     }
 
@@ -178,15 +184,12 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
       let hI = ''; const pH1 = this._hass.states['sensor.porcentaje_neto_harina_1']?.state || '0', pH2 = this._hass.states['sensor.porcentaje_neto_harina_2']?.state || '0', pH3 = this._hass.states['sensor.porcentaje_neto_harina_3']?.state || '0';
       const pA = this._hass.states['sensor.porcentaje_hidratacion_final']?.state || '0', pS = this._hass.states['number.sal']?.state || '2', pL = this._hass.states['number.levadura']?.state || '0';
       const marcaH2 = this._hass.states['select.harina_secundaria_2']?.state || (isEn ? 'FLOUR 2' : 'HARINA 2'), marcaH3 = this._hass.states['select.harina_secundaria_3']?.state || (isEn ? 'FLOUR 3' : 'HARINA 3');
-      
       const tLevaFinal = (this._hass.states['button.alternar_fresca_seca']?.state || 'fresca').toUpperCase();
       const textoLevaFinal = isEn ? `${tLevaFinal} YEAST` : `LEVADURA ${tLevaFinal}`;
 
       if (h1 > 0) hI += cf(`${marcaH1.toUpperCase()} (${pH1}%)`, h1); if (h2 > 0) hI += cf(`${marcaH2.toUpperCase()} (${pH2}%)`, h2); if (h3 > 0) hI += cf(`${marcaH3.toUpperCase()} (${pH3}%)`, h3);
       if (agua > 0) hI += cf(`${isEn ? 'WATER' : 'AGUA'} (${pA}%)`, agua); if (sal > 0) hI += cf(`${isEn ? 'SALT' : 'SAL'} (${pS}%)`, sal); 
-      
       if (leva > 0 || parseFloat(pL) > 0) hI += cf(`${textoLevaFinal} (${pL}%)`, leva);
-      
       if (pctPref > 0) { const tPrefReal = (this._hass.states['select.tipo_de_prefermento']?.state || 'POOLISH').toUpperCase(), totPrefPct = this._hass.states['sensor.pan_prefermento_total']?.state || '0', grPrefReales = this._hass.states['sensor.pan_prefermento_total']?.attributes['gramos_totales_reales'] || 0; if (grPrefReales > 0) hI += cf(`${tPrefReal} (${totPrefPct}%)`, grPrefReales); }
       if (tzTotal > 0) { const pctTZMando = this._hass.states['number.tang_zhong']?.state || '0'; hI += cf(`TANG-ZHONG (${pctTZMando}%)`, tzTotal); }
       const malta = parseFloat(this._hass.states['sensor.pan_malta']?.state || 0), azucar = parseFloat(this._hass.states['sensor.pan_azucar']?.state || 0), mantequilla = parseFloat(this._hass.states['sensor.pan_mantequilla']?.state || 0);
@@ -202,12 +205,16 @@ class PorcentajePanaderoFormulaCard extends HTMLElement {
   }
   registrarEventosCard() {
     this.shadowRoot.getElementById('btn-reset-card').addEventListener('click', () => { this._hass.callService('button', 'press', { entity_id: 'button.restablecer_parametros_base' }); });
-    this.shadowRoot.getElementById('select-formula-card').addEventListener('change', (e) => { this._hass.callService('select', 'select_option', { entity_id: 'select.formula_de_receta', option: e.target.value }); });
+    this.shadowRoot.getElementById('select-formula-card').addEventListener('change', (e) => {
+      const elegida = e.target.value;
+      if (!elegida) return;
+      this._hass.callService('select', 'select_option', { entity_id: 'select.formula_de_receta', option: elegida });
+      e.target.value = '';
+    });
   }
   getCardSize() { return 6; }
 }
 customElements.define('porcentaje-panadero-formula-card', PorcentajePanaderoFormulaCard);
-
 
 
 
@@ -235,22 +242,19 @@ class PorcentajePanaderoInfoCard extends HTMLElement {
     const tAguaIdeal = this._hass.states['sensor.pan_temperatura_agua_ideal']?.state || '---';
     const tFisica = this._hass.states['sensor.temperatura_real']?.state || '---';
     const origenTemp = (this._hass.states['select.origen_temperatura_levado']?.state || 'ambiente').toLowerCase();
-
     const tiempoLevado = this._hass.states['sensor.tiempo_de_levado_estimado']?.state || '---';
     const horaFin = this._hass.states['sensor.hora_de_masa_lista_aproximada']?.state || '---';
-
     const totHarinaG = this._hass.states['sensor.pan_harina_total']?.state || '0';
     const totHarinaPct = this._hass.states['sensor.porcentaje_harina_total']?.state || '100';
     const totAguaG = this._hass.states['sensor.pan_agua_total']?.state || '0';
     const totAguaPct = this._hass.states['number.agua_hidratacion']?.state || '0';
-    
     const tzTotal = parseFloat(this._hass.states['sensor.tang_zhong_total']?.state || 0);
     const tzPct = parseFloat(this._hass.states['number.tang_zhong']?.state || 0);
     const pctPref = parseFloat(this._hass.states['number.prefermento']?.state || 0);
     const tipoPref = (this._hass.states['select.tipo_de_prefermento']?.state || 'poolish').toLowerCase();
 
     if (!this._htmlInyectado) {
-      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${escapeHtml(this.config.title)}</div>` : '';
 
       this.content.innerHTML = `
         ${titleYaml}
@@ -301,7 +305,7 @@ class PorcentajePanaderoInfoCard extends HTMLElement {
       if (pctPref > 0) {
         const totPrefPct = this._hass.states['sensor.pan_prefermento_total']?.state || '0';
         const grPrefReales = this._hass.states['sensor.pan_prefermento_total']?.attributes['gramos_totales_reales'] || 0;
-        divPref.innerHTML = `<div class="ingrediente-row" style="border-bottom: none;"><span class="ingrediente-nombre">TOTAL ${tipoPref.toUpperCase()} (${totPrefPct}%)</span><span class="ingrediente-gramos">${grPrefReales} g</span></div>`;
+        divPref.innerHTML = `<div class="ingrediente-row" style="border-bottom: none;"><span class="ingrediente-nombre">TOTAL ${escapeHtml(tipoPref.toUpperCase())} (${escapeHtml(totPrefPct)}%)</span><span class="ingrediente-gramos">${escapeHtml(grPrefReales)} g</span></div>`;
       } else { divPref.innerHTML = ''; }
     }
   }
@@ -384,12 +388,12 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     }
 
     if (!this._htmlInyectado){
-      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${escapeHtml(this.config.title)}</div>` : '';
       
       this.content.innerHTML = `
         ${titleYaml}
         <div class="sub-seccion">${isEn ? 'ADD NEW FORMULA' : 'AÑADIR FÓRMULA NUEVA'}</div>
-        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-formula-nueva" placeholder="${isEn ? 'Formula name...' : 'Nombre de la fórmula...'}" value="${valFormulaNueva}"><button class="btn-guardar" id="btn-guardar-formula-nueva"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
+        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-formula-nueva" placeholder="${isEn ? 'Formula name...' : 'Nombre de la fórmula...'}" value="${escapeHtml(valFormulaNueva)}"><button class="btn-guardar" id="btn-guardar-formula-nueva"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: #2196f3;">${isEn ? 'CURRENT FORMULA MANAGEMENT' : 'GESTIÓN DE FÓRMULA SELECCIONADA'}</div>
         <span id="receta-actual-cargada">---</span>
@@ -399,7 +403,7 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         </div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: var(--success-color, #4caf50);">${isEn ? 'REGISTER FLOUR IN DATABASE' : 'REGISTRAR HARINA EN LA BASE DE DATOS'}</div>
-        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-harina-nueva" placeholder="${isEn ? 'Brand / Type...' : 'Marca / Tipo de harina...'}" value="${valHarinaNueva}"><button class="btn-guardar" id="btn-anadir-harina"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
+        <div class="fila-inline"><input type="text" class="input-text-pan" id="input-harina-nueva" placeholder="${isEn ? 'Brand / Type...' : 'Marca / Tipo de harina...'}" value="${escapeHtml(valHarinaNueva)}"><button class="btn-guardar" id="btn-anadir-harina"> 💾 ${isEn ? 'SAVE' : 'GUARDAR'}</button></div>
         <div class="divider"></div>
         <div class="sub-seccion" style="border-left-color: var(--error-color, #db4437);">${isEn ? 'DELETE FLOUR FROM DATABASE' : 'ELIMINAR HARINA DE LA BASE DE DATOS'}</div>
         <select id="select-retirar-harina"></select>
@@ -421,7 +425,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         btnGuardarArriba.style.backgroundColor = "#2e7d32"; 
         btnGuardarArriba.disabled = true;
 
-        // Aseguramos el vaciado del cuadro físico al tener éxito
         const cuadroFormulaDefinitivo = this.shadowRoot.getElementById('input-formula-nueva');
         if (cuadroFormulaDefinitivo) {
             cuadroFormulaDefinitivo.value = '';
@@ -431,7 +434,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         btnGuardarArriba.style.backgroundColor = "var(--success-color, #4caf50)";
         btnGuardarArriba.disabled = false;
 
-        // BLINDAJE ANTIBORRADO: Solo actualiza desde Home Assistant si no estás escribiendo en él
         const inputFormulaNueva = this.shadowRoot.getElementById('input-formula-nueva');
         if (inputFormulaNueva && this.shadowRoot.activeElement !== inputFormulaNueva) {
           // Si en Home Assistant está vacío, unknown o unavailable, forzamos que se vea vacío en pantalla
@@ -478,7 +480,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
         btnRegHarina.style.backgroundColor = "#2e7d32";
         btnRegHarina.disabled = true;
         
-        // CORRECCIÓN DIRECTA: Forzamos al cuadro de texto de la pantalla a quedarse en blanco
         const cuadroTextoDefinitivo = this.shadowRoot.getElementById('input-harina-nueva');
         if (cuadroTextoDefinitivo) {
             cuadroTextoDefinitivo.value = '';
@@ -512,7 +513,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
                 selRetHar.innerHTML = ''; 
                 
                 opcionesRetirarHarina.forEach(opt => {
-                    // CORRECCIÓN DIRECTA: Purgamos tanto los guiones como los textos por defecto
                     if (opt === '---' || opt === '' || opt.toLowerCase().includes('select')) return;
                     
                     const option = document.createElement('option');
@@ -539,7 +539,6 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     this.shadowRoot.getElementById('input-harina-nueva').addEventListener('change',(e) => { this._hass.callService('text', 'set_value',{ entity_id: 'text.nombre_nueva_harina', value: e.target.value }); });
     this.shadowRoot.getElementById('select-retirar-harina').addEventListener('change',(e) => { this._hass.callService('select', 'select_option',{ entity_id: 'select.porcentaje_panadero_pan_select_retirar_harina_del_inventario', option: e.target.value }); });
     
-    // CORRECCIÓN: Borrado inmediato en la pantalla al pulsar guardar receta y temporizador de restablecimiento
     this.shadowRoot.getElementById('btn-guardar-formula-nueva').addEventListener('click', () => { 
       this._hass.callService('porcentaje_panadero', 'guardar_formula'); 
       const cuadroFormula = this.shadowRoot.getElementById('input-formula-nueva');
@@ -583,11 +582,11 @@ class PorcentajePanaderoControlPanelCard extends HTMLElement {
     }
   }
 
-
-  
   getCardSize() { return 10;}
 }
 customElements.define('porcentaje-panadero-control-panel-card', PorcentajePanaderoControlPanelCard);
+
+
 
 
 class PorcentajePanaderoControlTermicoCard extends HTMLElement {
@@ -623,7 +622,6 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
       .tile-name { font-size: 14px; font-weight: 500; color: var(--secondary-text-color); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .tile-state { font-size: 1.2rem; font-weight: bold; color: var(--primary-text-color); margin-top: 2px; }
       
-      /* Reducido el control al 40% fijo con botones +- igual que en la calculadora */
       .tile-control { width: 40%; display: flex; align-items: center; gap: 6px; }
       .custom-slider-input { flex: 1; height: 20px; display: block !important; opacity: 1 !important; visibility: visible !important; cursor: pointer; min-width: 0; }
       .btn-step { background-color: var(--secondary-background-color, #eee); color: var(--primary-text-color); border: none; width: 26px; height: 26px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; flex-shrink: 0; }
@@ -649,7 +647,7 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
     const pctPrefermento = parseFloat(this._hass.states['number.prefermento']?.state || 0);
 
     if (!this._htmlInyectado) {
-      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${escapeHtml(this.config.title)}</div>` : '';
       
       const secAgua = isEn ? 'IDEAL WATER TEMPERATURE' : 'TEMPERATURA IDEAL DEL AGUA';
       const secLevado = isEn ? 'PROOFING TEMPERATURE' : 'TEMPERATURA DE LEVADO';
@@ -682,17 +680,14 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
       const valorSeleccionado = entState.state || '---';
       const selectExistente = targetDiv.querySelector('.tile-select');
 
-      // CORRECCIÓN: Si el número de harinas o su contenido cambia, invalidamos la caché inmediatamente
       const opcionesStringActual = opciones.join(',');
       if (!selectExistente || targetDiv._cacheOpcionesSelect !== opcionesStringActual) {
         const containerDiv = document.createElement('div');
         containerDiv.className = 'tile-row tile-row-select';
-        
         const labelSpan = document.createElement('span');
         labelSpan.className = 'tile-name';
         labelSpan.textContent = nombre;
         containerDiv.appendChild(labelSpan);
-        
         const selectEl = document.createElement('select');
         selectEl.className = 'tile-select';
         
@@ -709,10 +704,7 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
         containerDiv.appendChild(selectEl);
         targetDiv.innerHTML = '';
         targetDiv.appendChild(containerDiv);
-        
-        // Guardamos el string exacto en el elemento del DOM para validar cambios futuros
         targetDiv._cacheOpcionesSelect = opcionesStringActual;
-        
         targetDiv.querySelector('.tile-select').addEventListener('change', (e) => {
           this._hass.callService('select', 'select_option', { entity_id: entidad, option: e.target.value });
         });
@@ -740,7 +732,7 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
       if (!sliderExistente) {
         targetDiv.innerHTML = `
           <div class="tile-row">
-            <div class="tile-info"><span class="tile-name">${nombre}</span><span class="tile-state">${val}${sufijo}</span></div>
+            <div class="tile-info"><span class="tile-name">${escapeHtml(nombre)}</span><span class="tile-state">${val}${sufijo}</span></div>
             <div class="tile-control">
               <button class="btn-step btn-minus">−</button>
               <input type="range" class="custom-slider-input" min="${min}" max="${max}" step="${step}" value="${val}">
@@ -860,7 +852,6 @@ class PorcentajePanaderoControlTermicoCard extends HTMLElement {
 
   getCardSize() { return 6; }
 }
-
 customElements.define('porcentaje-panadero-control-termico-card', PorcentajePanaderoControlTermicoCard);
 
 
@@ -892,11 +883,11 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
   registrarEscuchaHarinasCalculadora() {
     if (!this._escuchaHarinasCalculadoraRegistrada && this._hass && this._hass.connection) {
       this._hass.connection.subscribeEvents(() => {
-        const selectoresIds = ['select-h1', 'select-h2', 'select-h3'];
+        const selectoresIds = ['combo-h1', 'combo-h2', 'combo-h3'];
         selectoresIds.forEach(id => {
           const contenedor = this.shadowRoot.getElementById(id);
           if (contenedor) {
-            delete contenedor._cacheOpcionesSelect;
+            delete contenedor._cacheOpciones;
           }
         });
         this.updateCard();
@@ -918,20 +909,16 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
       
       .tile-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; border-radius: 12px; background-color: var(--card-background-color, #fff); border: 1px solid var(--divider-color, rgba(0,0,0,0.1)); gap: 12px; }
       .tile-row-select { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .tile-row-harina-combo { flex-direction: column; align-items: stretch; gap: 10px; }
+      .tile-harina-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; }
       .tile-info { flex: 1; display: flex; flex-direction: column; min-width: 0; }
       .tile-name { font-size: 14px; font-weight: 500; color: var(--secondary-text-color); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      
-      /* El número del porcentaje vuelve a ser grande de forma unificada */
       .tile-state { font-size: 1.2rem; font-weight: bold; color: var(--primary-text-color); margin-top: 2px; }
-      
-      /* Ajuste específico para reducir un pelín el texto de TIPO DE LEVADURA (FRESCA / SECA) */
       .tile-state-leva-tipo { font-size: 1.05rem !important; font-weight: bold; margin-top: 2px; text-transform: uppercase; }
-      
       .tile-control { width: 40%; display: flex; align-items: center; gap: 6px; }
       .custom-slider-input { flex: 1; height: 20px; display: block !important; opacity: 1 !important; visibility: visible !important; cursor: pointer; min-width: 0; }
       .btn-step { background-color: var(--secondary-background-color, #eee); color: var(--primary-text-color); border: none; width: 26px; height: 26px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; flex-shrink: 0; }
       .btn-step:active { background-color: var(--divider-color, #ccc); }
-      
       .tile-select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--divider-color, #ccc); background-color: var(--card-background-color, #fff); color: var(--primary-text-color); font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; box-sizing: border-box; }
       .badge-status { font-size: 13px; font-weight: bold; text-transform: uppercase; }
       .btn-tile-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; text-transform: uppercase; transition: opacity 0.1s ease; }
@@ -974,23 +961,18 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
     if (!this._hass) return;
 
     const lang = this._hass.language || 'es', isEn = lang.startsWith('en');
-
     const prefermentoState = this._hass.states['number.prefermento'];
     const pctPrefermento = prefermentoState ? parseFloat(prefermentoState.state || 0) : 0;
     const tipoPrefReal = (this._hass.states['select.tipo_de_prefermento']?.state || 'poolish').toLowerCase();
-
     const extrasSwitch = this._hass.states['switch.habilitar_ingredientes_extras'];
     const extrasActivos = extrasSwitch ? extrasSwitch.state === 'on' : false;
-
     const marcaHarina1 = this._hass.states['select.harina_principal_1']?.state || (isEn ? 'FLOUR 1' : 'HARINA 1');
     const marcaHarina2 = this._hass.states['select.harina_secundaria_2']?.state || (isEn ? 'FLOUR 2' : 'HARINA 2');
     const marcaHarina3 = this._hass.states['select.harina_secundaria_3']?.state || (isEn ? 'FLOUR 3' : 'HARINA 3');
 
-
     if (!this._htmlInyectado) {
-      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${this.config.title}</div>` : '';
+      const titleYaml = this.config && this.config.title ? `<div style="font-size: 24px; font-weight: normal; color: var(--primary-text-color); margin-bottom: 16px; padding: 4px 0 12px 0;">${escapeHtml(this.config.title)}</div>` : '';
       
-      const secMarcas = isEn ? 'FLOUR FORMULA: BRAND / TYPE' : 'HARINA FÓRMULA: MARCA / TIPO';
       const secPorcentajes = isEn ? 'BAKER PERCENTAGES' : 'PORCENTAJES';
       const secPrefermento = isEn ? 'BIGA / POOLISH / SOURDOUGH' : 'BIGA / POOLISH / MASA MADRE';
 
@@ -998,15 +980,11 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
         ${titleYaml}
         <div id="slider-masa-objetivo"></div>
 
-        <div class="section-divider color-orange"><ha-icon icon="mdi:barley"></ha-icon><span>${secMarcas}</span></div>
-        <div id="select-h1"></div>
-        <div id="select-h2"></div>
-        <div id="select-h3"></div>
-        
-        <div class="section-divider color-orange"><span>${secPorcentajes}</span></div>
-        <div id="slider-h1"></div>
-        <div id="slider-h2"></div>
-        <div id="slider-h3"></div>
+        <div class="section-divider color-orange"><ha-icon icon="mdi:barley"></ha-icon><span>${secPorcentajes}</span></div>
+        <div id="combo-h1"></div>
+        <div id="combo-h2"></div>
+        <div id="combo-h3"></div>
+
         <div id="slider-agua"></div>
         <div id="slider-sal"></div>
         <div id="row-tipo-levadura"></div>
@@ -1048,11 +1026,9 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
       const opciones = entState.attributes['options'] || [];
       const valorSeleccionado = entState.state || '---';
       
-      // Creamos un string con las opciones actuales para saber si han cambiado de verdad
       const opcionesString = opciones.join(',');
       let selectEl = targetDiv.querySelector('.tile-select');
 
-      // Si el selector no existe o la lista de harinas ha cambiado, lo redibujamos
       if (!selectEl || targetDiv._cacheOpciones !== opcionesString) {
         const containerDiv = document.createElement('div');
         containerDiv.className = 'tile-row tile-row-select';
@@ -1076,8 +1052,6 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
         containerDiv.appendChild(selectEl);
         targetDiv.innerHTML = '';
         targetDiv.appendChild(containerDiv);
-        
-        // Guardamos la lista en la caché del contenedor para evitar bucles
         targetDiv._cacheOpciones = opcionesString;
         
         selectEl.addEventListener('change', (e) => {
@@ -1111,7 +1085,7 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
       if (!sliderExistente) {
         targetDiv.innerHTML = `
           <div class="tile-row">
-            <div class="tile-info"><span class="tile-name">${nombre}</span><span class="tile-state">${val} ${sufijo}</span></div>
+            <div class="tile-info"><span class="tile-name">${escapeHtml(nombre)}</span><span class="tile-state">${val} ${sufijo}</span></div>
             <div class="tile-control">
               <button class="btn-step btn-minus">−</button>
               <input type="range" class="custom-slider-input ${claseColorSlider}" min="${min}" max="${max}" step="${step}" value="${val}">
@@ -1159,19 +1133,115 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
       }
     };
 
+    const actualizarHarinaCombo = (contenedorId, etiquetaPlaceholder, entidadSelect, entidadNumber, claseColorSlider = 'slider-orange') => {
+      const targetDiv = this.shadowRoot.getElementById(contenedorId);
+      if (!targetDiv) return;
+
+      const selState = this._hass.states[entidadSelect];
+      const numState = this._hass.states[entidadNumber];
+      if (!selState || !numState || numState.state === undefined) {
+        targetDiv.style.display = 'none';
+        return;
+      }
+
+      const opciones = selState.attributes['options'] || [];
+      const valorSeleccionado = selState.state || '---';
+      const opcionesString = opciones.join(',');
+
+      const val = parseFloat(numState.state);
+      const min = numState.attributes.min !== undefined ? numState.attributes.min : 0;
+      const max = numState.attributes.max !== undefined ? numState.attributes.max : 100;
+      const step = numState.attributes.step !== undefined ? numState.attributes.step : 1;
+
+      let selectEl = targetDiv.querySelector('.tile-select');
+      let sliderEl = targetDiv.querySelector('.custom-slider-input');
+
+      if (!selectEl || !sliderEl) {
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'tile-row tile-row-harina-combo';
+
+        selectEl = document.createElement('select');
+        selectEl.className = 'tile-select';
+        selectEl.setAttribute('aria-label', etiquetaPlaceholder);
+        opciones.forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt.toUpperCase();
+          if (opt === valorSeleccionado) option.selected = true;
+          selectEl.appendChild(option);
+        });
+        containerDiv.appendChild(selectEl);
+
+        const bottomDiv = document.createElement('div');
+        bottomDiv.className = 'tile-harina-bottom';
+        bottomDiv.innerHTML = `
+          <div class="tile-info"><span class="tile-state">${val} %</span></div>
+          <div class="tile-control">
+            <button class="btn-step btn-minus">−</button>
+            <input type="range" class="custom-slider-input ${claseColorSlider}" min="${min}" max="${max}" step="${step}" value="${val}">
+            <button class="btn-step btn-plus">+</button>
+          </div>
+        `;
+        containerDiv.appendChild(bottomDiv);
+
+        targetDiv.innerHTML = '';
+        targetDiv.appendChild(containerDiv);
+        targetDiv._cacheOpciones = opcionesString;
+
+        selectEl.addEventListener('change', (e) => {
+          this._hass.callService('select', 'select_option', { entity_id: entidadSelect, option: e.target.value });
+        });
+
+        const inputEl = targetDiv.querySelector('.custom-slider-input');
+        const stateEl = targetDiv.querySelector('.tile-state');
+
+        const enviarServicio = (nuevoValor) => {
+          if (nuevoValor < min) nuevoValor = min;
+          if (nuevoValor > max) nuevoValor = max;
+          const stepStr = step.toString();
+          const decimales = stepStr.includes('.') ? stepStr.split('.')[1].length : 0;
+          nuevoValor = parseFloat(nuevoValor.toFixed(decimales));
+
+          stateEl.textContent = `${nuevoValor} %`;
+          inputEl.value = nuevoValor;
+          this._hass.callService('number', 'set_value', { entity_id: entidadNumber, value: nuevoValor });
+        };
+
+        inputEl.addEventListener('input', (e) => enviarServicio(parseFloat(e.target.value)));
+        targetDiv.querySelector('.btn-minus').addEventListener('click', () => enviarServicio(parseFloat(inputEl.value) - step));
+        targetDiv.querySelector('.btn-plus').addEventListener('click', () => enviarServicio(parseFloat(inputEl.value) + step));
+      } else {
+        if (targetDiv._cacheOpciones !== opcionesString) {
+          selectEl.innerHTML = '';
+          opciones.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.textContent = opt.toUpperCase();
+            if (opt === valorSeleccionado) option.selected = true;
+            selectEl.appendChild(option);
+          });
+          targetDiv._cacheOpciones = opcionesString;
+        } else if (this.shadowRoot.activeElement !== selectEl && selectEl.value !== valorSeleccionado) {
+          selectEl.value = valorSeleccionado;
+        }
+
+        if (this.shadowRoot.activeElement !== sliderEl) {
+          sliderEl.value = val;
+          const stateEl = targetDiv.querySelector('.tile-state');
+          if (stateEl) stateEl.textContent = `${val} %`;
+        }
+      }
+      targetDiv.style.display = 'block';
+    };
+
     actualizarSliderFila('slider-masa-objetivo', isEn ? 'TOTAL DOUGH WEIGHT' : 'CANTIDAD DE MASA', 'number.masa_final_objetivo', 'g', 50, 'slider-green');
-    
-    // CORRECCIÓN DE IDS: Alineado perfecto con tu arquitectura original
-    actualizarSelectFila('select-h1', isEn ? 'FLOUR TYPE 1' : 'HARINA 1', 'select.harina_principal_1');
-    actualizarSelectFila('select-h2', isEn ? 'FLOUR TYPE 2' : 'HARINA 2', 'select.harina_secundaria_2');
-    actualizarSelectFila('select-h3', isEn ? 'FLOUR TYPE 3' : 'HARINA 3', 'select.harina_secundaria_3');
-	
-    actualizarSliderFila('slider-h1', marcaHarina1.toUpperCase(), 'number.harina_1', '%', null, 'slider-orange');
-    actualizarSliderFila('slider-h2', marcaHarina2.toUpperCase(), 'number.harina_2', '%', null, 'slider-orange');
-    actualizarSliderFila('slider-h3', marcaHarina3.toUpperCase(), 'number.harina_3', '%', null, 'slider-orange');
+
+    actualizarHarinaCombo('combo-h1', isEn ? 'FLOUR 1' : 'HARINA 1', 'select.harina_principal_1', 'number.harina_1', 'slider-orange');
+    actualizarHarinaCombo('combo-h2', isEn ? 'FLOUR 2' : 'HARINA 2', 'select.harina_secundaria_2', 'number.harina_2', 'slider-orange');
+    actualizarHarinaCombo('combo-h3', isEn ? 'FLOUR 3' : 'HARINA 3', 'select.harina_secundaria_3', 'number.harina_3', 'slider-orange');
+
     actualizarSliderFila('slider-agua', isEn ? 'WATER' : 'AGUA', 'number.agua_hidratacion', '%', null, 'slider-orange');
     actualizarSliderFila('slider-sal', isEn ? 'SALT' : 'SAL', 'number.sal', '%', null, 'slider-orange');
-
 
     const divTipoLeva = this.shadowRoot.getElementById('row-tipo-levadura');
     if (divTipoLeva) {
@@ -1191,7 +1261,6 @@ class PorcentajePanaderoCalculadoraCard extends HTMLElement {
     }
 
     actualizarSliderFila('slider-leva', isEn ? 'YEAST' : 'LEVADURA', 'number.levadura', '%', null, 'slider-orange');
-
     actualizarSliderFila('slider-prefermento', isEn ? 'PREFERMENT' : 'PREFERMENTO', 'number.prefermento', '%', null, 'slider-indigo');
 
     const divTipoPref = this.shadowRoot.getElementById('select-tipo-prefermento');
