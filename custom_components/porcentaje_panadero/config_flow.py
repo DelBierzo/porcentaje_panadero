@@ -14,6 +14,9 @@ class PorcentajePanaderoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Primer paso cuando el usuario añade la integración desde la interfaz."""
+        if self._async_current_entries():
+            return self.async_abort(reason="single_instance_allowed")
+
         errores = {}
 
         if user_input is not None:

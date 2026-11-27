@@ -14,5 +14,6 @@
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/DelBierzo/porcentaje_panadero/issues",
   "requirements": [],
-  "version": "5.0.2"
+  "single_config_entry": true,
+  "version": "5.0.3"
 }
