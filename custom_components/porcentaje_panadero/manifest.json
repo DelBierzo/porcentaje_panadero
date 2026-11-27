@@ -1,6 +1,9 @@
 {
   "domain": "porcentaje_panadero",
   "name": "Porcentaje Panadero",
+  "after_dependencies": [
+    "lovelace"
+  ],
   "codeowners": ["@DelBierzo"],
   "config_flow": true,
   "dependencies": [
