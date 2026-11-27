@@ -1,10 +1,14 @@
 import os
 import asyncio
 import logging
-from homeassistant.core import HomeAssistant, ServiceCall
+import json
+from pathlib import Path
+from homeassistant.core import HomeAssistant, ServiceCall, Event
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
+from homeassistant.const import Platform, EVENT_HOMEASSISTANT_STARTED
 from homeassistant.components.http import StaticPathConfig
+from homeassistant.components.frontend import add_extra_js_url
+from homeassistant.components.lovelace.resources import ResourceStorageCollection
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 import homeassistant.helpers.config_validation as cv
@@ -427,13 +431,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN]["formulas"] = data_formulas
     hass.data[DOMAIN]["harinas"] = listado_harinas
 
-    await hass.http.async_register_static_paths([
-        StaticPathConfig(
-            url_path="/porcentaje_panadero_ui",
-            path=hass.config.path("custom_components/porcentaje_panadero/www"),
-            cache_headers=False
-        )
-    ])
+    if not hass.data[DOMAIN].get("static_registered"):
+        try:
+            await hass.http.async_register_static_paths([
+                StaticPathConfig(
+                    url_path="/porcentaje_panadero_ui",
+                    path=hass.config.path("custom_components/porcentaje_panadero/www"),
+                    cache_headers=False
+                )
+            ])
+        except RuntimeError:
+            pass
+        hass.data[DOMAIN]["static_registered"] = True
+
+    if hass.is_running:
+        await _async_registrar_recurso_lovelace(hass)
+    else:
+        async def _registrar_al_arrancar(_event: Event) -> None:
+            await _async_registrar_recurso_lovelace(hass)
+
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _registrar_al_arrancar)
+
 
     await sincronizar_selectores_harina(hass, listado_harinas)
 
@@ -467,9 +485,64 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hass.services.async_remove(DOMAIN, servicio)
             
         if DOMAIN in hass.data:
-            hass.data.pop(DOMAIN)
+            hass.data[DOMAIN].pop(entry.entry_id, None)
 
     return unload_ok
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Elimina el recurso JS de Lovelace cuando el usuario borra la integración."""
+    url_base = "/porcentaje_panadero_ui/porcentaje-panadero-card.js"
+
+    lovelace = hass.data.get("lovelace")
+    if lovelace and getattr(lovelace, "resources", None):
+        resources = lovelace.resources
+        if isinstance(resources, ResourceStorageCollection):
+            if not resources.loaded:
+                await resources.async_load()
+
+            for r in list(resources.async_items()):
+                if r.get("url", "").startswith(url_base):
+                    _LOGGER.info("Eliminando recurso Lovelace al desinstalar: %s", r.get("url"))
+                    await resources.async_delete_item(r["id"])
+                    
+async def _async_registrar_recurso_lovelace(hass: HomeAssistant) -> None:
+    """Registra o actualiza automáticamente la tarjeta JS en los recursos de Lovelace."""
+    manifest_path = Path(__file__).parent / "manifest.json"
+    try:
+        manifest_data = await hass.async_add_executor_job(
+            lambda: json.loads(manifest_path.read_text(encoding="utf-8"))
+        )
+        version = manifest_data.get("version", "5.0.1")
+    except Exception:
+        version = "5.0.1"
+
+    url_base = "/porcentaje_panadero_ui/porcentaje-panadero-card.js"
+    url_versionada = f"{url_base}?v={version}"
+
+    lovelace = hass.data.get("lovelace")
+    if lovelace and getattr(lovelace, "resources", None):
+        resources = lovelace.resources
+        if isinstance(resources, ResourceStorageCollection):
+            if not resources.loaded:
+                await resources.async_load()
+
+            existente = next(
+                (r for r in resources.async_items() if r.get("url", "").startswith(url_base)),
+                None,
+            )
+
+            if existente is None:
+                _LOGGER.info("Registrando recurso Lovelace automáticamente: %s", url_versionada)
+                await resources.async_create_item({"res_type": "module", "url": url_versionada})
+            elif existente.get("url") != url_versionada:
+                _LOGGER.info("Actualizando versión de recurso Lovelace a: %s", url_versionada)
+                await resources.async_update_item(
+                    existente["id"], {"res_type": "module", "url": url_versionada}
+                )
+            return
+
+    # Fallback para usuarios que gestionan Lovelace mediante archivos YAML
+    add_extra_js_url(hass, url_versionada)
 
 # ==========================================
 #     MÓDULOS DE LECTURA E INYECCIÓN DE UI
